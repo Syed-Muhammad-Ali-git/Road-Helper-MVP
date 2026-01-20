@@ -75,6 +75,7 @@ const LoginForm: React.FC = () => {
             <Button
               type="submit"
               fullWidth
+              className="manrope-font"
               style={{
                 backgroundColor: "#FF8A3D",
                 color: "black",
