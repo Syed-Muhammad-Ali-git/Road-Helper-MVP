@@ -5,7 +5,7 @@ const Login = () => {
   return (
     <>
       {/* Form Container */}
-      <div className="flex justify-center w-full xl:mr-40 mt-25 md:mt-0 p-5 satoshi-font">
+      <div className="flex justify-center w-full xl:mr-40 mt-25 md:mt-0 p-5 ">
         <div className="w-120">
           <h1 className="text-3xl md:text-4xl font-semibold mb-2 manrope-font">
             Road Helper

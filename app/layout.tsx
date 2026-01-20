@@ -66,7 +66,7 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
       </head>
       <body>
         {/* ---------------- MANTINE PROVIDER ---------------- */}
-        <MantineProvider>{children}</MantineProvider>
+        <MantineProvider theme={{ fontFamily: 'Satosi, sans-serif' }}>{children}</MantineProvider>
       </body>
     </html>
   );
