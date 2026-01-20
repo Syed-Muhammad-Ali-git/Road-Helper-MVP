@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useEffect } from "react";
-import { Stack, TextInput, PasswordInput, Button } from "@mantine/core";
+import { Stack, TextInput, PasswordInput, Button, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { z } from "zod";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const LoginForm: React.FC = () => {
   const router = useRouter();
@@ -85,6 +86,16 @@ const LoginForm: React.FC = () => {
               Login
             </Button>
           </Stack>
+
+          {/* Already have account */}
+          <div className="flex justify-center mt-4">
+            <Text size="sm" c="#697586">
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className="text-[#FF8A3D] font-semibold">
+                Signup
+              </Link>
+            </Text>
+          </div>
         </form>
       </Stack>
 
