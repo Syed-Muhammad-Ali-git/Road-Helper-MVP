@@ -21,7 +21,7 @@ import {
 } from "@tabler/icons-react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "@/redux/store";
-import { logoutUserAction } from "@/redux/actions/auth-action";
+import { logoutUserAction } from "@/redux/actions/auth-action/auth-action";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 
@@ -37,7 +37,7 @@ export default function Header({ opened, toggle }: HeaderProps) {
 
     const handleLogout = async () => {
         await dispatch(logoutUserAction());
-        router.push("/auth/login");
+        router.push("/login");
     };
 
     return (

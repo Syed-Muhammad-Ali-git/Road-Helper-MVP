@@ -16,13 +16,15 @@ import {
     IconMapPin,
     IconWallet,
     IconListDetails,
-    IconArrowLeftRight
+    IconArrowLeftRight,
+    IconLogout
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useSelector } from "react-redux";
-import { RootState } from "@/redux/store";
+import { usePathname, useRouter } from "next/navigation";
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "@/redux/store";
 import { motion } from "framer-motion";
+import { logoutUserAction } from "@/redux/actions/auth-action/auth-action";
 
 const clientItems = [
     { icon: IconDashboard, label: 'Dashboard', href: '/client/dashboard' },
@@ -41,13 +43,20 @@ const helperItems = [
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
+    const dispatch: AppDispatch = useDispatch();
     const { userData } = useSelector((state: RootState) => state.auth);
 
     const items = userData?.role === 'helper' ? helperItems : clientItems;
 
+    const handleLogout = async () => {
+        await dispatch(logoutUserAction());
+        router.replace("/login");
+    };
+
     return (
-        <Box className="w-full bg-[#fcfcfc] h-[calc(100vh-70px)] p-4 border-r overflow-y-auto">
-            <Stack gap="xs">
+        <Box className="w-full bg-[#fcfcfc] h-[calc(100vh-70px)] p-4 border-r flex flex-col justify-between">
+            <Stack gap="xs" className="flex-1 overflow-y-auto">
                 <Text size="xs" fw={700} c="dimmed" tt="uppercase" px="md" mb="xs">
                     Main Menu
                 </Text>
@@ -65,8 +74,8 @@ export default function Sidebar() {
                                 component={Link}
                                 href={item.href}
                                 className={`w-full p-3 rounded-xl flex items-center gap-3 transition-all duration-200 ${active
-                                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
-                                        : 'hover:bg-slate-100 text-slate-600'
+                                    ? 'bg-blue-600 text-white shadow-lg shadow-blue-100'
+                                    : 'hover:bg-slate-100 text-slate-600'
                                     }`}
                             >
                                 <item.icon size={22} stroke={active ? 2.5 : 2} />
@@ -85,6 +94,16 @@ export default function Sidebar() {
                     <Text fw={500} size="sm">Customer Service</Text>
                 </UnstyledButton>
             </Stack>
+
+            <Box pt="md">
+                <UnstyledButton
+                    onClick={handleLogout}
+                    className="w-full p-3 rounded-xl flex items-center gap-3 hover:bg-red-50 text-red-600 transition-all font-bold"
+                >
+                    <IconLogout size={22} />
+                    <Text size="sm">Logout Session</Text>
+                </UnstyledButton>
+            </Box>
         </Box>
     );
 }

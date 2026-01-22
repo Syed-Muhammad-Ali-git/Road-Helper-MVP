@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { publicRoutes } from "./app/utils/routes";
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const token = req.cookies.get("token")?.value || null;
   const { pathname } = req.nextUrl;
 
@@ -19,7 +19,7 @@ export function middleware(req: NextRequest) {
 
   // Redirect to login if accessing protected route without token
   if (!token && !isPublic && pathname !== "/") {
-    return NextResponse.redirect(new URL("/auth/login", req.url));
+    return NextResponse.redirect(new URL("/login", req.url));
   }
 
   // Redirect to dashboard if accessing public route with token

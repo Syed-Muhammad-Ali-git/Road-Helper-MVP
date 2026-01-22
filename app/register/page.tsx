@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
     TextInput,
     PasswordInput,
@@ -25,7 +25,7 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { registerUserAction } from "@/redux/actions/auth-action";
+import { registerUserAction } from "@/redux/actions/auth-action/auth-action";
 import { motion, AnimatePresence } from "framer-motion";
 
 const registerSchema = z.object({
@@ -85,7 +85,7 @@ export default function RegisterPage() {
                         <Title order={2} className="text-4xl font-black text-slate-800 tracking-tight">Register</Title>
                         <Text c="dimmed" size="md" mt={5}>
                             Already have an account?{' '}
-                            <Anchor size="md" component={Link} href="/auth/login" className="font-bold text-blue-600">
+                            <Anchor size="md" component={Link} href="/login" className="font-bold text-blue-600">
                                 Login here
                             </Anchor>
                         </Text>
