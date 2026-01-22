@@ -14,7 +14,6 @@ import {
     Box,
     Image,
     LoadingOverlay,
-    SegmentedControl,
     Select
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -25,28 +24,21 @@ import { toast } from "react-toastify";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/redux/store";
-import { registerUserAction } from "@/redux/actions/auth-action/auth-action";
-import { motion, AnimatePresence } from "framer-motion";
+import { helperRegisterAction } from "@/redux/actions/helper-action";
+import { motion } from "framer-motion";
 
-const registerSchema = z.object({
+const helperSchema = z.object({
     fullName: z.string().min(2, "Name is too short"),
     email: z.string().email("Invalid email"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     phone: z.string().min(10, "Invalid phone number"),
-    role: z.enum(["client", "helper"]),
-    serviceType: z.string().optional(),
-}).refine((data) => {
-    if (data.role === "helper" && !data.serviceType) return false;
-    return true;
-}, {
-    message: "Service type is required for helpers",
-    path: ["serviceType"]
+    serviceType: z.string().min(1, "Service type is required"),
 });
 
 export default function RegisterPage() {
     const router = useRouter();
     const dispatch: AppDispatch = useDispatch();
-    const { loading } = useSelector((state: RootState) => state.auth);
+    const loading = useSelector((state: RootState) => state.helper.loading);
 
     const form = useForm({
         initialValues: {
@@ -54,17 +46,16 @@ export default function RegisterPage() {
             email: "",
             password: "",
             phone: "",
-            role: "client" as "client" | "helper",
             serviceType: "",
         },
-        validate: zodResolver(registerSchema),
+        validate: zodResolver(helperSchema),
     });
 
     const handleSubmit = async (values: typeof form.values) => {
         try {
-            await dispatch(registerUserAction(values));
-            toast.success("Account created successfully!");
-            router.replace("/");
+            await dispatch(helperRegisterAction(values));
+            toast.success("Helper account created successfully!");
+            router.replace("/helper/dashboard");
         } catch (err: any) {
             toast.error(err.message || "Registration failed");
         }
@@ -78,36 +69,17 @@ export default function RegisterPage() {
                 transition={{ duration: 0.6 }}
                 className="flex-1 flex items-center justify-center p-8 bg-white lg:rounded-r-[60px] shadow-2xl z-20 relative order-2 lg:order-1"
             >
-                <LoadingOverlay visible={loading} zIndex={1000} overlayProps={{ blur: 2 }} loaderProps={{ variant: 'bars' }} />
+                <LoadingOverlay visible={loading} zIndex={1000} overlayProps={{ blur: 2 }} />
 
                 <Container size={450} className="w-full">
                     <Box className="mb-8">
-                        <Title order={2} className="text-4xl font-black text-slate-800 tracking-tight">Register</Title>
+                        <Title order={2} className="text-3xl font-black text-slate-800 tracking-tight">Helper Registration</Title>
                         <Text c="dimmed" size="md" mt={5}>
-                            Already have an account?{' '}
+                            Already registered?{' '}
                             <Anchor size="md" component={Link} href="/login" className="font-bold text-blue-600">
                                 Login here
                             </Anchor>
                         </Text>
-                    </Box>
-
-                    <Box className="mb-8">
-                        <Text size="sm" fw={700} mb={8} c="slate.8" tt="uppercase">Register as:</Text>
-                        <SegmentedControl
-                            fullWidth
-                            size="md"
-                            value={form.values.role}
-                            onChange={(value) => form.setFieldValue("role", value as any)}
-                            data={[
-                                { label: 'Client (User)', value: 'client' },
-                                { label: 'Helper (Provider)', value: 'helper' },
-                            ]}
-                            classNames={{
-                                root: "bg-slate-100 p-1 rounded-xl",
-                                indicator: "bg-white shadow-md rounded-lg",
-                                label: "font-bold"
-                            }}
-                        />
                     </Box>
 
                     <form onSubmit={form.onSubmit(handleSubmit)}>
@@ -121,50 +93,38 @@ export default function RegisterPage() {
                                 {...form.getInputProps("fullName")}
                             />
 
-                            <Group grow>
-                                <TextInput
-                                    label="Email"
-                                    placeholder="john@example.com"
-                                    required
-                                    size="md"
-                                    radius="md"
-                                    {...form.getInputProps("email")}
-                                />
-                                <TextInput
-                                    label="Phone"
-                                    placeholder="+1234567890"
-                                    required
-                                    size="md"
-                                    radius="md"
-                                    {...form.getInputProps("phone")}
-                                />
-                            </Group>
+                            <TextInput
+                                label="Email"
+                                placeholder="john@example.com"
+                                required
+                                size="md"
+                                radius="md"
+                                {...form.getInputProps("email")}
+                            />
 
-                            <AnimatePresence mode="wait">
-                                {form.values.role === "helper" && (
-                                    <motion.div
-                                        key="helper-fields"
-                                        initial={{ opacity: 0, height: 0 }}
-                                        animate={{ opacity: 1, height: 'auto' }}
-                                        exit={{ opacity: 0, height: 0 }}
-                                    >
-                                        <Select
-                                            label="Primary Service Type"
-                                            placeholder="Choose your expertise"
-                                            required
-                                            size="md"
-                                            radius="md"
-                                            data={[
-                                                { value: "bike_mechanic", label: "Bike Mechanic" },
-                                                { value: "car_mechanic", label: "Car Mechanic" },
-                                                { value: "fuel_delivery", label: "Fuel Delivery" },
-                                                { value: "towing", label: "Towing Service" },
-                                            ]}
-                                            {...form.getInputProps("serviceType")}
-                                        />
-                                    </motion.div>
-                                )}
-                            </AnimatePresence>
+                            <TextInput
+                                label="Phone"
+                                placeholder="+1234567890"
+                                required
+                                size="md"
+                                radius="md"
+                                {...form.getInputProps("phone")}
+                            />
+
+                            <Select
+                                label="Primary Service Type"
+                                placeholder="Choose your expertise"
+                                required
+                                size="md"
+                                radius="md"
+                                data={[
+                                    { value: "bike_mechanic", label: "Bike Mechanic" },
+                                    { value: "car_mechanic", label: "Car Mechanic" },
+                                    { value: "fuel_delivery", label: "Fuel Delivery" },
+                                    { value: "towing", label: "Towing Service" },
+                                ]}
+                                {...form.getInputProps("serviceType")}
+                            />
 
                             <PasswordInput
                                 label="Password"
@@ -180,9 +140,9 @@ export default function RegisterPage() {
                                 fullWidth
                                 size="lg"
                                 radius="md"
-                                className="bg-blue-600 hover:bg-blue-700 h-14 mt-6 shadow-lg transition-all"
+                                className="bg-indigo-600 h-14 mt-6 shadow-lg transition-all"
                             >
-                                Create Account
+                                Register as Helper
                             </Button>
                         </Stack>
                     </form>
@@ -199,9 +159,9 @@ export default function RegisterPage() {
                     <Image src="/assets/images/logo.jpg" alt="Background" h="100%" w="100%" fit="cover" />
                 </Box>
                 <Stack align="center" gap="xl" className="z-10 text-white text-center">
-                    <Title order={1} className="text-6xl font-black tracking-tight leading-tight">Join the <br /> <span className="text-red-500">HEROES</span></Title>
+                    <Title order={1} className="text-5xl font-black tracking-tight leading-tight">Join Our <br /> <span className="text-red-500">Service Network</span></Title>
                     <Text className="text-xl text-slate-300 max-w-md">
-                        Whether you need help or want to provide it, Road Helper is your platform for reliability.
+                        Help travelers in need and grow your business with Road Helper.
                     </Text>
                 </Stack>
             </motion.div>

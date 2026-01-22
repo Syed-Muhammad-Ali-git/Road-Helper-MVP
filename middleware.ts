@@ -1,8 +1,9 @@
 import { NextResponse, NextRequest } from "next/server";
 import { publicRoutes } from "./app/utils/routes";
 
-export function proxy(req: NextRequest) {
+export function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value || null;
+  const role = req.cookies.get("userRole")?.value || null;
   const { pathname } = req.nextUrl;
 
   // Static files and api routes bypass
@@ -25,6 +26,15 @@ export function proxy(req: NextRequest) {
   // Redirect to dashboard if accessing public route with token
   if (token && isPublic) {
     return NextResponse.redirect(new URL("/", req.url));
+  }
+
+  // Cross-role protection
+  if (token && role === "helper" && pathname.startsWith("/client")) {
+    return NextResponse.redirect(new URL("/helper/dashboard", req.url));
+  }
+
+  if (token && role === "client" && pathname.startsWith("/helper")) {
+    return NextResponse.redirect(new URL("/client/dashboard", req.url));
   }
 
   return NextResponse.next();

@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
-import authReducer from "./reducers/auth-reducer/auth-reducer";
+import customerReducer from "./reducers/customer-reducer";
+import helperReducer from "./reducers/helper-reducer";
 
 const store = configureStore({
   reducer: {
-    auth: authReducer,
+    customer: customerReducer,
+    helper: helperReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
