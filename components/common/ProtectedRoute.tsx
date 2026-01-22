@@ -16,7 +16,6 @@ export function ProtectedRoute({ children, allowedRole }: { children: React.Reac
             if (!user) {
                 router.replace("/auth/login");
             } else if (allowedRole && role !== allowedRole) {
-                // Redirect to their respective dashboard if they try to access wrong side
                 router.replace(role === "client" ? "/client/dashboard" : "/helper/dashboard");
             }
         }
