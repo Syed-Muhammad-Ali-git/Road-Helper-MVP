@@ -15,16 +15,10 @@
   font-style: normal;
 }
 
-@layer base {
-  body {
-    font-family: "Satoshi", sans-serif;
-  }
-}
-
 .satoshi-font {
-  font-family: "Satoshi", sans-serif;
+  font-family: "Satoshi";
 }
 
 .manrope-font {
-  font-family: "Manrope", sans-serif;
+  font-family: "Manrope";
 }

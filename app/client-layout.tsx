@@ -1,104 +1,77 @@
 "use client";
 
-import React, { ReactNode, useEffect, useState, useMemo } from "react";
-import "react-toastify/dist/ReactToastify.css";
+/* ---------------- IMPORTS ---------------- */
+import React, { ReactNode, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import PathChecker from "./utils/pathChecker";
 import { protectedRoutes } from "./utils/routes";
+import useMediaQuery from "@mui/material/useMediaQuery";
 import { ToastContainer } from "react-toastify";
-import { useLayout } from "./context/layoutContext";
-import { Box, Center, Loader, Drawer, Stack, Text } from "@mantine/core";
-import Sidebar from "@/components/sidebar/sidebar";
-import { motion, AnimatePresence } from "framer-motion";
+import "react-toastify/dist/ReactToastify.css";
 
-const drawerWidth = 280;
+/* ---------------- INTERFACES ---------------- */
+interface ClientLayoutProps {
+  children: ReactNode;
+}
 
-const ClientLayoutInner = ({ children }: { children: ReactNode }) => {
+/* ---------------- CONSTANTS ---------------- */
+const drawerWidth = 260;
+
+/* ---------------- COMPONENT ---------------- */
+const ClientLayout = ({ children }: ClientLayoutProps) => {
   const pathname = usePathname();
-  const [drawerOpen, setDrawerOpen] = useState(true);
-  const { isLayoutVisible } = useLayout();
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
+  // ----- MEDIA QUERY FOR DESKTOP VIEW -----
+  const isDesktop = useMediaQuery("(min-width: 900px)");
+
+  // ----- EFFECT TO SET DRAWER STATE BASED ON VIEWPORT -----
   useEffect(() => {
-    if (window.innerWidth < 768) {
-      setDrawerOpen(false);
-    }
-  }, [pathname]);
+    setDrawerOpen(isDesktop);
+  }, [isDesktop]);
 
-  const showSidebar = useMemo(() => {
-    if (!pathname || !isLayoutVisible) return false;
-    return protectedRoutes.includes(pathname) || pathname === "/";
-  }, [pathname, isLayoutVisible]);
+  // ----- DETERMINE IF SIDEBAR SHOULD BE SHOWN -----
+  const showSidebar =
+    protectedRoutes.includes(pathname || "") ||
+    /^\/organization\/[^\/]+$/.test(pathname || ""); // Dynamic org routes
 
+  // ----- DYNAMIC STYLING FOR THE MAIN CONTENT -----
   const mainStyle: React.CSSProperties = {
-    transition: "padding-left 300ms cubic-bezier(0.4, 0, 0.2, 1)",
-    paddingLeft:
-      showSidebar &&
-      drawerOpen &&
-      typeof window !== "undefined" &&
-      window.innerWidth >= 768
+    transition: "margin-left 200ms ease",
+    marginLeft:
+      showSidebar && drawerOpen && pathname
         ? `${drawerWidth}px`
-        : "0",
-    minHeight: "100vh",
-    backgroundColor: "#f8fafc",
-    width: "100%",
+        : showSidebar
+          ? "calc(59px + 1px)"
+          : undefined,
+    paddingTop: showSidebar ? "70px" : "0",
   };
 
   return (
     <>
-      <ToastContainer position="top-right" autoClose={2000} />
+      {/* Toast Notification Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={true}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
 
-      {showSidebar && (
-        <Box
-          className="fixed left-0 top-17.5 bottom-0 z-99 bg-white border-r hidden md:block transition-all duration-300"
-          style={{
-            width: drawerOpen ? drawerWidth : 0,
-            overflow: "hidden",
-            opacity: drawerOpen ? 1 : 0,
-          }}
-        >
-          <Box style={{ width: drawerWidth }}>
-            <Sidebar />
-          </Box>
-        </Box>
-      )}
-
-      <Drawer
-        opened={
-          showSidebar &&
-          drawerOpen &&
-          typeof window !== "undefined" &&
-          window.innerWidth < 768
-        }
-        onClose={() => setDrawerOpen(false)}
-        size={drawerWidth}
-        withCloseButton={false}
-        padding={0}
-        hiddenFrom="md"
-      >
-        <Sidebar />
-      </Drawer>
-
-      <Box className="flex flex-col min-h-screen">
-        <main style={mainStyle} className="relative">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={pathname}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.3 }}
-              className="p-0"
-            >
-              {children}
-            </motion.div>
-          </AnimatePresence>
-        </main>
-      </Box>
+      {/* PATH CHECKER (Handles Sidebar/Header Rendering) */}
+      <PathChecker
+        pathName={pathname}
+        open={drawerOpen}
+        setOpen={setDrawerOpen}
+      />
+      {/* MAIN CONTENT */}
+      <main style={mainStyle}>{children}</main>
     </>
   );
-};
-
-const ClientLayout = ({ children }: { children: ReactNode }) => {
-  return <ClientLayoutInner>{children}</ClientLayoutInner>;
 };
 
 export default ClientLayout;

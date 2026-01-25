@@ -8,12 +8,10 @@ import {
   Title,
   Text,
   Container,
-  Group,
   Anchor,
   Stack,
   Box,
   Image,
-  LoadingOverlay,
   Select,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -49,6 +47,7 @@ export default function RegisterPage() {
   const handleSubmit = async (values: typeof form.values) => {
     console.log("Registration form submitted:", values);
     toast.success("Registration form submitted. Check console for data.");
+    router.push("/helper/dashboard");
   };
 
   return (

@@ -27,7 +27,7 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
         <ColorSchemeScript />
       </head>
       <body cz-shortcut-listen="true">
-        <MantineProvider>
+        <MantineProvider theme={{ fontFamily: "satoshi" }}>
           <LayoutProvider>
             <SearchProvider>
               <ClientLayout>{children}</ClientLayout>
