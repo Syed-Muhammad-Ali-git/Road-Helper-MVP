@@ -16,8 +16,6 @@ import {
   Timeline,
 } from "@mantine/core";
 import {
-  IconMapPin,
-  IconUser,
   IconPhone,
   IconCircleCheck,
   IconClock,
@@ -27,8 +25,8 @@ import {
 
 export default function ActiveJobUI() {
   const [activeJob, setActiveJob] = useState<any>({
-    clientName: "Ali Khan",
-    clientPhone: "+92 300 1234567",
+    customerName: "Ali Khan",
+    customerPhone: "+92 300 1234567",
     location: "Gulshan-e-Iqbal, Karachi",
     vehicleDetails: "Honda Civic Red (ABC-123)",
     issueDescription: "Car broke down near main road, engine not starting.",
@@ -97,14 +95,14 @@ export default function ActiveJobUI() {
           <Group justify="space-between" mb="xl">
             <Group gap="md">
               <Avatar size="xl" radius="md" color="blue">
-                {activeJob.clientName.charAt(0)}
+                {activeJob.customerName.charAt(0)}
               </Avatar>
               <Box>
-                <Title order={3}>{activeJob.clientName}</Title>
+                <Title order={3}>{activeJob.customerName}</Title>
                 <Group gap="xs">
                   <IconPhone size={14} className="text-slate-400" />
                   <Text size="sm" c="dimmed">
-                    {activeJob.clientPhone}
+                    {activeJob.customerPhone}
                   </Text>
                 </Group>
               </Box>

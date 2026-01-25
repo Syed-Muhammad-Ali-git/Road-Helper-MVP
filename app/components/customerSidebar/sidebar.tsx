@@ -85,7 +85,7 @@ const Drawer = styled(MuiDrawer, {
 }));
 
 /* ---------------- COMPONENT ---------------- */
-const HelperSideBar = ({ open, setOpen }: SideBarProps) => {
+const CustomerSideBar = ({ open, setOpen }: SideBarProps) => {
   const router = useRouter();
   const pathname = usePathname();
 
@@ -93,35 +93,37 @@ const HelperSideBar = ({ open, setOpen }: SideBarProps) => {
     {
       text: "Dashboard",
       icon: <Image src={dashboardLogo} alt="" />,
-      path: "/",
+      path: "/customer/dashboard",
     },
     {
-      text: "Organization",
+      text: "Request Help",
       icon: <Image src={organizationLogo} alt="" />,
-      path: "/organization",
+      path: "/customer/request-help",
     },
   ];
 
   const otherMenuItems: SidebarItem[] = [
     {
-      text: "Audit",
+      text: "History",
       icon: <Image src={auditLogo} alt="" />,
-      path: "/audit",
+      path: "/customer/history",
     },
     {
-      text: "Settings",
+      text: "Profile",
       icon: <Image src={settingsLogo} alt="" />,
-      path: "/settings",
+      path: "/customer/profile",
     },
   ];
 
   const renderMenu = (items: SidebarItem[]) =>
     items.map((item) => {
       let isActive = pathname === item.path;
-      if (item.text === "Organization") {
-        isActive = pathname.startsWith("/organization");
+      if (item.text === "Request Help") {
+        isActive = pathname.startsWith("/customer/request-help");
       } else if (item.text === "Dashboard") {
-        isActive = pathname === "/" || pathname.startsWith("/myAccount");
+        isActive =
+          pathname === "/customer/dashboard" ||
+          pathname.startsWith("/customer/request-status");
       }
       return (
         <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
@@ -247,4 +249,4 @@ const HelperSideBar = ({ open, setOpen }: SideBarProps) => {
   );
 };
 
-export default HelperSideBar;
+export default CustomerSideBar;

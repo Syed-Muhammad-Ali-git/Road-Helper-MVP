@@ -1,13 +1,13 @@
 /**
- * Client-specific protected routes
+ * customer-specific protected routes
  */
-const clientRoutes = [
+const customerRoutes = [
   "/",
-  "/client/dashboard",
-  "/client/history",
-  "/client/profile",
-  "/client/request-help",
-  "/client/request-status",
+  "/customer/dashboard",
+  "/customer/history",
+  "/customer/profile",
+  "/customer/request-help",
+  "/customer/request-status",
 ];
 
 /**
@@ -29,6 +29,6 @@ const publicRoutes = ["/login", "/register", "/forgot-password"];
 /**
  * All protected routes (for backward compatibility)
  */
-const protectedRoutes = [...clientRoutes, ...helperRoutes];
+const protectedRoutes = [...customerRoutes, ...helperRoutes];
 
-export { publicRoutes, protectedRoutes, clientRoutes, helperRoutes };
+export { publicRoutes, protectedRoutes, customerRoutes, helperRoutes };

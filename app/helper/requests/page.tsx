@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import {
   Title,
   Text,
@@ -28,7 +28,7 @@ export default function NearbyRequestsUI() {
   const requests = [
     {
       id: "1",
-      clientName: "Ahmed Raza",
+      customerName: "Ahmed Raza",
       vehicleDetails: "Toyota Corolla White (XYZ-123)",
       location: "Gulshan-e-Iqbal, Karachi",
       issueDescription: "Car won't start, engine makes clicking sound",
@@ -36,7 +36,7 @@ export default function NearbyRequestsUI() {
     },
     {
       id: "2",
-      clientName: "Sara Khan",
+      customerName: "Sara Khan",
       vehicleDetails: "Honda Civic Red (ABC-456)",
       location: "Clifton, Karachi",
       issueDescription: "Flat tire, need urgent help to replace it",
@@ -60,7 +60,9 @@ export default function NearbyRequestsUI() {
           <Title order={1} className="text-3xl font-bold text-slate-800">
             Available Jobs
           </Title>
-          <Text c="dimmed">Nearby clients needing your assistance.</Text>
+          <Text c="dimmed">
+            Nearby customer&apos;s needing your assistance.
+          </Text>
         </Box>
 
         {requests.length === 0 ? (
@@ -103,10 +105,10 @@ export default function NearbyRequestsUI() {
                 <Stack gap="md">
                   <Group gap="md">
                     <Avatar color="blue" radius="xl">
-                      {req.clientName.charAt(0)}
+                      {req.customerName.charAt(0)}
                     </Avatar>
                     <Box>
-                      <Text fw={700}>{req.clientName}</Text>
+                      <Text fw={700}>{req.customerName}</Text>
                       <Text size="sm" c="dimmed">
                         {req.vehicleDetails}
                       </Text>

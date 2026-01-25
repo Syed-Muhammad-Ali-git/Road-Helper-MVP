@@ -4,7 +4,7 @@
 import React, { ReactNode, useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import PathChecker from "./utils/pathChecker";
-import { helperRoutes } from "./utils/routes";
+import { helperRoutes, customerRoutes } from "./utils/routes";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -31,7 +31,8 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
   }, [isDesktop]);
 
   // ----- DETERMINE IF SIDEBAR SHOULD BE SHOWN -----
-  const showSidebar = helperRoutes.includes(pathname);
+  const showSidebar =
+    helperRoutes.includes(pathname) || customerRoutes.includes(pathname);
   // ----- DYNAMIC STYLING FOR THE MAIN CONTENT -----
   const mainStyle: React.CSSProperties = {
     transition: "margin-left 200ms ease",
