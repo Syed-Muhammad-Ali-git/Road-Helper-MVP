@@ -1,15 +1,4 @@
 /**
- * Public routes accessible without authentication
- */
-const publicRoutes = [
-  "/login",
-  "/register",
-  "/forgot-password",
-  "/client/login",
-  "/helper/login",
-];
-
-/**
  * Client-specific protected routes
  */
 const clientRoutes = [
@@ -31,6 +20,11 @@ const helperRoutes = [
   "/helper/requests",
   "/helper/active-job",
 ];
+
+/**
+ * Public routes accessible without authentication
+ */
+const publicRoutes = ["/login", "/register", "/forgot-password"];
 
 /**
  * All protected routes (for backward compatibility)
