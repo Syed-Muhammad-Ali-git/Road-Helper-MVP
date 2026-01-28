@@ -1,13 +1,16 @@
-import { Center, Loader, Stack, Text } from "@mantine/core";
+import { LandingNavbar } from "./components/landing/LandingNavbar";
+import { HeroSection } from "./components/landing/HeroSection";
+import { FeaturesSection } from "./components/landing/FeaturesSection";
+import { LandingFooter } from "./components/landing/LandingFooter";
 
 const Home = () => {
   return (
-    <Center className="h-screen bg-slate-50">
-      <Stack align="center">
-        <Loader size="xl" variant="bars" color="blue" />
-        <Text fw={700}>Redirecting to your dashboard...</Text>
-      </Stack>
-    </Center>
+    <main className="min-h-screen bg-white font-satoshi">
+      <LandingNavbar />
+      <HeroSection />
+      <FeaturesSection />
+      <LandingFooter />
+    </main>
   );
 };
 

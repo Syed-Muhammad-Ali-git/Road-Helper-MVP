@@ -28,6 +28,17 @@ const publicRoutes = ["/login", "/register", "/forgot-password"];
 /**
  * All protected routes (for backward compatibility)
  */
-const protectedRoutes = [...customerRoutes, ...helperRoutes];
+const adminRoutes = ["/admin/dashboard"];
 
-export { publicRoutes, protectedRoutes, customerRoutes, helperRoutes };
+/**
+ * All protected routes (for backward compatibility)
+ */
+const protectedRoutes = [...customerRoutes, ...helperRoutes, ...adminRoutes];
+
+export {
+  publicRoutes,
+  protectedRoutes,
+  customerRoutes,
+  helperRoutes,
+  adminRoutes,
+};

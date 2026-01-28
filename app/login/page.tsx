@@ -7,17 +7,11 @@ import {
   Button,
   Title,
   Text,
-  Container,
-  Group,
-  Anchor,
   Stack,
-  Box,
-  Image,
-  LoadingOverlay,
   SegmentedControl,
   Paper,
-  Divider,
 } from "@mantine/core";
+import Image from "next/image";
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { z } from "zod";
@@ -50,220 +44,202 @@ export default function LoginPage() {
   });
 
   const handleCustomerSubmit = async (values: typeof customerForm.values) => {
-    console.log("Customer login form submitted:", values);
-    toast.success("Customer login form submitted. Check console for data.");
+    toast.success("Welcome back!");
     router.replace("/customer/dashboard");
   };
 
   const handleHelperSubmit = async (values: typeof helperForm.values) => {
-    console.log("Helper login form submitted:", values);
-    toast.success("Helper login form submitted. Check console for data.");
+    toast.success("Welcome back, Helper!");
     router.replace("/helper/dashboard");
   };
 
   return (
-    <>
-      <Box className="min-h-screen flex bg-slate-50">
-        <motion.div
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          className="hidden lg:flex flex-1 relative overflow-hidden bg-[#1a237e] items-center justify-center p-12"
-        >
-          <Box className="absolute top-0 left-0 w-full h-full opacity-30 pointer-events-none">
+    <div className="min-h-screen flex bg-white font-satoshi">
+      {/* Left Side - Image */}
+      <motion.div
+        initial={{ opacity: 0, x: -50 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8 }}
+        className="hidden lg:block w-1/2 relative overflow-hidden bg-brand-charcoal"
+      >
+        <Image
+          src="/assets/images/login-sidebar.png"
+          alt="Road Helper Network"
+          fill
+          className="object-cover opacity-80"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-brand-black/90 to-transparent" />
+
+        <div className="absolute bottom-0 left-0 p-16 text-white z-10">
+          <div className="mb-6 w-16 h-16 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20">
             <Image
-              src="/assets/images/ui-design.jpg"
-              alt="Background"
-              h="100%"
-              w="100%"
-              fit="cover"
+              src="/assets/images/logo.jpg"
+              alt="Logo"
+              width={64}
+              height={64}
+              className="object-cover"
             />
-          </Box>
-          <Stack
-            align="center"
-            gap="xl"
-            className="z-10 text-white text-center"
-          >
-            <Title
-              order={1}
-              className="text-6xl font-black tracking-tight leading-tight"
-            >
-              Your Roadside <br />{" "}
-              <span className="text-blue-400">Guardian</span>
-            </Title>
-            <Text className="text-xl text-slate-300 max-w-md font-medium">
-              Instant assistance for car and bike emergencies.
-            </Text>
-          </Stack>
-        </motion.div>
+          </div>
+          <Title className="font-manrope text-5xl font-bold mb-4 leading-tight">
+            Your Safety, <br />
+            <span className="text-brand-red">Our Priority.</span>
+          </Title>
+          <Text className="text-gray-300 text-lg max-w-md">
+            Join thousands of drivers and helpers in the fastest growing
+            roadside assistance network.
+          </Text>
+        </div>
+      </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0, x: 50 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.6 }}
-          className="flex-1 flex items-center justify-center p-8 bg-white lg:rounded-l-[60px] shadow-2xl z-20 relative"
+      {/* Right Side - Form */}
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white relative">
+        <Link
+          href="/"
+          className="absolute top-8 right-8 text-sm font-bold text-brand-charcoal hover:text-brand-red transition-colors"
         >
-          <LoadingOverlay
-            visible={false}
-            zIndex={1000}
-            overlayProps={{ blur: 2 }}
-          />
+          Back to Home
+        </Link>
 
-          <Container size={420} className="w-full">
-            <Box className="mb-8">
-              <Group gap="xs" mb="lg">
-                <Box className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <Text fw={900} c="white">
-                    RH
-                  </Text>
-                </Box>
-                <Text fw={900} size="xl" className="tracking-tighter">
-                  ROAD HELPER
-                </Text>
-              </Group>
-              <Title
-                order={2}
-                className="text-3xl font-black text-slate-800 tracking-tight"
-              >
-                Login Account
+        <div className="w-full max-w-md">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <div className="text-center mb-10">
+              <Title className="font-manrope text-4xl font-bold text-brand-black mb-2">
+                Welcome Back
               </Title>
-            </Box>
+              <Text className="text-gray-500">
+                Please enter your details to sign in.
+              </Text>
+            </div>
 
-            <Paper p="xs" radius="xl" bg="slate.0" mb="xl">
+            <Paper
+              p="md"
+              radius="lg"
+              className="bg-gray-50 border border-gray-100 mb-8"
+            >
               <SegmentedControl
                 fullWidth
                 size="md"
-                radius="xl"
+                radius="md"
                 value={loginType}
                 onChange={setLoginType}
                 data={[
-                  { label: "Customer", value: "customer" },
-                  { label: "Helper", value: "helper" },
+                  { label: "For Drivers", value: "customer" },
+                  { label: "For Helpers", value: "helper" },
                 ]}
                 classNames={{
                   root: "bg-transparent",
-                  indicator: "bg-blue-600",
-                  label: "font-bold text-sm h-10",
-                }}
-                styles={{
-                  label: {
-                    color: "inherit",
-                    "&[data-active]": { color: "white" },
-                  },
+                  indicator: "bg-white shadow-md",
+                  label:
+                    "text-gray-600 data-[active=true]:text-brand-black font-semibold",
                 }}
               />
             </Paper>
 
             <AnimatePresence mode="wait">
               {loginType === "customer" ? (
-                <motion.div
+                <motion.form
                   key="customer"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2 }}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  onSubmit={customerForm.onSubmit(handleCustomerSubmit)}
                 >
-                  <form onSubmit={customerForm.onSubmit(handleCustomerSubmit)}>
-                    <Stack gap="lg">
-                      <TextInput
-                        label="Phone Number"
-                        placeholder="Enter your phone number"
-                        required
-                        size="lg"
-                        radius="md"
-                        {...customerForm.getInputProps("phone")}
-                      />
-                      <Button
-                        type="submit"
-                        fullWidth
-                        size="lg"
-                        radius="md"
-                        className="bg-blue-600 h-14"
-                      >
-                        Continue with Phone
-                      </Button>
-
-                      <Divider label="OR" labelPosition="center" my="sm" />
-
-                      <Button
-                        variant="default"
-                        fullWidth
-                        size="lg"
-                        radius="md"
-                        leftSection={
-                          <Image
-                            src="https://www.google.com/favicon.ico"
-                            alt="google icon"
-                            w={16}
-                            h={16}
-                          />
-                        }
-                        onClick={() => toast.info("Google Login coming soon!")}
-                      >
-                        Continue with Google
-                      </Button>
-                    </Stack>
-                  </form>
-                </motion.div>
+                  <Stack>
+                    <TextInput
+                      label="Phone Number"
+                      placeholder="+1 (555) 000-0000"
+                      size="lg"
+                      radius="md"
+                      classNames={{
+                        input:
+                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                      }}
+                      {...customerForm.getInputProps("phone")}
+                    />
+                    <Button
+                      type="submit"
+                      size="lg"
+                      radius="md"
+                      fullWidth
+                      className="bg-brand-red hover:bg-brand-dark-red transition-colors h-14 font-manrope font-bold text-lg text-white"
+                    >
+                      Continue
+                    </Button>
+                  </Stack>
+                </motion.form>
               ) : (
-                <motion.div
+                <motion.form
                   key="helper"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.2 }}
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  onSubmit={helperForm.onSubmit(handleHelperSubmit)}
                 >
-                  <form onSubmit={helperForm.onSubmit(handleHelperSubmit)}>
-                    <Stack gap="lg">
-                      <TextInput
-                        label="Email Address"
-                        placeholder="helper@example.com"
-                        required
-                        size="lg"
-                        radius="md"
-                        {...helperForm.getInputProps("email")}
-                      />
-                      <PasswordInput
-                        label="Password"
-                        placeholder="••••••••"
-                        required
-                        size="lg"
-                        radius="md"
-                        {...helperForm.getInputProps("password")}
-                      />
-                      <Button
-                        type="submit"
-                        fullWidth
-                        size="lg"
-                        radius="md"
-                        className="bg-indigo-600 h-14"
+                  <Stack>
+                    <TextInput
+                      label="Email Address"
+                      placeholder="helper@roadhelper.com"
+                      size="lg"
+                      radius="md"
+                      classNames={{
+                        input:
+                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                      }}
+                      {...helperForm.getInputProps("email")}
+                    />
+                    <PasswordInput
+                      label="Password"
+                      placeholder="••••••••"
+                      size="lg"
+                      radius="md"
+                      classNames={{
+                        input:
+                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                      }}
+                      {...helperForm.getInputProps("password")}
+                    />
+                    <Button
+                      type="submit"
+                      size="lg"
+                      radius="md"
+                      fullWidth
+                      className="bg-brand-black hover:bg-gray-800 transition-colors h-14 font-manrope font-bold text-lg text-white"
+                    >
+                      Login to Dashboard
+                    </Button>
+                    <Text size="sm" ta="center" className="text-gray-500 mt-2">
+                      Want to be a helper?{" "}
+                      <Link
+                        href="/register?type=helper"
+                        className="text-brand-red font-bold hover:underline"
                       >
-                        Helper Sign In
-                      </Button>
-                      <Text size="sm" ta="center">
-                        New helper?{" "}
-                        <Anchor component={Link} href="/register" fw={700}>
-                          Register Here
-                        </Anchor>
-                      </Text>
-                    </Stack>
-                  </form>
-                </motion.div>
+                        Apply here
+                      </Link>
+                    </Text>
+                  </Stack>
+                </motion.form>
               )}
             </AnimatePresence>
 
-            <Text
-              ta="center"
-              mt="xl"
-              size="xs"
-              c="dimmed"
-              className="uppercase font-bold tracking-widest"
-            >
-              SECURE LOGGED-IN SESSION
-            </Text>
-          </Container>
-        </motion.div>
-      </Box>
-    </>
+            <div className="mt-8 text-center">
+              <Text size="sm" className="text-gray-400">
+                Protected by reCAPTCHA and subject to the Road Helper{" "}
+                <Link href="#" className="underline">
+                  Privacy Policy
+                </Link>
+                .
+              </Text>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    </div>
   );
 }

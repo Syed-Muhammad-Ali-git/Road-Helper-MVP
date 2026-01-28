@@ -10,6 +10,11 @@ import {
   Button,
   Box,
   ThemeIcon,
+  Group,
+  RingProgress,
+  ActionIcon,
+  Card,
+  Avatar,
 } from "@mantine/core";
 import {
   IconCar,
@@ -17,8 +22,13 @@ import {
   IconDroplet,
   IconTruck,
   IconMapPin,
+  IconCurrentLocation,
+  IconPhoneCall,
+  IconHistory,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import Image from "next/image";
 
 const serviceCategories = [
   {
@@ -52,138 +62,241 @@ const serviceCategories = [
 ];
 
 export default function ClientDashboard() {
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  };
+
+  const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { y: 0, opacity: 1 },
+  };
+
   return (
-    <Box className="p-4 md:p-8">
-      <Stack gap="xl">
-        <Box>
-          <Title order={1} className="text-3xl font-bold text-slate-800">
-            Hello, User 👋
-          </Title>
-          <Text c="dimmed" size="lg">
-            Need roadside assistance? Select a service below.
-          </Text>
-        </Box>
-
-        <Paper
-          p="xl"
-          radius="xl"
-          bg="blue.6"
-          className="relative overflow-hidden"
-        >
-          <Box className="relative z-10 text-white max-w-md">
-            <Title order={2} mb="xs">
-              Quick Emergency?
-            </Title>
-            <Text mb="xl" size="lg" opacity={0.9}>
-              Our nearest helpers are just 10-15 minutes away from your current
-              location.
+    <Box className="p-4 md:p-8 bg-gray-50 min-h-screen font-satoshi">
+      <motion.div
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        {/* HEADER SECTION */}
+        <Group justify="space-between" mb="xl" align="flex-end">
+          <Box>
+            <Text className="text-gray-500 font-medium mb-1 uppercase tracking-wider text-xs">
+              Overview
             </Text>
-            <Button
-              variant="white"
-              color="blue"
-              size="lg"
-              radius="md"
-              leftSection={<IconMapPin size={20} />}
-              component={Link}
-              href="/customer/request-help"
+            <Title
+              order={1}
+              className="font-manrope font-bold text-3xl md:text-4xl text-brand-black"
             >
-              Request Immediate Help
-            </Button>
+              Good Afternoon, User
+            </Title>
           </Box>
-        </Paper>
+          <Button
+            variant="white"
+            color="red"
+            className="bg-white text-brand-red border border-red-100 shadow-sm hover:shadow-md transition-all font-manrope font-bold"
+            leftSection={<IconPhoneCall size={18} />}
+          >
+            Emergency Support
+          </Button>
+        </Group>
 
-        <Box>
-          <Title order={2} className="text-2xl font-bold text-slate-800 mb-6">
-            Services Available
-          </Title>
+        <SimpleGrid cols={{ base: 1, lg: 3 }} spacing="xl" mb="xl">
+          {/* MAP SECTION (Takes up 2 columns) */}
+          <motion.div variants={itemVariants} className="lg:col-span-2">
+            <Paper
+              p={0}
+              radius="xl"
+              className="relative overflow-hidden h-[300px] md:h-[400px] shadow-lg border border-gray-200"
+            >
+              {/* Simulated Map Background */}
+              <div className="absolute inset-0 bg-gray-200">
+                {/* Placeholder for actual map */}
+                <div className="absolute inset-0 opacity-50 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg')] bg-cover bg-center" />
 
-          <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg">
-            {serviceCategories.map((service) => (
+                {/* Pulse Effect for User Location */}
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <span className="relative flex h-8 w-8">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-red opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-8 w-8 bg-brand-red border-4 border-white shadow-lg items-center justify-center">
+                      <IconCurrentLocation size={16} color="white" />
+                    </span>
+                  </span>
+                </div>
+              </div>
+
+              <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-white/50 flex items-center justify-between">
+                <div>
+                  <Text className="font-bold text-brand-black">
+                    Your Current Location
+                  </Text>
+                  <Text className="text-xs text-gray-500">
+                    242 Park Avenue, NY (Approximate)
+                  </Text>
+                </div>
+                <Button
+                  className="bg-brand-red hover:bg-brand-dark-red rounded-full px-6 font-manrope transition-all"
+                  leftSection={<IconMapPin size={18} />}
+                  component={Link}
+                  href="/customer/request-help"
+                >
+                  Request Help Here
+                </Button>
+              </div>
+            </Paper>
+          </motion.div>
+
+          {/* QUICK STATS / INFO */}
+          <motion.div variants={itemVariants}>
+            <Stack>
               <Paper
-                key={service.id}
+                p="xl"
+                radius="xl"
+                className="bg-brand-black text-white relative overflow-hidden shadow-xl"
+              >
+                <div className="absolute top-0 right-0 p-3 opacity-10">
+                  <IconCar size={100} />
+                </div>
+                <Text className="text-gray-400 text-xs font-bold uppercase tracking-widest mb-2">
+                  Membership Status
+                </Text>
+                <Title order={2} className="font-manrope mb-4">
+                  Premium Plan
+                </Title>
+                <Group mb="xl">
+                  <Badge
+                    color="green"
+                    variant="light"
+                    size="lg"
+                    className="bg-white/10 text-green-300"
+                  >
+                    Active
+                  </Badge>
+                </Group>
+                <Text className="text-sm text-gray-400">
+                  Next renewal: Jan 24, 2027
+                </Text>
+              </Paper>
+
+              <Paper p="lg" radius="xl" withBorder className="bg-white">
+                <Group justify="space-between" mb={5}>
+                  <Text className="font-bold text-gray-700">
+                    Nearby Helpers
+                  </Text>
+                  <Badge color="gray" variant="light">
+                    8 Active
+                  </Badge>
+                </Group>
+                <Text size="xs" c="dimmed" mb="md">
+                  Within 5km radius
+                </Text>
+                <Group>
+                  <Avatar.Group spacing="sm">
+                    <Avatar src="https://i.pravatar.cc/150?u=1" radius="xl" />
+                    <Avatar src="https://i.pravatar.cc/150?u=2" radius="xl" />
+                    <Avatar src="https://i.pravatar.cc/150?u=3" radius="xl" />
+                    <Avatar radius="xl">+5</Avatar>
+                  </Avatar.Group>
+                </Group>
+              </Paper>
+            </Stack>
+          </motion.div>
+        </SimpleGrid>
+
+        <Title
+          order={3}
+          className="font-manrope text-xl font-bold text-brand-black mb-6"
+        >
+          What help do you need?
+        </Title>
+
+        <SimpleGrid cols={{ base: 1, sm: 2, md: 4 }} spacing="lg" mb="xl">
+          {serviceCategories.map((service) => (
+            <motion.div
+              key={service.id}
+              variants={itemVariants}
+              whileHover={{ y: -5 }}
+            >
+              <Paper
                 withBorder
-                p="lg"
-                radius="md"
+                p="xl"
+                radius="xl"
                 component={Link}
                 href={`/customer/request-help?service=${service.id}`}
-                className="hover:shadow-md transition-shadow no-underline"
+                className="hover:shadow-xl transition-all duration-300 no-underline block h-full border-gray-200 bg-white group"
               >
-                <Stack align="center" gap="sm">
-                  <ThemeIcon
-                    variant="light"
-                    size="xl"
-                    radius="xl"
-                    color={service.color}
+                <ThemeIcon
+                  size={60}
+                  radius="md"
+                  className={`bg-${service.color}-50 text-${service.color}-600 mb-6 group-hover:scale-110 transition-transform`}
+                >
+                  <service.icon size={30} stroke={1.5} />
+                </ThemeIcon>
+
+                <Text
+                  fw={700}
+                  size="lg"
+                  className="font-manrope text-brand-black mb-2 group-hover:text-brand-red transition-colors"
+                >
+                  {service.title}
+                </Text>
+                <Text c="dimmed" size="sm" className="leading-relaxed mb-6">
+                  {service.desc}
+                </Text>
+
+                <Group justify="space-between" align="center" mt="auto">
+                  <Text
+                    size="sm"
+                    fw={600}
+                    className={`text-${service.color}-600`}
                   >
-                    <service.icon size={24} />
-                  </ThemeIcon>
-                  <Text fw={600} size="lg" c="dark">
-                    {service.title}
+                    Select
                   </Text>
-                  <Text c="dimmed" size="sm" ta="center">
-                    {service.desc}
-                  </Text>
-                  <Text size="sm" c={service.color} fw={500} mt="sm">
-                    Request now →
-                  </Text>
-                </Stack>
+                  <ActionIcon variant="subtle" color="gray" radius="xl">
+                    <IconMapPin size={18} />
+                  </ActionIcon>
+                </Group>
               </Paper>
-            ))}
-          </SimpleGrid>
-        </Box>
-
-        <SimpleGrid cols={{ base: 1, md: 2 }} spacing="xl">
-          <Paper p="xl" radius="xl" withBorder>
-            <Title order={4} mb="lg">
-              Recent Activity
-            </Title>
-            <Stack gap="md">
-              <Text c="dimmed" size="sm" ta="center" py="xl">
-                No recent requests found.
-              </Text>
-            </Stack>
-          </Paper>
-
-          <Paper
-            p="xl"
-            radius="xl"
-            withBorder
-            className="bg-slate-50 border-dashed"
-          >
-            <Title order={4} mb="lg">
-              Safety Tips
-            </Title>
-            <Stack gap="sm">
-              <Paper
-                p="md"
-                bg="white"
-                radius="md"
-                className="border border-slate-100"
-              >
-                <Text fw={600} size="sm">
-                  1. Stay with your vehicle
-                </Text>
-                <Text size="xs" c="dimmed">
-                  Unless it&apos;s unsafe, always stay near your car or bike.
-                </Text>
-              </Paper>
-              <Paper
-                p="md"
-                bg="white"
-                radius="md"
-                className="border border-slate-100"
-              >
-                <Text fw={600} size="sm">
-                  2. Use hazard lights
-                </Text>
-                <Text size="xs" c="dimmed">
-                  Signal clearly to other drivers that you are stationary.
-                </Text>
-              </Paper>
-            </Stack>
-          </Paper>
+            </motion.div>
+          ))}
         </SimpleGrid>
-      </Stack>
+
+        {/* RECENT ACTIVITY */}
+        <motion.div variants={itemVariants}>
+          <Paper p="xl" radius="xl" withBorder className="bg-white">
+            <Group justify="space-between" mb="lg">
+              <Title order={4} className="font-manrope">
+                Recent Activity
+              </Title>
+              <Button variant="subtle" color="gray" size="xs">
+                View All
+              </Button>
+            </Group>
+
+            <Stack gap="md">
+              <div className="text-center py-10">
+                <ThemeIcon
+                  color="gray"
+                  variant="light"
+                  size={60}
+                  radius="xl"
+                  mb="md"
+                >
+                  <IconHistory size={30} />
+                </ThemeIcon>
+                <Text c="dimmed">No recent requests found</Text>
+                <Button variant="light" color="red" size="xs" mt="md">
+                  Request Help
+                </Button>
+              </div>
+            </Stack>
+          </Paper>
+        </motion.div>
+      </motion.div>
     </Box>
   );
 }
+
+// Helper component for Badge - Mantine Badge is fine used above.
+import { Badge } from "@mantine/core";

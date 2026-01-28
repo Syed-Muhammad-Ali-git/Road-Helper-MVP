@@ -45,30 +45,17 @@ export default function NearbyRequestsUI() {
     },
   ];
 
-  const loading = false; // static, no async
-
-  const acceptRequest = (requestId: string) => {
-    console.log(`Accepted request ${requestId}`);
-    toast.success("Request accepted successfully!");
-  };
-
-  if (loading)
-    return (
-      <Box className="p-8 text-center">
-        <Text>Loading...</Text>
-      </Box>
-    );
-
   return (
-    <Box className="p-4 md:p-8">
+    <Box className="p-4 md:p-8 font-satoshi bg-gray-50 min-h-screen">
       <Stack gap="xl">
         <Box>
-          <Title order={1} className="text-3xl font-bold text-slate-800">
+          <Title
+            order={1}
+            className="text-3xl font-bold text-brand-black font-manrope"
+          >
             Available Jobs
           </Title>
-          <Text c="dimmed">
-            Nearby customer&apos;s needing your assistance.
-          </Text>
+          <Text c="dimmed">Nearby customers needing your assistance.</Text>
         </Box>
 
         {requests.length === 0 ? (
@@ -76,7 +63,7 @@ export default function NearbyRequestsUI() {
             p="xl"
             radius="xl"
             withBorder
-            className="bg-slate-50 border-dashed py-20"
+            className="bg-white border-dashed py-20"
           >
             <Stack align="center" gap="sm">
               <ThemeIcon size={60} radius="xl" color="gray" variant="light">
@@ -97,51 +84,61 @@ export default function NearbyRequestsUI() {
                 p="xl"
                 radius="xl"
                 withBorder
-                className="hover:shadow-md transition-shadow"
+                className="hover:shadow-lg transition-all duration-300 bg-white group"
               >
                 <Group justify="space-between" mb="md">
-                  <Badge size="lg" color="red" variant="filled">
+                  <Badge
+                    size="lg"
+                    color="red"
+                    variant="filled"
+                    className="bg-brand-red"
+                  >
                     PENDING
                   </Badge>
                   <Text size="xs" c="dimmed">
-                    {req.createdAt.toLocaleString()}
+                    {req.createdAt.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </Text>
                 </Group>
 
                 <Stack gap="md">
                   <Group gap="md">
-                    <Avatar color="blue" radius="xl">
+                    <Avatar color="blue" radius="xl" size="md">
                       {req.customerName.charAt(0)}
                     </Avatar>
                     <Box>
-                      <Text fw={700}>{req.customerName}</Text>
+                      <Text fw={700} className="text-brand-black">
+                        {req.customerName}
+                      </Text>
                       <Text size="sm" c="dimmed">
                         {req.vehicleDetails}
                       </Text>
                     </Box>
                   </Group>
 
-                  <Group gap="xs">
-                    <IconMapPin size={18} className="text-blue-600" />
-                    <Text size="sm" fw={600}>
+                  <Group gap="xs" className="bg-gray-50 p-2 rounded-lg">
+                    <IconMapPin size={18} className="text-brand-red" />
+                    <Text size="sm" fw={600} className="text-gray-700">
                       {req.location}
                     </Text>
                   </Group>
 
                   <Paper p="md" radius="lg" bg="gray.0" withBorder>
-                    <Text size="sm" lineClamp={3}>
+                    <Text size="sm" lineClamp={3} className="text-gray-600">
                       {req.issueDescription}
                     </Text>
                   </Paper>
 
                   <Group mt="md">
                     <Button
-                      className="bg-green-600 flex-1 h-12 rounded-xl"
+                      className="bg-green-600 hover:bg-green-700 flex-1 h-12 rounded-xl transition-colors font-bold"
                       leftSection={<IconCheck size={20} />}
                       disabled={!userData.isOnline}
-                      onClick={() => acceptRequest(req.id)}
+                      onClick={() => alert("Accepted")}
                     >
-                      Accept Request
+                      Accept Job
                     </Button>
                     {!userData.isOnline && (
                       <Text size="xs" c="red" fw={600}>
