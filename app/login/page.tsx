@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
+import logoIcon from "../assets/images/logo.png";
 
 const customerSchema = z.object({
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
@@ -74,7 +75,7 @@ export default function LoginPage() {
         <div className="absolute bottom-16 left-0 p-16 text-white z-10">
           <div className="mb-6 w-16 h-16 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20">
             <Image
-              src="/assets/images/logo.jpg"
+              src={logoIcon}
               alt="Logo"
               width={64}
               height={64}

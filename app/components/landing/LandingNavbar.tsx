@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Button, Group, Container } from "@mantine/core";
 import { motion } from "framer-motion";
+import logoIcon from "../../assets/images/logo.png";
 
 export function LandingNavbar() {
   return (
@@ -12,15 +13,12 @@ export function LandingNavbar() {
       animate={{ y: 0 }}
       className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
     >
-      <Container
-        size="xl"
-        className="h-[70px] flex items-center justify-between"
-      >
+      <Container size="xl" className="h-17.5 flex items-center justify-between">
         {/* LOGO */}
         <Link href="/" className="flex items-center gap-2">
           <div className="relative h-10 w-10 overflow-hidden rounded-lg">
             <Image
-              src="/assets/images/logo.jpg"
+              src={logoIcon}
               alt="Road Helper Logo"
               fill
               className="object-cover"

@@ -123,8 +123,8 @@ const HelperSideBar = ({ open, setOpen }: SideBarProps) => {
   const renderMenu = (items: SidebarItem[]) =>
     items.map((item) => {
       let isActive = pathname === item.path;
-      if (item.text === "Organization") {
-        isActive = pathname.startsWith("/organization");
+      if (item.text === "Dashboard") {
+        isActive = pathname.startsWith("/helper/dashboard");
       } else if (item.text === "Dashboard") {
         isActive = pathname === "/" || pathname.startsWith("/myAccount");
       }
