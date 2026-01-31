@@ -5,7 +5,7 @@ import { LandingFooter } from "./components/landing/LandingFooter";
 
 const Home = () => {
   return (
-    <main className="min-h-screen bg-white font-satoshi">
+    <main className="min-h-screen bg-brand-black text-white font-satoshi">
       <LandingNavbar />
       <HeroSection />
       <FeaturesSection />

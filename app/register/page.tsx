@@ -10,10 +10,13 @@ import {
   Stack,
   SegmentedControl,
   Select,
+  MultiSelect,
   Paper,
   Loader,
   Box,
+  Divider,
 } from "@mantine/core";
+import { IconBrandGoogle } from "@tabler/icons-react";
 import Image from "next/image";
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
@@ -32,7 +35,7 @@ const helperSchema = z.object({
   fullName: z.string().min(2, "Name is required"),
   email: z.string().email("Invalid email"),
   phone: z.string().min(10, "Invalid phone number"),
-  serviceType: z.string().min(1, "Service type is required"),
+  serviceType: z.array(z.string()).min(1, "Select at least one service"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
@@ -53,7 +56,7 @@ function RegisterPageContent() {
       fullName: "",
       email: "",
       phone: "",
-      serviceType: "",
+      serviceType: [],
       password: "",
     },
     validate: zodResolver(helperSchema),
@@ -161,6 +164,25 @@ function RegisterPageContent() {
                     >
                       Sign Up
                     </Button>
+
+                    <Divider
+                      label="Or continue with"
+                      labelPosition="center"
+                      my="sm"
+                      color="gray.7"
+                    />
+
+                    <Button
+                      variant="default"
+                      size="lg"
+                      radius="md"
+                      fullWidth
+                      leftSection={<IconBrandGoogle size={20} />}
+                      className="bg-white text-black hover:bg-gray-100 transition-colors h-14 font-manrope font-bold text-lg border-gray-300"
+                      onClick={() => toast.info("Google Sign Up coming soon!")}
+                    >
+                      Sign up with Google
+                    </Button>
                     <Text size="sm" ta="center" className="text-gray-500 mt-2">
                       Already have an account?{" "}
                       <Link
@@ -215,9 +237,9 @@ function RegisterPageContent() {
                       }}
                       {...helperForm.getInputProps("phone")}
                     />
-                    <Select
-                      label="Service Type"
-                      placeholder="Select your service"
+                    <MultiSelect
+                      label="Service Types"
+                      placeholder="Select your services"
                       size="lg"
                       radius="md"
                       data={[
@@ -228,7 +250,10 @@ function RegisterPageContent() {
                       ]}
                       classNames={{
                         input:
-                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                          "bg-brand-charcoal border-gray-700 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                        dropdown: "bg-brand-charcoal border-gray-700",
+                        option:
+                          "hover:bg-brand-black text-gray-300 hover:text-white",
                       }}
                       {...helperForm.getInputProps("serviceType")}
                     />
@@ -248,9 +273,28 @@ function RegisterPageContent() {
                       size="lg"
                       radius="md"
                       fullWidth
-                      className="bg-brand-black hover:bg-gray-800 transition-colors h-14 font-manrope font-bold text-lg text-white"
+                      className="bg-brand-red hover:bg-brand-dark-red transition-colors h-14 font-manrope font-bold text-lg text-white"
                     >
                       Join Network
+                    </Button>
+
+                    <Divider
+                      label="Or continue with"
+                      labelPosition="center"
+                      my="sm"
+                      color="gray.7"
+                    />
+
+                    <Button
+                      variant="default"
+                      size="lg"
+                      radius="md"
+                      fullWidth
+                      leftSection={<IconBrandGoogle size={20} />}
+                      className="bg-white text-black hover:bg-gray-100 transition-colors h-14 font-manrope font-bold text-lg border-gray-300"
+                      onClick={() => toast.info("Google Sign Up coming soon!")}
+                    >
+                      Sign up with Google
                     </Button>
                     <Text size="sm" ta="center" className="text-gray-500 mt-2">
                       Already have an account?{" "}

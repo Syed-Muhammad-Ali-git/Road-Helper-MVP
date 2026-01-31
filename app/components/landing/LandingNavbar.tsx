@@ -2,21 +2,33 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Button, Group, Container } from "@mantine/core";
-import { motion } from "framer-motion";
+import { Button, Group, Container, Box } from "@mantine/core";
+import { motion, useScroll, useMotionValueEvent } from "framer-motion";
+import { useState } from "react";
 import logoIcon from "../../assets/images/logo.png";
+import { IconChevronRight } from "@tabler/icons-react";
 
 export function LandingNavbar() {
+  const { scrollY } = useScroll();
+  const [scrolled, setScrolled] = useState(false);
+
+  useMotionValueEvent(scrollY, "change", (latest) => {
+    setScrolled(latest > 50);
+  });
+
   return (
     <motion.nav
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100"
+      transition={{ duration: 0.5, ease: "circOut" }}
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? "glass-dark py-4" : "bg-transparent py-6"
+      }`}
     >
-      <Container size="xl" className="h-17.5 flex items-center justify-between">
+      <Container size="xl" className="flex items-center justify-between">
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="relative h-10 w-10 overflow-hidden rounded-lg">
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative h-10 w-10 overflow-hidden rounded-xl shadow-lg shadow-red-500/20 transition-transform group-hover:scale-105">
             <Image
               src={logoIcon}
               alt="Road Helper Logo"
@@ -24,31 +36,23 @@ export function LandingNavbar() {
               className="object-cover"
             />
           </div>
-          <span className="font-manrope font-bold text-xl text-brand-black tracking-tight">
+          <span className="font-satoshi font-bold text-xl text-white tracking-tight group-hover:text-brand-red transition-colors">
             Road Helper
           </span>
         </Link>
 
-        {/* DESKTOP MENU - HIDDEN ON MOBILE */}
-        <Group visibleFrom="sm" gap="xl">
-          <Link
-            href="#features"
-            className="text-gray-600 hover:text-brand-red transition-colors font-medium"
-          >
-            How it works
-          </Link>
-          <Link
-            href="#features"
-            className="text-gray-600 hover:text-brand-red transition-colors font-medium"
-          >
-            Trust & Safety
-          </Link>
-          <Link
-            href="/register?type=helper"
-            className="text-gray-600 hover:text-brand-red transition-colors font-medium"
-          >
-            Become a Helper
-          </Link>
+        {/* DESKTOP MENU */}
+        <Group visibleFrom="sm" gap="xl" className="hidden md:flex">
+          {["How it works", "Trust & Safety", "Services"].map((item) => (
+            <Link
+              key={item}
+              href={`#${item.toLowerCase().replace(/\s+/g, "-")}`}
+              className="relative text-sm font-medium text-gray-300 hover:text-white transition-colors"
+            >
+              <span className="relative z-10">{item}</span>
+              <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-red transition-all duration-300 hover:w-full group-hover:w-full"></span>
+            </Link>
+          ))}
         </Group>
 
         {/* AUTH BUTTONS */}
@@ -56,16 +60,18 @@ export function LandingNavbar() {
           <Link href="/login">
             <Button
               variant="subtle"
-              color="gray"
-              className="font-manrope text-gray-700 hover:bg-gray-100"
+              className="font-manrope text-sm text-gray-300 hover:text-white hover:bg-white/5 transition-all"
+              radius="xl"
             >
               Log in
             </Button>
           </Link>
           <Link href="/register">
             <Button
-              className="bg-brand-red hover:bg-brand-dark-red transition-all shadow-md hover:shadow-lg font-manrope rounded-full px-6"
-              size="md"
+              className="bg-brand-red hover:bg-brand-dark-red text-white transition-all shadow-lg shadow-red-900/20 hover:shadow-red-600/40"
+              radius="xl"
+              size="sm"
+              rightSection={<IconChevronRight size={16} />}
             >
               Get Started
             </Button>

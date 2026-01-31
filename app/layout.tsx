@@ -69,8 +69,45 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
       </head>
       <body className="bg-gray-50 text-gray-900">
         <MantineProvider
-          forceColorScheme="light"
-          theme={{ fontFamily: "satoshi" }}
+          defaultColorScheme="dark"
+          theme={{
+            fontFamily: "Satoshi, sans-serif",
+            primaryColor: "red",
+            colors: {
+              dark: [
+                "#C1C2C5",
+                "#A6A7AB",
+                "#909296",
+                "#5c5f66",
+                "#373A40",
+                "#2C2E33",
+                "#1F1F1F", // brand-charcoal
+                "#171717", // brand-dark-gray
+                "#0A0A0A", // brand-black
+                "#000000",
+              ],
+              red: [
+                "#FFF5F5",
+                "#FFE3E3",
+                "#FFC9C9",
+                "#FFA8A8",
+                "#FF8787",
+                "#FF6B6B",
+                "#FA5252",
+                "#E63946", // brand-red
+                "#C92A2A",
+                "#A4161A", // brand-dark-red
+              ],
+            },
+            components: {
+              Button: {
+                defaultProps: {
+                  fw: 700,
+                  radius: "md",
+                },
+              },
+            },
+          }}
         >
           <LayoutProvider>
             <SearchProvider>

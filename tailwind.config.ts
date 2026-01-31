@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 
+// Configuration for tailwindcss
 const config: Config = {
   content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,11 +10,14 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        "brand-red": "#D72626",
+        "brand-red": "#E63946",
         "brand-dark-red": "#A4161A",
-        "brand-black": "#0F0F0F",
-        "brand-charcoal": "#1C1C1C",
-        "brand-offwhite": "#F5F5F5",
+        "brand-black": "#0A0A0A",
+        "brand-dark-gray": "#171717",
+        "brand-charcoal": "#1F1F1F",
+        "brand-gray": "#2D2D2D",
+        "brand-offwhite": "#F8F9FA",
+        "brand-muted": "#A1A1AA",
       },
       backgroundImage: {
         "primary-gradient": "linear-gradient(135deg, #D72626 0%, #A4161A 100%)",

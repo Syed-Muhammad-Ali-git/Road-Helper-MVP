@@ -33,10 +33,10 @@ const openedMixin = (theme: Theme): CSSObject => ({
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
   }),
-  backgroundColor: "#3A3E46",
-  color: "#F8FAFC",
+  backgroundColor: "#1C1C1C",
+  color: "#FFFFFF",
   overflow: "hidden",
-  borderRight: "none",
+  borderRight: "1px solid #333",
 });
 
 const closedMixin = (theme: Theme): CSSObject => ({
@@ -44,14 +44,14 @@ const closedMixin = (theme: Theme): CSSObject => ({
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  backgroundColor: "#3A3E46",
-  color: "#F8FAFC",
+  backgroundColor: "#1C1C1C",
+  color: "#FFFFFF",
   width: `calc(${theme.spacing(7)} + 1px)`,
   [theme.breakpoints.up("sm")]: {
     width: `calc(${theme.spacing(8)} + 1px)`,
   },
   overflow: "hidden",
-  borderRight: "none",
+  borderRight: "1px solid #333",
 });
 
 const DrawerHeader = styled("div")(() => ({
@@ -138,9 +138,9 @@ const HelperSideBar = ({ open, setOpen }: SideBarProps) => {
               px: 2.5,
               mx: 1,
               borderRadius: "12px",
-              backgroundColor: isActive ? "#FF8A3D" : "transparent",
+              backgroundColor: isActive ? "#D72626" : "transparent",
               "&:hover": {
-                backgroundColor: isActive ? "#FF8A3D" : "#2F333A",
+                backgroundColor: isActive ? "#D72626" : "#2C2E33",
               },
             }}
           >
@@ -158,7 +158,7 @@ const HelperSideBar = ({ open, setOpen }: SideBarProps) => {
               primary={item.text}
               sx={{
                 opacity: open ? 1 : 0,
-                color: isActive ? "#000" : "#F8FAFC",
+                color: isActive ? "#FFFFFF" : "#F8FAFC",
               }}
             />
           </ListItemButton>
@@ -175,8 +175,10 @@ const HelperSideBar = ({ open, setOpen }: SideBarProps) => {
             <>
               <Avatar src="/logo.png" w={60} mt={5} />
               <Stack sx={{ ml: -3 }}>
-                <Typography sx={{ color: "#EEF2F6" }}>Road Helper</Typography>
-                <Typography fontSize="10px" sx={{}}>
+                <Typography sx={{ color: "#FFFFFF", fontWeight: "bold" }}>
+                  Road Helper
+                </Typography>
+                <Typography fontSize="10px" sx={{ color: "#9CA3AF" }}>
                   Helping You On The Go
                 </Typography>
               </Stack>

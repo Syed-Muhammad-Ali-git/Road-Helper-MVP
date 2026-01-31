@@ -10,7 +10,9 @@ import {
   Stack,
   SegmentedControl,
   Paper,
+  Divider,
 } from "@mantine/core";
+import { IconBrandGoogle } from "@tabler/icons-react";
 import Image from "next/image";
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
@@ -55,7 +57,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex bg-white font-satoshi">
+    <div className="min-h-screen flex bg-brand-black font-satoshi text-white">
       {/* Left Side - Image */}
       <motion.div
         initial={{ opacity: 0, x: -50 }}
@@ -94,10 +96,10 @@ export default function LoginPage() {
       </motion.div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white relative">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-brand-black relative">
         <Link
           href="/"
-          className="absolute top-8 right-8 text-sm font-bold text-brand-charcoal hover:text-brand-red transition-colors"
+          className="absolute top-8 right-8 text-sm font-bold text-gray-400 hover:text-brand-red transition-colors"
         >
           Back to Home
         </Link>
@@ -109,7 +111,7 @@ export default function LoginPage() {
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="text-center mb-10">
-              <Title className="font-manrope text-4xl font-bold text-brand-black mb-2">
+              <Title className="font-manrope text-4xl font-bold text-white mb-2">
                 Welcome Back
               </Title>
               <Text className="text-gray-500">
@@ -120,7 +122,7 @@ export default function LoginPage() {
             <Paper
               p="md"
               radius="lg"
-              className="bg-gray-50 border border-gray-100 mb-8"
+              className="bg-brand-charcoal border border-gray-800 mb-8"
             >
               <SegmentedControl
                 fullWidth
@@ -134,9 +136,9 @@ export default function LoginPage() {
                 ]}
                 classNames={{
                   root: "bg-transparent",
-                  indicator: "bg-white shadow-md",
+                  indicator: "bg-brand-red shadow-md",
                   label:
-                    "text-gray-600 data-[active=true]:text-brand-black font-semibold",
+                    "text-gray-400 data-[active=true]:text-white font-semibold",
                 }}
               />
             </Paper>
@@ -159,7 +161,8 @@ export default function LoginPage() {
                       radius="md"
                       classNames={{
                         input:
-                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
+                        label: "text-gray-300 mb-1",
                       }}
                       {...customerForm.getInputProps("phone")}
                     />
@@ -171,6 +174,25 @@ export default function LoginPage() {
                       className="bg-brand-red hover:bg-brand-dark-red transition-colors h-14 font-manrope font-bold text-lg text-white"
                     >
                       Continue
+                    </Button>
+
+                    <Divider
+                      label="Or continue with"
+                      labelPosition="center"
+                      my="sm"
+                      color="gray.8"
+                    />
+
+                    <Button
+                      variant="default"
+                      size="lg"
+                      radius="md"
+                      fullWidth
+                      leftSection={<IconBrandGoogle size={20} />}
+                      className="bg-white/5 text-white hover:bg-white/10 border-white/10 transition-colors h-14 font-manrope font-bold text-lg"
+                      onClick={() => toast.info("Google Login coming soon!")}
+                    >
+                      Sign in with Google
                     </Button>
                     <Text size="sm" ta="center" className="text-gray-500 mt-2">
                       If You are new First Signup to continue{" "}
@@ -200,7 +222,8 @@ export default function LoginPage() {
                       radius="md"
                       classNames={{
                         input:
-                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
+                        label: "text-gray-300 mb-1",
                       }}
                       {...helperForm.getInputProps("email")}
                     />
@@ -211,7 +234,9 @@ export default function LoginPage() {
                       radius="md"
                       classNames={{
                         input:
-                          "focus:border-brand-red focus:ring-1 focus:ring-brand-red",
+                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
+                        label: "text-gray-300 mb-1",
+                        innerInput: "placeholder:text-gray-600",
                       }}
                       {...helperForm.getInputProps("password")}
                     />
@@ -220,9 +245,28 @@ export default function LoginPage() {
                       size="lg"
                       radius="md"
                       fullWidth
-                      className="bg-brand-black hover:bg-gray-800 transition-colors h-14 font-manrope font-bold text-lg text-white"
+                      className="bg-brand-red hover:bg-brand-dark-red transition-colors h-14 font-manrope font-bold text-lg text-white"
                     >
                       Login to Dashboard
+                    </Button>
+
+                    <Divider
+                      label="Or continue with"
+                      labelPosition="center"
+                      my="sm"
+                      color="gray.8"
+                    />
+
+                    <Button
+                      variant="default"
+                      size="lg"
+                      radius="md"
+                      fullWidth
+                      leftSection={<IconBrandGoogle size={20} />}
+                      className="bg-white/5 text-white hover:bg-white/10 border-white/10 transition-colors h-14 font-manrope font-bold text-lg"
+                      onClick={() => toast.info("Google Login coming soon!")}
+                    >
+                      Sign in with Google
                     </Button>
                     <Text size="sm" ta="center" className="text-gray-500 mt-2">
                       Want to be a helper?{" "}

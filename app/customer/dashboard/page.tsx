@@ -15,6 +15,7 @@ import {
   ActionIcon,
   Card,
   Avatar,
+  Badge,
 } from "@mantine/core";
 import {
   IconCar,
@@ -29,6 +30,14 @@ import {
 import Link from "next/link";
 import { motion } from "framer-motion";
 import Image from "next/image";
+
+import mapBg from "../../../assets/images/backgrounds/map-bg.svg";
+import avatar1 from "../../../assets/images/avatars/avatar-1.jpg";
+import avatar2 from "../../../assets/images/avatars/avatar-2.jpg";
+import avatar3 from "../../../assets/images/avatars/avatar-3.jpg";
+import avatar5 from "../../../assets/images/avatars/avatar-5.jpg";
+import avatar6 from "../../../assets/images/avatars/avatar-6.jpg";
+import avatar7 from "../../../assets/images/avatars/avatar-7.jpg";
 
 const serviceCategories = [
   {
@@ -73,7 +82,7 @@ export default function ClientDashboard() {
   };
 
   return (
-    <Box className="p-4 md:p-8 bg-gray-50 min-h-screen font-satoshi">
+    <Box className="p-4 md:p-8 min-h-screen font-satoshi bg-transparent">
       <motion.div
         variants={containerVariants}
         initial="hidden"
@@ -82,20 +91,21 @@ export default function ClientDashboard() {
         {/* HEADER SECTION */}
         <Group justify="space-between" mb="xl" align="flex-end">
           <Box>
-            <Text className="text-gray-500 font-medium mb-1 uppercase tracking-wider text-xs">
+            <Text className="text-gray-400 font-medium mb-1 uppercase tracking-wider text-xs">
               Overview
             </Text>
             <Title
               order={1}
-              className="font-manrope font-bold text-3xl md:text-4xl text-brand-black"
+              className="font-manrope font-bold text-3xl md:text-4xl text-white"
             >
               Good Afternoon, User
             </Title>
           </Box>
           <Button
-            variant="white"
+            variant="filled"
             color="red"
-            className="bg-white text-brand-red border border-red-100 shadow-sm hover:shadow-md transition-all font-manrope font-bold"
+            size="md"
+            className="bg-brand-red text-white shadow-lg shadow-red-900/20 hover:bg-brand-dark-red transition-all font-manrope font-bold rounded-full px-6"
             leftSection={<IconPhoneCall size={18} />}
           >
             Emergency Support
@@ -108,30 +118,37 @@ export default function ClientDashboard() {
             <Paper
               p={0}
               radius="xl"
-              className="relative overflow-hidden h-[300px] md:h-[400px] shadow-lg border border-gray-200"
+              className="relative overflow-hidden h-[300px] md:h-[400px] shadow-lg border border-white/10 glass-dark"
             >
               {/* Simulated Map Background */}
-              <div className="absolute inset-0 bg-gray-200">
-                {/* Placeholder for actual map */}
-                <div className="absolute inset-0 opacity-50 bg-[url('https://upload.wikimedia.org/wikipedia/commons/e/ec/World_map_blank_without_borders.svg')] bg-cover bg-center" />
+              <div className="absolute inset-0 bg-brand-charcoal">
+                {/* Placeholder for actual map - Dark Mode Style */}
+                <div className="absolute inset-0 opacity-40">
+                  <Image
+                    src={mapBg}
+                    alt="Map Background"
+                    fill
+                    className="object-cover invert filter brightness-0"
+                  />
+                </div>
 
                 {/* Pulse Effect for User Location */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
                   <span className="relative flex h-8 w-8">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-red opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-8 w-8 bg-brand-red border-4 border-white shadow-lg items-center justify-center">
+                    <span className="relative inline-flex rounded-full h-8 w-8 bg-brand-red border-4 border-brand-charcoal shadow-lg items-center justify-center">
                       <IconCurrentLocation size={16} color="white" />
                     </span>
                   </span>
                 </div>
               </div>
 
-              <div className="absolute bottom-6 left-6 right-6 p-4 bg-white/90 backdrop-blur-md rounded-2xl shadow-sm border border-white/50 flex items-center justify-between">
+              <div className="absolute bottom-6 left-6 right-6 p-4 glass-dark rounded-2xl shadow-sm border border-white/10 flex items-center justify-between z-20">
                 <div>
-                  <Text className="font-bold text-brand-black">
+                  <Text className="font-bold text-white">
                     Your Current Location
                   </Text>
-                  <Text className="text-xs text-gray-500">
+                  <Text className="text-xs text-gray-400">
                     242 Park Avenue, NY (Approximate)
                   </Text>
                 </div>
@@ -153,7 +170,7 @@ export default function ClientDashboard() {
               <Paper
                 p="xl"
                 radius="xl"
-                className="bg-brand-black text-white relative overflow-hidden shadow-xl"
+                className="bg-gradient-to-br from-brand-charcoal to-brand-black text-white relative overflow-hidden shadow-xl border border-white/10"
               >
                 <div className="absolute top-0 right-0 p-3 opacity-10">
                   <IconCar size={100} />
@@ -169,7 +186,7 @@ export default function ClientDashboard() {
                     color="green"
                     variant="light"
                     size="lg"
-                    className="bg-white/10 text-green-300"
+                    className="bg-green-500/10 text-green-400 border border-green-500/20"
                   >
                     Active
                   </Badge>
@@ -179,24 +196,34 @@ export default function ClientDashboard() {
                 </Text>
               </Paper>
 
-              <Paper p="lg" radius="xl" withBorder className="bg-white">
+              <Paper
+                p="lg"
+                radius="xl"
+                className="glass-dark border border-white/10"
+              >
                 <Group justify="space-between" mb={5}>
-                  <Text className="font-bold text-gray-700">
+                  <Text className="font-bold text-gray-200">
                     Nearby Helpers
                   </Text>
-                  <Badge color="gray" variant="light">
+                  <Badge
+                    color="gray"
+                    variant="light"
+                    className="text-gray-300 bg-white/10"
+                  >
                     8 Active
                   </Badge>
                 </Group>
-                <Text size="xs" c="dimmed" mb="md">
+                <Text size="xs" c="dimmed" mb="md" className="text-gray-500">
                   Within 5km radius
                 </Text>
                 <Group>
                   <Avatar.Group spacing="sm">
-                    <Avatar src="https://i.pravatar.cc/150?u=1" radius="xl" />
-                    <Avatar src="https://i.pravatar.cc/150?u=2" radius="xl" />
-                    <Avatar src="https://i.pravatar.cc/150?u=3" radius="xl" />
-                    <Avatar radius="xl">+5</Avatar>
+                    <Avatar src={avatar1.src} radius="xl" />
+                    <Avatar src={avatar5.src} radius="xl" />
+                    <Avatar src={avatar6.src} radius="xl" />
+                    <Avatar radius="xl" className="bg-brand-red text-white">
+                      +5
+                    </Avatar>
                   </Avatar.Group>
                 </Group>
               </Paper>
@@ -206,7 +233,7 @@ export default function ClientDashboard() {
 
         <Title
           order={3}
-          className="font-manrope text-xl font-bold text-brand-black mb-6"
+          className="font-manrope text-xl font-bold text-white mb-6"
         >
           What help do you need?
         </Title>
@@ -219,17 +246,16 @@ export default function ClientDashboard() {
               whileHover={{ y: -5 }}
             >
               <Paper
-                withBorder
                 p="xl"
                 radius="xl"
                 component={Link}
                 href={`/customer/request-help?service=${service.id}`}
-                className="hover:shadow-xl transition-all duration-300 no-underline block h-full border-gray-200 bg-white group"
+                className="hover:shadow-xl hover:shadow-brand-red/10 transition-all duration-300 no-underline block h-full border border-white/10 glass-dark group"
               >
                 <ThemeIcon
                   size={60}
                   radius="md"
-                  className={`bg-${service.color}-50 text-${service.color}-600 mb-6 group-hover:scale-110 transition-transform`}
+                  className={`bg-${service.color}-500/10 text-${service.color}-400 mb-6 group-hover:scale-110 transition-transform`}
                 >
                   <service.icon size={30} stroke={1.5} />
                 </ThemeIcon>
@@ -237,11 +263,15 @@ export default function ClientDashboard() {
                 <Text
                   fw={700}
                   size="lg"
-                  className="font-manrope text-brand-black mb-2 group-hover:text-brand-red transition-colors"
+                  className="font-manrope text-white mb-2 group-hover:text-brand-red transition-colors"
                 >
                   {service.title}
                 </Text>
-                <Text c="dimmed" size="sm" className="leading-relaxed mb-6">
+                <Text
+                  c="dimmed"
+                  size="sm"
+                  className="leading-relaxed mb-6 text-gray-400"
+                >
                   {service.desc}
                 </Text>
 
@@ -249,11 +279,16 @@ export default function ClientDashboard() {
                   <Text
                     size="sm"
                     fw={600}
-                    className={`text-${service.color}-600`}
+                    className={`text-${service.color}-400 group-hover:underline`}
                   >
                     Select
                   </Text>
-                  <ActionIcon variant="subtle" color="gray" radius="xl">
+                  <ActionIcon
+                    variant="subtle"
+                    color="gray"
+                    radius="xl"
+                    className="hover:bg-white/10 text-gray-400"
+                  >
                     <IconMapPin size={18} />
                   </ActionIcon>
                 </Group>
@@ -264,12 +299,21 @@ export default function ClientDashboard() {
 
         {/* RECENT ACTIVITY */}
         <motion.div variants={itemVariants}>
-          <Paper p="xl" radius="xl" withBorder className="bg-white">
+          <Paper
+            p="xl"
+            radius="xl"
+            className="glass-dark border border-white/10"
+          >
             <Group justify="space-between" mb="lg">
-              <Title order={4} className="font-manrope">
+              <Title order={4} className="font-manrope text-white">
                 Recent Activity
               </Title>
-              <Button variant="subtle" color="gray" size="xs">
+              <Button
+                variant="subtle"
+                color="gray"
+                size="xs"
+                className="hover:bg-white/5 text-gray-400"
+              >
                 View All
               </Button>
             </Group>
@@ -282,11 +326,20 @@ export default function ClientDashboard() {
                   size={60}
                   radius="xl"
                   mb="md"
+                  className="bg-white/5 text-gray-500"
                 >
                   <IconHistory size={30} />
                 </ThemeIcon>
-                <Text c="dimmed">No recent requests found</Text>
-                <Button variant="light" color="red" size="xs" mt="md">
+                <Text c="dimmed" className="text-gray-500">
+                  No recent requests found
+                </Text>
+                <Button
+                  variant="outline"
+                  color="red"
+                  size="xs"
+                  mt="md"
+                  className="border-brand-red text-brand-red hover:bg-brand-red/10"
+                >
                   Request Help
                 </Button>
               </div>
@@ -297,6 +350,3 @@ export default function ClientDashboard() {
     </Box>
   );
 }
-
-// Helper component for Badge - Mantine Badge is fine used above.
-import { Badge } from "@mantine/core";
