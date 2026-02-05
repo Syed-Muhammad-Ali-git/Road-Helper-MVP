@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { styled, Theme, CSSObject } from "@mui/material/styles";
 import Box from "@mui/material/Box";
 import MuiDrawer from "@mui/material/Drawer";
@@ -18,6 +18,9 @@ import ListItemText from "@mui/material/ListItemText";
 import { Avatar } from "@mantine/core";
 import { Stack } from "@mui/material";
 import Image from "next/image";
+import { motion } from "framer-motion";
+
+// Icons
 import dashboardLogo from "../../assets/images/dashboard.png";
 import auditLogo from "../../assets/images/audit.png";
 import settingsLogo from "../../assets/images/settings.png";
@@ -34,7 +37,7 @@ const openedMixin = (theme: Theme): CSSObject => ({
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.enteringScreen,
   }),
-  backgroundColor: "#0A0A0A",
+  backgroundColor: "#0A0A0A", // brand-black
   color: "#FFFFFF",
   overflow: "hidden",
   borderRight: "1px solid #27272A",
@@ -85,17 +88,18 @@ const Drawer = styled(MuiDrawer, {
 
 const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
   const router = useRouter();
-  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const currentTab = searchParams.get("tab");
 
   const mainMenuItems: SidebarItem[] = [
     {
       text: "Overview",
-      icon: <Image src={dashboardLogo} alt="" />,
+      icon: <Image src={dashboardLogo} alt="Overview" width={24} height={24} />,
       path: "/admin/dashboard",
     },
     {
       text: "Users & Helpers",
-      icon: <Image src={totalIcon} alt="" />,
+      icon: <Image src={totalIcon} alt="Users" width={24} height={24} />,
       path: "/admin/dashboard?tab=users",
     },
   ];
@@ -103,31 +107,41 @@ const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
   const otherMenuItems: SidebarItem[] = [
     {
       text: "Requests & Payments",
-      icon: <Image src={auditLogo} alt="" />,
+      icon: <Image src={auditLogo} alt="Requests" width={24} height={24} />,
       path: "/admin/dashboard?tab=requests",
     },
     {
       text: "System Status",
-      icon: <Image src={activeIcon} alt="" />,
+      icon: <Image src={activeIcon} alt="Status" width={24} height={24} />,
       path: "/admin/dashboard?tab=status",
     },
     {
       text: "Settings",
-      icon: <Image src={settingsLogo} alt="" />,
+      icon: <Image src={settingsLogo} alt="Settings" width={24} height={24} />,
       path: "/admin/dashboard?tab=settings",
     },
   ];
 
+  const isItemActive = (path: string) => {
+    // If exact match (e.g. overview with no tab)
+    if (path === "/admin/dashboard" && !currentTab) return true;
+
+    // Check if the path contains the current tab
+    if (currentTab && path.includes(`tab=${currentTab}`)) return true;
+
+    return false;
+  };
+
   const renderMenu = (items: SidebarItem[]) =>
     items.map((item) => {
-      const isActive =
-        pathname === "/admin/dashboard" &&
-        (item.path === "/admin/dashboard" ||
-          item.path.startsWith("/admin/dashboard?"));
+      const active = isItemActive(item.path);
 
       return (
         <ListItem key={item.text} disablePadding sx={{ mb: 1 }}>
           <ListItemButton
+            component={motion.div}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
             onClick={() => router.push(item.path)}
             sx={{
               minHeight: 48,
@@ -135,9 +149,13 @@ const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
               px: 2.5,
               mx: 1,
               borderRadius: "12px",
-              backgroundColor: isActive ? "#E63946" : "transparent",
+              backgroundColor: active ? "#DC2626" : "transparent", // brand-red
+              transition: "all 0.3s ease",
+              boxShadow: active ? "0 4px 12px rgba(220, 38, 38, 0.3)" : "none",
               "&:hover": {
-                backgroundColor: isActive ? "#E63946" : "#18181B",
+                backgroundColor: active
+                  ? "#DC2626"
+                  : "rgba(255, 255, 255, 0.05)",
               },
             }}
           >
@@ -146,7 +164,9 @@ const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
                 minWidth: 0,
                 mr: open ? 3 : "auto",
                 justifyContent: "center",
-                filter: isActive ? "brightness(0)" : "brightness(0) invert(1)",
+                filter: active
+                  ? "brightness(0) invert(1)"
+                  : "brightness(0.7) invert(1)",
               }}
             >
               {item.icon}
@@ -155,9 +175,20 @@ const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
               primary={item.text}
               sx={{
                 opacity: open ? 1 : 0,
-                color: isActive ? "#FFFFFF" : "#E4E4E7",
+                color: active ? "#FFFFFF" : "#A1A1AA",
+                "& .MuiTypography-root": {
+                  fontFamily: "var(--font-manrope)",
+                  fontWeight: active ? 600 : 500,
+                  fontSize: "0.95rem",
+                },
               }}
             />
+            {active && open && (
+              <motion.div
+                layoutId="active-pill"
+                className="absolute right-2 w-1.5 h-1.5 rounded-full bg-white"
+              />
+            )}
           </ListItemButton>
         </ListItem>
       );
@@ -168,51 +199,103 @@ const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
       <Drawer variant="permanent" open={open}>
         <DrawerHeader>
           {open && (
-            <>
-              <Avatar src="/logo.png" w={60} mt={5} />
-              <Stack sx={{ ml: -3 }}>
-                <Typography sx={{ color: "#F9FAFB", fontWeight: "bold" }}>
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex items-center gap-3"
+            >
+              <Avatar src="/logo.png" size="md" radius="sm" />
+              <div className="flex flex-col">
+                <Typography
+                  sx={{
+                    color: "#ffffff",
+                    fontWeight: 800,
+                    fontFamily: "var(--font-manrope)",
+                    letterSpacing: "-0.5px",
+                  }}
+                >
                   Road Helper
                 </Typography>
-                <Typography fontSize="10px" sx={{ color: "#9CA3AF" }}>
-                  Admin Control Center
+                <Typography
+                  fontSize="10px"
+                  sx={{
+                    color: "#ef4444",
+                    fontWeight: 700,
+                    textTransform: "uppercase",
+                    letterSpacing: "1px",
+                  }}
+                >
+                  Admin Panel
                 </Typography>
-              </Stack>
-            </>
+              </div>
+            </motion.div>
           )}
           <IconButton
             onClick={() => setOpen(!open)}
-            sx={{ color: "white", backgroundColor: "#1F1F1F", "&:hover": { backgroundColor: "#27272A" } }}
+            sx={{
+              color: "white",
+              backgroundColor: "rgba(255,255,255,0.05)",
+              "&:hover": { backgroundColor: "rgba(255,255,255,0.1)" },
+              width: 32,
+              height: 32,
+            }}
           >
-            {open ? <ChevronLeftIcon /> : <MenuIcon />}
+            {open ? (
+              <ChevronLeftIcon fontSize="small" />
+            ) : (
+              <MenuIcon fontSize="small" />
+            )}
           </IconButton>
         </DrawerHeader>
 
-        <Divider />
+        <Divider sx={{ borderColor: "#27272A", my: 1 }} />
 
-        <Typography
+        <Box
           sx={{
-            fontSize: 12,
-            color: "#9CA3AF",
-            ml: open ? 2 : 0,
-            mt: 3,
+            px: open ? 2 : 0,
+            mt: 2,
+            mb: 1,
             opacity: open ? 1 : 0,
+            transition: "opacity 0.2s",
           }}
         >
-          Overview
-        </Typography>
-        <List sx={{ mt: 1 }}>{renderMenu(mainMenuItems)}</List>
+          <Typography
+            sx={{
+              fontSize: 11,
+              color: "#52525B",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "1px",
+              fontFamily: "var(--font-manrope)",
+            }}
+          >
+            Main
+          </Typography>
+        </Box>
+        <List>{renderMenu(mainMenuItems)}</List>
 
-        <Typography
+        <Box
           sx={{
-            fontSize: 12,
-            color: "#9CA3AF",
-            ml: open ? 2 : 0,
+            px: open ? 2 : 0,
+            mt: 2,
+            mb: 1,
             opacity: open ? 1 : 0,
+            transition: "opacity 0.2s",
           }}
         >
-          Management
-        </Typography>
+          <Typography
+            sx={{
+              fontSize: 11,
+              color: "#52525B",
+              fontWeight: 700,
+              textTransform: "uppercase",
+              letterSpacing: "1px",
+              fontFamily: "var(--font-manrope)",
+            }}
+          >
+            Management
+          </Typography>
+        </Box>
         <List>{renderMenu(otherMenuItems)}</List>
 
         <Box sx={{ flexGrow: 1 }} />
@@ -223,13 +306,15 @@ const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
             sx={{
               borderRadius: 3,
               background:
-                "linear-gradient(135deg, rgba(220,38,38,0.15), rgba(127,29,29,0.3))",
+                "linear-gradient(135deg, rgba(220,38,38,0.1), rgba(0,0,0,0))",
+              border: "1px solid rgba(220,38,38,0.2)",
             }}
           >
             <ListItemButton
               sx={{
                 gap: 1.5,
                 alignItems: "flex-start",
+                py: 2,
               }}
             >
               <ListItemIcon
@@ -239,17 +324,25 @@ const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
                   justifyContent: "center",
                 }}
               >
-                <Image src={suspendedRed} alt="alerts" />
+                <Image src={suspendedRed} alt="alerts" width={24} height={24} />
               </ListItemIcon>
-              <Box sx={{ opacity: open ? 1 : 0 }}>
+              <Box sx={{ opacity: open ? 1 : 0, transition: "opacity 0.2s" }}>
                 <Typography
-                  sx={{ fontSize: 12, color: "#FEE2E2", fontWeight: 600 }}
+                  sx={{
+                    fontSize: 13,
+                    color: "#FEE2E2",
+                    fontWeight: 600,
+                    fontFamily: "var(--font-manrope)",
+                  }}
                 >
                   System Alerts
                 </Typography>
-                <Typography sx={{ fontSize: 11, color: "#FCA5A5" }}>
-                  2 helper accounts under review
-                </Typography>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+                  <Typography sx={{ fontSize: 11, color: "#FCA5A5" }}>
+                    2 Suspicious Actions
+                  </Typography>
+                </div>
               </Box>
             </ListItemButton>
           </ListItem>
@@ -260,4 +353,3 @@ const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
 };
 
 export default AdminSideBar;
-

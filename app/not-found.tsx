@@ -12,13 +12,14 @@ export default function NotFound() {
       <div className="absolute top-0 right-0 w-[40vw] h-[40vw] bg-brand-red/10 rounded-full blur-[100px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
       <div className="absolute bottom-0 left-0 w-[30vw] h-[30vw] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none translate-y-1/2 -translate-x-1/2" />
 
-      <Container className="relative z-10 text-center">
+      <Container className="relative z-10 text-center flex flex-col items-center justify-center h-full">
         <motion.div
+          className="absolute z-0 select-none opacity-20"
           initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+          animate={{ opacity: 0.2, scale: 1 }}
+          transition={{ duration: 0.8 }}
         >
-          <Text className="text-[12rem] md:text-[18rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-brand-charcoal to-brand-black leading-none select-none">
+          <Text className="text-[12rem] md:text-[20rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-brand-charcoal to-brand-black leading-none">
             404
           </Text>
         </motion.div>
@@ -27,20 +28,20 @@ export default function NotFound() {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full"
+          className="relative z-10"
         >
-          <Title className="text-white text-3xl md:text-5xl font-bold mb-4 font-manrope">
+          <Title className="text-white text-4xl md:text-6xl font-bold mb-6 font-manrope">
             Page Not Found
           </Title>
-          <Text className="text-gray-400 text-lg mb-8 max-w-md mx-auto">
+          <Text className="text-gray-400 text-lg md:text-xl mb-10 max-w-lg mx-auto">
             The page you are looking for might have been removed, had its name
             changed, or is temporarily unavailable.
           </Text>
           <Link href="/">
             <Button
-              size="lg"
-              className="bg-brand-red hover:bg-brand-dark-red text-white rounded-full px-8 transition-transform hover:scale-105 active:scale-95"
-              leftSection={<IconArrowLeft size={20} />}
+              size="xl"
+              className="bg-brand-red hover:bg-brand-dark-red text-white rounded-full px-10 h-14 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,0,0,0.4)] hover:scale-105 active:scale-95"
+              leftSection={<IconArrowLeft size={24} />}
             >
               Back to Home
             </Button>

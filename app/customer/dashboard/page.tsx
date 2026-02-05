@@ -102,6 +102,9 @@ export default function ClientDashboard() {
             </Title>
           </Box>
           <Button
+            component={motion.button}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             variant="filled"
             color="red"
             size="md"
@@ -152,14 +155,20 @@ export default function ClientDashboard() {
                     242 Park Avenue, NY (Approximate)
                   </Text>
                 </div>
-                <Button
-                  className="bg-brand-red hover:bg-brand-dark-red rounded-full px-6 font-manrope transition-all"
-                  leftSection={<IconMapPin size={18} />}
-                  component={Link}
-                  href="/customer/request-help"
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-block"
                 >
-                  Request Help Here
-                </Button>
+                  <Button
+                    className="bg-brand-red hover:bg-brand-dark-red rounded-full px-6 font-manrope transition-all"
+                    leftSection={<IconMapPin size={18} />}
+                    component={Link}
+                    href="/customer/request-help"
+                  >
+                    Request Help Here
+                  </Button>
+                </motion.div>
               </div>
             </Paper>
           </motion.div>

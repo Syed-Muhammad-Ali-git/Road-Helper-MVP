@@ -241,6 +241,9 @@ export default function HelperDashboardUI() {
                   </div>
                 </Group>
                 <Button
+                  component={motion.button}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                   className="bg-yellow-500 hover:bg-yellow-600 text-black font-bold"
                   radius="xl"
                   size="md"
@@ -293,15 +296,21 @@ export default function HelperDashboardUI() {
                   Stay online to receive job alerts nearby.
                 </Text>
 
-                <Button
-                  className="bg-brand-red hover:bg-brand-dark-red text-white"
-                  size="md"
-                  radius="xl"
-                  component={Link}
-                  href="/helper/requests"
+                <motion.div
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="inline-block"
                 >
-                  Browse Manual List
-                </Button>
+                  <Button
+                    className="bg-brand-red hover:bg-brand-dark-red text-white"
+                    size="md"
+                    radius="xl"
+                    component={Link}
+                    href="/helper/requests"
+                  >
+                    Browse Manual List
+                  </Button>
+                </motion.div>
               </Box>
             </Paper>
           </motion.div>
