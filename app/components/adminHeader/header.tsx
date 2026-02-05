@@ -1,0 +1,149 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Group, Avatar, Menu, Text, Badge } from "@mantine/core";
+import Image from "next/image";
+import helpLogo from "../../assets/images/helpLogo.png";
+import myAccountLogo from "../../assets/images/myAccount.png";
+import signoutLogo from "../../assets/images/signout.png";
+
+interface AdminHeaderProps {
+  sidebarOpen?: boolean;
+}
+
+const AdminHeader: React.FC<AdminHeaderProps> = ({ sidebarOpen = false }) => {
+  const router = useRouter();
+  const [adminName, setAdminName] = useState<string>("Admin");
+  const [adminEmail, setAdminEmail] = useState<string>("admin@example.com");
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const drawerWidth = 260;
+  const collapsedWidth = 65;
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const loginDataRaw = localStorage.getItem("loginData");
+    if (!loginDataRaw) return;
+    try {
+      const loginData = JSON.parse(loginDataRaw);
+      if (loginData.fullName) setAdminName(loginData.fullName);
+      if (loginData.email) setAdminEmail(loginData.email);
+    } catch {
+      // ignore parse error
+    }
+  }, []);
+
+  const handleSignOut = () => {
+    if (typeof window !== "undefined") {
+      localStorage.clear();
+    }
+    router.push("/login");
+  };
+
+  return (
+    <div
+      className="h-16 fixed top-0 right-0 z-50 glass-dark flex items-center justify-between px-4 md:px-6 border-b border-white/10"
+      style={{
+        left: sidebarOpen ? drawerWidth : collapsedWidth,
+      }}
+    >
+      <div className="flex items-center gap-2">
+        <Badge
+          color="red"
+          radius="xl"
+          variant="filled"
+          className="bg-brand-red/90 text-white uppercase tracking-wide text-[10px]"
+        >
+          Admin Panel
+        </Badge>
+        <Text size="sm" className="text-gray-400 hidden sm:inline">
+          Monitor users, helpers & requests
+        </Text>
+      </div>
+
+      <Group gap={12}>
+        <div className="p-2 rounded-lg glass hover:bg-white/10 cursor-pointer transition-all">
+          <Image
+            src={helpLogo}
+            alt="help"
+            width={24}
+            height={24}
+            className="opacity-80 hover:opacity-100 transition-opacity"
+          />
+        </div>
+
+        <Menu
+          shadow="xl"
+          width={240}
+          radius={12}
+          position="bottom-end"
+          opened={isDropdownOpen}
+          onChange={setIsDropdownOpen}
+          classNames={{
+            dropdown: "glass-dark border border-white/10",
+          }}
+        >
+          <Menu.Target>
+            <Avatar
+              radius="xl"
+              size="md"
+              className="cursor-pointer ring-2 ring-brand-red/40 hover:ring-brand-red/60 transition-all bg-brand-red/20 text-white"
+              onClick={() => setIsDropdownOpen((o) => !o)}
+            >
+              {adminName.charAt(0).toUpperCase()}
+            </Avatar>
+          </Menu.Target>
+
+          <Menu.Dropdown>
+            <div className="flex items-center gap-3 p-4 border-b border-white/10">
+              <Avatar
+                radius="xl"
+                size="lg"
+                className="ring-2 ring-brand-red/40 bg-brand-red/20 text-white"
+              >
+                {adminName.charAt(0).toUpperCase()}
+              </Avatar>
+              <div>
+                <div className="font-bold text-sm text-white">{adminName}</div>
+                <div className="text-xs text-gray-400">{adminEmail}</div>
+              </div>
+            </div>
+
+            <Menu.Item
+              onClick={() => router.push("/admin/dashboard")}
+              className="text-gray-300 hover:text-white hover:bg-white/5 transition-all my-1"
+              style={{ fontWeight: 500, padding: "12px 16px" }}
+            >
+              <Image
+                src={myAccountLogo}
+                alt="my account"
+                className="inline-block opacity-80"
+                width={18}
+                height={18}
+              />
+              &nbsp; Overview
+            </Menu.Item>
+            <Menu.Item
+              onClick={handleSignOut}
+              className="text-red-400 hover:text-red-300 hover:bg-red-500/10 transition-all my-1"
+              style={{ fontWeight: 500, padding: "12px 16px" }}
+            >
+              <Image
+                src={signoutLogo}
+                alt="signout"
+                className="inline-block opacity-80"
+                width={18}
+                height={18}
+              />
+              &nbsp; Sign Out
+            </Menu.Item>
+          </Menu.Dropdown>
+        </Menu>
+      </Group>
+    </div>
+  );
+};
+
+export default AdminHeader;
+
