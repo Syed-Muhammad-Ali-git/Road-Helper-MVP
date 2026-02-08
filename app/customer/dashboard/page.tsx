@@ -28,11 +28,12 @@ import {
   IconArrowRight,
   IconSparkles,
   IconShieldCheck,
-  IconZap,
+  IconBolt,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 // Background assets (using standard paths)
 const mapBg = "/assets/images/backgrounds/map-bg.svg";
@@ -75,6 +76,23 @@ const serviceCategories = [
   },
 ];
 
+const containerVariants: any = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1, delayChildren: 0.2 },
+  },
+};
+
+const itemVariants: any = {
+  hidden: { y: 20, opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: { type: "spring", stiffness: 100 },
+  },
+};
+
 const ClientDashboard = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [userName, setUserName] = useState("User");
@@ -90,22 +108,15 @@ const ClientDashboard = () => {
     }
   }, []);
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.1, delayChildren: 0.2 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { type: "spring", stiffness: 100 },
-    },
-  };
+  const particles = useMemo(
+    () =>
+      [...Array(15)].map((_, i) => ({
+        x: Math.random() * 100 + "%",
+        y_target: Math.random() * 100 + "%",
+        duration: Math.random() * 10 + 10,
+      })),
+    [],
+  );
 
   return (
     <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8">
@@ -132,20 +143,20 @@ const ClientDashboard = () => {
 
         {/* Particles */}
         {isLoaded &&
-          [...Array(15)].map((_, i) => (
+          particles.map((p, i) => (
             <motion.div
               key={i}
               className="absolute w-1 h-1 bg-white/20 rounded-full"
               initial={{
-                x: Math.random() * 100 + "%",
-                y: Math.random() * 100 + "%",
+                x: p.x,
+                y: "100%",
               }}
               animate={{
-                y: [null, Math.random() * 100 + "%"],
+                y: [null, p.y_target],
                 opacity: [0, 0.5, 0],
               }}
               transition={{
-                duration: Math.random() * 10 + 10,
+                duration: p.duration,
                 repeat: Infinity,
                 ease: "linear",
               }}
@@ -154,7 +165,7 @@ const ClientDashboard = () => {
       </div>
 
       <motion.div
-        variants={containerVariants}
+        variants={containerVariants as any}
         initial="hidden"
         animate="visible"
         className="relative z-10 max-w-7xl mx-auto"
@@ -163,7 +174,7 @@ const ClientDashboard = () => {
         <Group justify="space-between" mb={40} align="flex-end">
           <Box>
             <motion.div
-              variants={itemVariants}
+              variants={itemVariants as any}
               className="flex items-center gap-2 mb-2"
             >
               <div className="h-[1px] w-8 bg-brand-red" />
@@ -184,7 +195,7 @@ const ClientDashboard = () => {
               Ready for your next journey? We've got your back.
             </Text>
           </Box>
-          <motion.div variants={itemVariants}>
+          <motion.div variants={itemVariants as any}>
             <Button
               variant="filled"
               className="bg-brand-red text-white shadow-2xl shadow-brand-red/20 hover:bg-brand-dark-red transition-all font-manrope font-bold rounded-2xl h-14 px-8 border border-white/10 group"
@@ -202,7 +213,7 @@ const ClientDashboard = () => {
 
         <SimpleGrid cols={{ base: 1, lg: 3 }} spacing={24} mb={40}>
           {/* --- MAP SECTION --- */}
-          <motion.div variants={itemVariants} className="lg:col-span-2">
+          <motion.div variants={itemVariants as any} className="lg:col-span-2">
             <Paper
               radius="32px"
               className="relative overflow-hidden h-[350px] md:h-[450px] border border-white/10 glass-dark shadow-2xl group"
@@ -253,7 +264,7 @@ const ClientDashboard = () => {
 
           {/* --- SIDE STATS --- */}
           <Stack gap={24}>
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <Paper
                 p={32}
                 radius="32px"
@@ -283,13 +294,13 @@ const ClientDashboard = () => {
                   </Title>
                 </div>
                 <div className="flex items-center gap-2 text-gray-400 text-xs font-medium">
-                  <IconZap size={14} className="text-yellow-500" />
+                  <IconBolt size={14} className="text-yellow-500" />
                   Expires in 312 days
                 </div>
               </Paper>
             </motion.div>
 
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <Paper
                 p={24}
                 radius="32px"
@@ -368,7 +379,7 @@ const ClientDashboard = () => {
             {serviceCategories.map((service) => (
               <motion.div
                 key={service.id}
-                variants={itemVariants}
+                variants={itemVariants as any}
                 whileHover={{
                   y: -10,
                   transition: { type: "spring", stiffness: 300 },
@@ -433,7 +444,7 @@ const ClientDashboard = () => {
         </div>
 
         {/* --- RECENT ACTIVITY --- */}
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants as any}>
           <Paper
             p={40}
             radius="32px"
@@ -498,4 +509,4 @@ const ClientDashboard = () => {
   );
 };
 
-export default memo(ClientDashboard);
+export default ClientDashboard;

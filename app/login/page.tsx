@@ -57,27 +57,33 @@ export default function LoginPage() {
     async (data: any) => {
       setIsLoading(true);
       try {
-        await signInWithEmailAndPassword(auth, data.email, data.password);
+        const userCredential = await signInWithEmailAndPassword(
+          auth,
+          data.email,
+          data.password,
+        );
+        const token = await userCredential.user.getIdToken();
+
         toast.success(
           `🎉 Welcome back, ${loginType === "customer" ? "User" : "Partner"}!`,
         );
 
         if (loginType === "customer") {
-          setCookie("userRole", "customer", {
+          setCookie("role", "customer", {
             maxAge: 60 * 60 * 24 * 7,
             path: "/",
           });
-          setCookie("authToken", "verified", {
+          setCookie("token", token, {
             maxAge: 60 * 60 * 24 * 7,
             path: "/",
           });
           router.push("/customer/dashboard");
         } else {
-          setCookie("userRole", "helper", {
+          setCookie("role", "helper", {
             maxAge: 60 * 60 * 24 * 7,
             path: "/",
           });
-          setCookie("authToken", "verified", {
+          setCookie("token", token, {
             maxAge: 60 * 60 * 24 * 7,
             path: "/",
           });
@@ -371,6 +377,7 @@ export default function LoginPage() {
               ].map((item) => (
                 <motion.button
                   key={item.type}
+                  type="button"
                   onClick={() => setLoginType(item.type as any)}
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
@@ -445,7 +452,7 @@ export default function LoginPage() {
                 />
                 <motion.button
                   type="button"
-                  whileHover={{ scale: 1.1 }}
+                  whileHover={{ scale: 1.1, rotate: 10 }}
                   whileTap={{ scale: 0.9 }}
                   onClick={togglePasswordVisibility}
                   className="absolute right-4 top-4 text-gray-500 hover:text-brand-red transition-colors z-10 cursor-pointer"

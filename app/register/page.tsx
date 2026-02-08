@@ -86,12 +86,13 @@ function RegisterPageContent() {
         data.email,
         data.password,
       );
+      const token = await userCredential.user.getIdToken();
       await updateProfile(userCredential.user, { displayName: data.fullName });
-      setCookie("userRole", "customer", {
+      setCookie("role", "customer", {
         maxAge: 60 * 60 * 24 * 7,
         path: "/",
       });
-      setCookie("authToken", "verified", {
+      setCookie("token", token, {
         maxAge: 60 * 60 * 24 * 7,
         path: "/",
       });
@@ -112,9 +113,10 @@ function RegisterPageContent() {
         data.email,
         data.password,
       );
+      const token = await userCredential.user.getIdToken();
       await updateProfile(userCredential.user, { displayName: data.fullName });
-      setCookie("userRole", "helper", { maxAge: 60 * 60 * 24 * 7, path: "/" });
-      setCookie("authToken", "verified", {
+      setCookie("role", "helper", { maxAge: 60 * 60 * 24 * 7, path: "/" });
+      setCookie("token", token, {
         maxAge: 60 * 60 * 24 * 7,
         path: "/",
       });

@@ -19,63 +19,63 @@ import {
   IconCpu,
   IconActivity,
   IconShieldLock,
-  IconCloudCompute,
+  IconCloudComputing,
   IconBolt,
   IconAlertTriangle,
 } from "@tabler/icons-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 
+const containerVariants: any = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
+
+const itemVariants: any = {
+  hidden: { scale: 0.9, opacity: 0 },
+  visible: {
+    scale: 1,
+    opacity: 1,
+    transition: { type: "spring", stiffness: 100 },
+  },
+};
+
+const systemMetrics = [
+  {
+    title: "Distributed Core",
+    sub: "Load Balanced",
+    val: 98,
+    color: "emerald",
+    icon: IconServer,
+    details: ["Uptime: 14d 21h", "Latency: 24ms"],
+  },
+  {
+    title: "Real-time DB",
+    sub: "Clusters Active",
+    val: 45,
+    color: "blue",
+    icon: IconDatabase,
+    details: ["Conn: 1,204/5k", "Cache: Hit 99.2%"],
+  },
+  {
+    title: "Neural Processing",
+    sub: "Priority Queue",
+    val: 65,
+    color: "amber",
+    icon: IconCpu,
+    details: ["Thread: 4/12", "Cycles: 4.2GHz"],
+  },
+  {
+    title: "Neural Network",
+    sub: "Encrypted Fiber",
+    val: 25,
+    color: "violet",
+    icon: IconWifi,
+    details: ["BW: 1.2 GB/s", "Packet Loss: 0%"],
+  },
+];
+
 const StatusPage = () => {
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-  };
-
-  const itemVariants = {
-    hidden: { scale: 0.9, opacity: 0 },
-    visible: {
-      scale: 1,
-      opacity: 1,
-      transition: { type: "spring", stiffness: 100 },
-    },
-  };
-
-  const systemMetrics = [
-    {
-      title: "Distributed Core",
-      sub: "Load Balanced",
-      val: 98,
-      color: "emerald",
-      icon: IconServer,
-      details: ["Uptime: 14d 21h", "Latency: 24ms"],
-    },
-    {
-      title: "Real-time DB",
-      sub: "Clusters Active",
-      val: 45,
-      color: "blue",
-      icon: IconDatabase,
-      details: ["Conn: 1,204/5k", "Cache: Hit 99.2%"],
-    },
-    {
-      title: "Neural Processing",
-      sub: "Priority Queue",
-      val: 65,
-      color: "amber",
-      icon: IconCpu,
-      details: ["Thread: 4/12", "Cycles: 4.2GHz"],
-    },
-    {
-      title: "Neural Network",
-      sub: "Encrypted Fiber",
-      val: 25,
-      color: "violet",
-      icon: IconWifi,
-      details: ["BW: 1.2 GB/s", "Packet Loss: 0%"],
-    },
-  ];
-
   return (
     <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white">
       {/* Dynamic Grid Background */}
@@ -96,14 +96,14 @@ const StatusPage = () => {
       </div>
 
       <motion.div
-        variants={containerVariants}
+        variants={containerVariants as any}
         initial="hidden"
         animate="visible"
         className="relative z-10 max-w-7xl mx-auto"
       >
         <header className="mb-12">
           <motion.div
-            variants={itemVariants}
+            variants={itemVariants as any}
             className="flex items-center gap-2 mb-2"
           >
             <IconActivity size={16} className="text-brand-red" />
@@ -127,7 +127,7 @@ const StatusPage = () => {
 
         <SimpleGrid cols={{ base: 1, lg: 2 }} spacing={32} mb={45}>
           {systemMetrics.map((metric, idx) => (
-            <motion.div key={idx} variants={itemVariants}>
+            <motion.div key={idx} variants={itemVariants as any}>
               <Paper
                 p={32}
                 radius="32px"
@@ -226,7 +226,7 @@ const StatusPage = () => {
 
         <SimpleGrid cols={{ base: 1, lg: 3 }} spacing={32}>
           {/* Active Protocols */}
-          <motion.div variants={itemVariants} className="lg:col-span-1">
+          <motion.div variants={itemVariants as any} className="lg:col-span-1">
             <Paper
               p={40}
               radius="32px"
@@ -254,7 +254,7 @@ const StatusPage = () => {
                 }}
               >
                 <Timeline.Item
-                  bullet={<IconCloudCompute size={16} />}
+                  bullet={<IconCloudComputing size={16} />}
                   title="Global Auth Proxy"
                 >
                   Active - Encrypted with 256-bit AES protocol.
@@ -276,7 +276,7 @@ const StatusPage = () => {
           </motion.div>
 
           {/* Live Analytics Stream */}
-          <motion.div variants={itemVariants} className="lg:col-span-2">
+          <motion.div variants={itemVariants as any} className="lg:col-span-2">
             <Paper
               p={40}
               radius="32px"

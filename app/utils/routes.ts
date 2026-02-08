@@ -31,7 +31,15 @@ const adminRoutes = [
 /**
  * Public routes accessible without authentication
  */
-const publicRoutes = ["/", "/login", "/register", "/forgot-password"];
+const publicRoutes = [
+  "/",
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/admin/login",
+  "/admin/signup",
+  "/about",
+];
 
 /**
  * All protected routes (for backward compatibility)

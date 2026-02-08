@@ -65,11 +65,11 @@ export default function NearbyRequestsUI() {
   return (
     <Box className="p-4 md:p-8 font-satoshi min-h-screen bg-transparent">
       <motion.div
-        variants={containerVariants}
+        variants={containerVariants as any}
         initial="hidden"
         animate="visible"
       >
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants as any}>
           <Box mb="xl">
             <Text className="text-gray-400 font-medium mb-1 uppercase tracking-wider text-xs">
               Job Requests
@@ -87,7 +87,7 @@ export default function NearbyRequestsUI() {
         </motion.div>
 
         {requests.length === 0 ? (
-          <motion.div variants={itemVariants}>
+          <motion.div variants={itemVariants as any}>
             <Paper
               p="xl"
               radius="xl"
@@ -116,7 +116,7 @@ export default function NearbyRequestsUI() {
             {requests.map((req, idx) => (
               <motion.div
                 key={req.id}
-                variants={itemVariants}
+                variants={itemVariants as any}
                 whileHover={{ scale: 1.02 }}
                 transition={{ type: "spring", stiffness: 300 }}
               >

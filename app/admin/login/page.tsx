@@ -51,12 +51,14 @@ export default function AdminLoginPage() {
   const onSubmit = async (data: any) => {
     setIsLoading(true);
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      setCookie("userRole", "admin", { maxAge: 60 * 60 * 24 * 7, path: "/" });
-      setCookie("authToken", "verified", {
-        maxAge: 60 * 60 * 24 * 7,
-        path: "/",
-      });
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password,
+      );
+      const token = await userCredential.user.getIdToken();
+      setCookie("role", "admin", { maxAge: 60 * 60 * 24 * 7, path: "/" });
+      setCookie("token", token, { maxAge: 60 * 60 * 24 * 7, path: "/" });
       toast.success("🎉 Welcome back, Admin!");
       router.push("/admin/dashboard");
     } catch (error: any) {
@@ -228,6 +230,16 @@ export default function AdminLoginPage() {
                   ⚠️ {errors.password.message as string}
                 </motion.span>
               )}
+              {/* Forgot Password Link */}
+              <div className="text-right pt-1">
+                <Link
+                  href="/forgot-password"
+                  className="text-xs font-semibold text-brand-red hover:text-white transition-colors hover:underline cursor-pointer inline-flex items-center gap-1 group"
+                >
+                  <Lock size={12} className="group-hover:animate-pulse" />
+                  Forgot Password?
+                </Link>
+              </div>
             </motion.div>
 
             <motion.div

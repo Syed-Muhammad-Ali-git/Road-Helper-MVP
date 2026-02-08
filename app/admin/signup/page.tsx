@@ -30,6 +30,9 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from "@/lib/firebase/config";
 import { cn } from "@/lib/utils";
 
 const AdminSignup = () => {
@@ -177,16 +180,31 @@ const AdminSignup = () => {
           </div>
 
           <form
-            onSubmit={form.onSubmit(() => {
-              setCookie("userRole", "admin", {
-                maxAge: 60 * 60 * 24 * 7,
-                path: "/",
-              });
-              setCookie("authToken", "verified", {
-                maxAge: 60 * 60 * 24 * 7,
-                path: "/",
-              });
-              router.push("/admin/dashboard");
+            onSubmit={form.onSubmit(async (data) => {
+              try {
+                const userCredential = await createUserWithEmailAndPassword(
+                  auth,
+                  data.email,
+                  data.password,
+                );
+                const token = await userCredential.user.getIdToken();
+                await updateProfile(userCredential.user, {
+                  displayName: `${data.firstName} ${data.lastName}`,
+                });
+
+                setCookie("role", "admin", {
+                  maxAge: 60 * 60 * 24 * 7,
+                  path: "/",
+                });
+                setCookie("token", token, {
+                  maxAge: 60 * 60 * 24 * 7,
+                  path: "/",
+                });
+                toast.success("🎉 Admin profile established.");
+                router.push("/admin/dashboard");
+              } catch (error: any) {
+                toast.error(`⚠️ ${error.message}`);
+              }
             })}
             className="space-y-6"
           >

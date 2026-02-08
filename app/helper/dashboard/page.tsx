@@ -140,7 +140,7 @@ const HelperDashboard = () => {
       </div>
 
       <motion.div
-        variants={containerVariants}
+        variants={containerVariants as any}
         initial="hidden"
         animate="visible"
         className="relative z-10 max-w-7xl mx-auto"
@@ -149,7 +149,7 @@ const HelperDashboard = () => {
         <Group justify="space-between" mb={40} align="center">
           <Box>
             <motion.div
-              variants={itemVariants}
+              variants={itemVariants as any}
               className="flex items-center gap-2 mb-2"
             >
               <div className="h-[1px] w-8 bg-orange-500" />
@@ -168,7 +168,7 @@ const HelperDashboard = () => {
             </Title>
           </Box>
 
-          <motion.div variants={itemVariants}>
+          <motion.div variants={itemVariants as any}>
             <Paper
               p="md"
               radius="24px"
@@ -207,7 +207,7 @@ const HelperDashboard = () => {
 
         <SimpleGrid cols={{ base: 1, lg: 4 }} spacing={24} mb={24}>
           {/* Earnings Card */}
-          <motion.div variants={itemVariants} className="lg:col-span-2">
+          <motion.div variants={itemVariants as any} className="lg:col-span-2">
             <Paper
               p={40}
               radius="32px"
@@ -261,7 +261,7 @@ const HelperDashboard = () => {
           </motion.div>
 
           {/* Jobs Stat Card */}
-          <motion.div variants={itemVariants}>
+          <motion.div variants={itemVariants as any}>
             <Paper
               p={32}
               radius="32px"
@@ -289,7 +289,7 @@ const HelperDashboard = () => {
           </motion.div>
 
           {/* Rating Card */}
-          <motion.div variants={itemVariants}>
+          <motion.div variants={itemVariants as any}>
             <Paper
               p={32}
               radius="32px"
@@ -320,7 +320,7 @@ const HelperDashboard = () => {
 
         {/* Payment Warning */}
         {userData.paymentDue && (
-          <motion.div variants={itemVariants} className="mb-24">
+          <motion.div variants={itemVariants as any} className="mb-24">
             <Paper
               p={24}
               radius="24px"
@@ -355,7 +355,7 @@ const HelperDashboard = () => {
 
         <SimpleGrid cols={{ base: 1, lg: 3 }} spacing={24} mb={40}>
           {/* Main Feed Section */}
-          <motion.div variants={itemVariants} className="lg:col-span-2">
+          <motion.div variants={itemVariants as any} className="lg:col-span-2">
             <Paper
               p={40}
               radius="32px"
@@ -426,7 +426,7 @@ const HelperDashboard = () => {
 
           {/* Side Widget */}
           <Stack gap={24}>
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <Paper
                 p={40}
                 radius="32px"
@@ -480,7 +480,7 @@ const HelperDashboard = () => {
               </Paper>
             </motion.div>
 
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <Paper
                 p={30}
                 radius="32px"
@@ -511,7 +511,7 @@ const HelperDashboard = () => {
         </SimpleGrid>
 
         {/* RECENT SETTLEMENTS */}
-        <motion.div variants={itemVariants}>
+        <motion.div variants={itemVariants as any}>
           <Paper
             p={40}
             radius="32px"
@@ -582,4 +582,4 @@ const HelperDashboard = () => {
   );
 };
 
-export default memo(HelperDashboard);
+export default HelperDashboard;

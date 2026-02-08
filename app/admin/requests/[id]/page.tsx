@@ -9,7 +9,7 @@ import {
   IconUser,
   IconPhone,
   IconCar,
-  IconWrench,
+  IconTools,
   IconCircleCheck,
   IconAlertCircle,
   IconClock,
@@ -32,8 +32,9 @@ import {
   Stack,
   ThemeIcon,
   ActionIcon,
+  Title,
 } from "@mantine/core";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { cn } from "@/lib/utils";
@@ -89,7 +90,17 @@ const getRequestById = (id: string) => {
   };
 };
 
-const IconTruck = (props: any) => <IconWrench {...props} />; // Placeholder as IconTruck import was missed
+const IconTruck = (props: any) => <IconTools {...props} />; // Placeholder as IconTruck import was missed
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
+
+const itemVariants: Variants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1 },
+};
 
 const RequestDetailPage = () => {
   const params = useParams();
@@ -99,16 +110,6 @@ const RequestDetailPage = () => {
 
   const handleAction = () => {
     toast.success("Job status updated successfully.");
-  };
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
-  };
-
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { y: 0, opacity: 1 },
   };
 
   return (
@@ -128,7 +129,7 @@ const RequestDetailPage = () => {
       </div>
 
       <motion.div
-        variants={containerVariants}
+        variants={containerVariants as any}
         initial="hidden"
         animate="visible"
         className="relative z-10 max-w-6xl mx-auto"
@@ -180,7 +181,7 @@ const RequestDetailPage = () => {
           {/* Primary Intel */}
           <div className="lg:col-span-8 space-y-8">
             {/* Mission Progress */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <Paper
                 p={40}
                 radius="40px"
@@ -262,7 +263,7 @@ const RequestDetailPage = () => {
             </motion.div>
 
             {/* Deployment Details */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <Paper
                 p={40}
                 radius="40px"
@@ -281,7 +282,7 @@ const RequestDetailPage = () => {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-12">
                   {[
                     {
-                      icon: IconWrench,
+                      icon: IconTools,
                       label: "Assigned Service",
                       value: request.service,
                       color: "red",
@@ -366,7 +367,7 @@ const RequestDetailPage = () => {
           {/* Sidebar Intel */}
           <div className="lg:col-span-4 space-y-8">
             {/* Asset: Requester */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <Paper
                 p={32}
                 radius="40px"
@@ -443,14 +444,14 @@ const RequestDetailPage = () => {
             </motion.div>
 
             {/* Asset: Deployer */}
-            <motion.div variants={itemVariants}>
+            <motion.div variants={itemVariants as any}>
               <Paper
                 p={32}
                 radius="40px"
                 className="glass-dark border border-white/10 shadow-2xl overflow-hidden relative group"
               >
                 <div className="absolute top-0 right-0 p-6 text-white/[0.01]">
-                  <IconWrench size={100} />
+                  <IconTools size={100} />
                 </div>
                 <Title
                   order={4}
