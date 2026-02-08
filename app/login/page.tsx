@@ -1,298 +1,437 @@
 "use client";
 
-import React, { useState } from "react";
-import {
-  TextInput,
-  PasswordInput,
-  Button,
-  Title,
-  Text,
-  Stack,
-  SegmentedControl,
-  Paper,
-  Divider,
-} from "@mantine/core";
-import { IconBrandGoogle } from "@tabler/icons-react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
-import { useForm } from "@mantine/form";
-import { zodResolver } from "mantine-form-zod-resolver";
-import { z } from "zod";
-import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import logoIcon from "../assets/images/logo.png";
+import { toast } from "react-toastify";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase/config";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { cn } from "@/lib/utils";
+import {
+  Mail,
+  Lock,
+  ArrowRight,
+  Loader2,
+  UserCircle,
+  Eye,
+  EyeOff,
+  Sparkles,
+  Zap,
+} from "lucide-react";
 
-const customerSchema = z.object({
-  phone: z.string().min(10, "Phone number must be at least 10 digits"),
-});
-
-const helperSchema = z.object({
+const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
 export default function LoginPage() {
-  const [loginType, setLoginType] = useState<string>("customer");
+  const [loginType, setLoginType] = useState<"customer" | "helper">("customer");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const [isClient, setIsClient] = useState(false);
 
-  const customerForm = useForm({
-    initialValues: { phone: "" },
-    validate: zodResolver(customerSchema),
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(loginSchema),
   });
 
-  const helperForm = useForm({
-    initialValues: { email: "", password: "" },
-    validate: zodResolver(helperSchema),
-  });
+  const onSubmit = async (data: any) => {
+    setIsLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+      toast.success(
+        `🎉 Welcome back, ${loginType === "customer" ? "User" : "Partner"}!`,
+      );
 
-  const handleCustomerSubmit = async (values: typeof customerForm.values) => {
-    toast.success("Welcome back!");
-    router.replace("/customer/dashboard");
-  };
-
-  const handleHelperSubmit = async (values: typeof helperForm.values) => {
-    toast.success("Welcome back, Helper!");
-    router.replace("/helper/dashboard");
+      if (loginType === "customer") {
+        router.push("/customer/dashboard");
+      } else {
+        router.push("/helper/dashboard");
+      }
+    } catch (error: any) {
+      console.error(error);
+      toast.error("⚠️ Invalid email or password.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen flex bg-brand-black font-satoshi text-white">
-      {/* Left Side - Image */}
-      <motion.div
-        initial={{ opacity: 0, x: -50 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.8 }}
-        className="hidden lg:block w-1/2 relative overflow-hidden bg-brand-charcoal"
-      >
-        <Image
-          src="/assets/images/login-sidebar.png"
-          alt="Road Helper Network"
-          fill
-          className="object-cover opacity-80"
-          priority
-        />
-        <div className="absolute inset-0 bg-linear-to-t from-brand-black/90 to-transparent" />
-
-        <div className="absolute bottom-16 left-0 p-16 text-white z-10">
-          <div className="mb-6 w-16 h-16 rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20">
-            <Image
-              src={logoIcon}
-              alt="Logo"
-              width={64}
-              height={64}
-              className="object-cover"
+    <div className="min-h-screen flex bg-gradient-to-br from-black via-brand-black to-black font-satoshi text-white overflow-hidden relative">
+      {/* Animated Background Particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {isClient &&
+          [...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-brand-red/30 rounded-full"
+              initial={{
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                scale: Math.random() * 0.5 + 0.5,
+              }}
+              animate={{
+                y: [null, Math.random() * window.innerHeight],
+                x: [null, Math.random() * window.innerWidth],
+                opacity: [0.2, 0.8, 0.2],
+                scale: [null, Math.random() * 1.5 + 0.5],
+              }}
+              transition={{
+                duration: Math.random() * 10 + 10,
+                repeat: Infinity,
+                ease: "linear",
+              }}
             />
-          </div>
-          <Title className="font-manrope text-5xl font-bold mb-4 leading-tight">
-            Your Safety, <br />
-            <span className="text-brand-red">Our Priority.</span>
-          </Title>
-          <Text className="text-gray-300 text-lg max-w-md">
-            Join thousands of drivers and helpers in the fastest growing
-            roadside assistance network.
-          </Text>
+          ))}
+      </div>
+
+      {/* Gradient Orbs */}
+      <motion.div
+        animate={{
+          scale: [1, 1.2, 1],
+          rotate: [0, 180, 360],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] bg-brand-red/20 blur-[150px] rounded-full"
+      />
+      <motion.div
+        animate={{
+          scale: [1, 1.3, 1],
+          rotate: [360, 180, 0],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "linear",
+        }}
+        className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-blue-600/20 blur-[150px] rounded-full"
+      />
+
+      {/* Left Side - Premium Image */}
+      <motion.div
+        initial={{ opacity: 0, x: -100 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1, ease: "easeOut" }}
+        className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 z-10"
+      >
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-brand-charcoal/50 to-transparent">
+          <Image
+            src="/assets/images/login-sidebar.png"
+            alt="Background"
+            fill
+            className="object-cover opacity-30 grayscale"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent" />
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.8 }}
+          className="relative z-10"
+        >
+          <div className="flex items-center gap-3 mb-8">
+            <motion.div
+              whileHover={{ scale: 1.1, rotate: 5 }}
+              className="w-14 h-14 relative bg-white rounded-2xl overflow-hidden shadow-2xl shadow-brand-red/30 p-2"
+            >
+              <Image
+                src="/assets/images/logo.png"
+                alt="Road Helper Logo"
+                fill
+                className="object-contain"
+              />
+            </motion.div>
+            <span className="font-manrope font-bold text-3xl tracking-tighter">
+              Road<span className="text-brand-red">Helper</span>
+            </span>
+          </div>
+
+          <motion.h1
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="text-7xl font-bold leading-tight mb-6"
+          >
+            Roadside <br />
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
+              Assistance
+            </span>
+            <br /> Redefined.
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.7 }}
+            className="text-gray-300 text-xl max-w-md leading-relaxed"
+          >
+            Connect with verified mechanics and towing services instantly. Safe,
+            fast, and reliable help whenever you need it.
+          </motion.p>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1 }}
+          className="relative z-10 flex gap-4"
+        >
+          {[
+            { icon: Sparkles, label: "24/7 Support", value: "Always On" },
+            { icon: Zap, label: "Avg ETA", value: "15 mins" },
+          ].map((stat, i) => (
+            <motion.div
+              key={i}
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="glass-dark px-6 py-4 rounded-2xl border border-white/10 backdrop-blur-xl cursor-pointer group"
+            >
+              <div className="flex items-center gap-3 mb-2">
+                <stat.icon
+                  className="text-brand-red group-hover:animate-spin"
+                  size={24}
+                />
+                <p className="text-2xl font-bold text-white">{stat.value}</p>
+              </div>
+              <p className="text-xs text-gray-400 uppercase tracking-widest">
+                {stat.label}
+              </p>
+            </motion.div>
+          ))}
+        </motion.div>
       </motion.div>
 
       {/* Right Side - Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-brand-black relative">
-        <Link
-          href="/"
-          className="absolute top-8 right-8 text-sm font-bold text-gray-400 hover:text-brand-red transition-colors"
-        >
-          Back to Home
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 relative z-10">
+        <Link href="/" className="absolute top-8 right-8 group">
+          <motion.div
+            whileHover={{ scale: 1.05, x: 5 }}
+            className="flex items-center gap-2 text-sm font-bold text-gray-400 hover:text-brand-red transition-all"
+          >
+            <span>Back to Home</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </motion.div>
         </Link>
 
-        <div className="w-full max-w-md">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="w-full max-w-[480px]"
+        >
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.5 }}
+            className="mb-8 text-center"
           >
-            <div className="text-center mb-10">
-              <Title className="font-manrope text-4xl font-bold text-white mb-2">
-                Welcome Back
-              </Title>
-              <Text className="text-gray-500">
-                Please enter your details to sign in.
-              </Text>
-            </div>
-
-            <Paper
-              p="md"
-              radius="lg"
-              className="bg-brand-charcoal border border-gray-800 mb-8"
+            <motion.div
+              whileHover={{ rotate: [0, 5, -5, 0], scale: 1.1 }}
+              transition={{ duration: 0.5 }}
+              className="inline-block p-5 rounded-2xl bg-gradient-to-br from-brand-red/20 to-orange-500/20 mb-6 border border-brand-red/20 shadow-2xl shadow-brand-red/20 backdrop-blur-xl"
             >
-              <SegmentedControl
-                fullWidth
-                size="md"
-                radius="md"
-                value={loginType}
-                onChange={setLoginType}
-                data={[
-                  { label: "For Customers", value: "customer" },
-                  { label: "For Helpers", value: "helper" },
-                ]}
-                classNames={{
-                  root: "bg-transparent",
-                  indicator: "bg-brand-red shadow-md",
-                  label:
-                    "text-gray-400 data-[active=true]:text-white font-semibold",
-                }}
-              />
-            </Paper>
+              <UserCircle size={48} className="text-brand-red" />
+            </motion.div>
+            <h2 className="text-4xl font-bold mb-2 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+              Welcome Back
+            </h2>
+            <p className="text-gray-400 text-lg">
+              Sign in to continue your journey
+            </p>
+          </motion.div>
 
-            <AnimatePresence mode="wait">
-              {loginType === "customer" ? (
-                <motion.form
-                  key="customer"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  onSubmit={customerForm.onSubmit(handleCustomerSubmit)}
-                >
-                  <Stack>
-                    <TextInput
-                      label="Phone Number"
-                      placeholder="+1 (555) 000-0000"
-                      size="lg"
-                      radius="md"
-                      classNames={{
-                        input:
-                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
-                        label: "text-gray-300 mb-1",
-                      }}
-                      {...customerForm.getInputProps("phone")}
-                    />
-                    <Button
-                      type="submit"
-                      size="lg"
-                      radius="md"
-                      fullWidth
-                      className="bg-brand-red hover:bg-brand-dark-red transition-colors h-14 font-manrope font-bold text-lg text-white"
-                    >
-                      Continue
-                    </Button>
-
-                    <Divider
-                      label="Or continue with"
-                      labelPosition="center"
-                      my="sm"
-                      color="gray.8"
-                    />
-
-                    <Button
-                      variant="default"
-                      size="lg"
-                      radius="md"
-                      fullWidth
-                      leftSection={<IconBrandGoogle size={20} />}
-                      className="bg-white/5 text-white hover:bg-white/10 border-white/10 transition-colors h-14 font-manrope font-bold text-lg"
-                      onClick={() => toast.info("Google Login coming soon!")}
-                    >
-                      Sign in with Google
-                    </Button>
-                    <Text size="sm" ta="center" className="text-gray-500 mt-2">
-                      If You are new First Signup to continue{" "}
-                      <Link
-                        href="/register?type=customer"
-                        className="text-brand-red font-bold hover:underline"
-                      >
-                        Signup here
-                      </Link>
-                    </Text>
-                  </Stack>
-                </motion.form>
-              ) : (
-                <motion.form
-                  key="helper"
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  transition={{ duration: 0.3 }}
-                  onSubmit={helperForm.onSubmit(handleHelperSubmit)}
-                >
-                  <Stack>
-                    <TextInput
-                      label="Email Address"
-                      placeholder="helper@roadhelper.com"
-                      size="lg"
-                      radius="md"
-                      classNames={{
-                        input:
-                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
-                        label: "text-gray-300 mb-1",
-                      }}
-                      {...helperForm.getInputProps("email")}
-                    />
-                    <PasswordInput
-                      label="Password"
-                      placeholder="••••••••"
-                      size="lg"
-                      radius="md"
-                      classNames={{
-                        input:
-                          "bg-white/5 border-white/10 text-white focus:border-brand-red focus:ring-1 focus:ring-brand-red placeholder:text-gray-600",
-                        label: "text-gray-300 mb-1",
-                        innerInput: "placeholder:text-gray-600",
-                      }}
-                      {...helperForm.getInputProps("password")}
-                    />
-                    <Button
-                      type="submit"
-                      size="lg"
-                      radius="md"
-                      fullWidth
-                      className="bg-brand-red hover:bg-brand-dark-red transition-colors h-14 font-manrope font-bold text-lg text-white"
-                    >
-                      Login to Dashboard
-                    </Button>
-
-                    <Divider
-                      label="Or continue with"
-                      labelPosition="center"
-                      my="sm"
-                      color="gray.8"
-                    />
-
-                    <Button
-                      variant="default"
-                      size="lg"
-                      radius="md"
-                      fullWidth
-                      leftSection={<IconBrandGoogle size={20} />}
-                      className="bg-white/5 text-white hover:bg-white/10 border-white/10 transition-colors h-14 font-manrope font-bold text-lg"
-                      onClick={() => toast.info("Google Login coming soon!")}
-                    >
-                      Sign in with Google
-                    </Button>
-                    <Text size="sm" ta="center" className="text-gray-500 mt-2">
-                      Want to be a helper?{" "}
-                      <Link
-                        href="/register?type=helper"
-                        className="text-brand-red font-bold hover:underline"
-                      >
-                        Apply here
-                      </Link>
-                    </Text>
-                  </Stack>
-                </motion.form>
+          {/* Toggle Switch */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="relative bg-white/5 p-1.5 rounded-2xl border border-white/10 mb-8 backdrop-blur-xl shadow-xl"
+          >
+            <motion.div
+              layout
+              className={cn(
+                "absolute top-1.5 bottom-1.5 w-[calc(50%-6px)] bg-gradient-to-r from-brand-red to-brand-dark-red rounded-xl shadow-lg shadow-brand-red/30",
+                loginType === "helper" ? "left-[calc(50%+3px)]" : "left-1.5",
               )}
-            </AnimatePresence>
-
-            <div className="mt-8 text-center">
-              <Text size="sm" className="text-gray-400">
-                Protected by reCAPTCHA and subject to the Road Helper{" "}
-                <Link href="#" className="underline">
-                  Privacy Policy
-                </Link>
-                .
-              </Text>
+              transition={{ type: "spring", stiffness: 500, damping: 30 }}
+            />
+            <div className="relative z-10 flex">
+              {["customer", "helper"].map((type) => (
+                <motion.button
+                  key={type}
+                  onClick={() => setLoginType(type as any)}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  className={cn(
+                    "flex-1 py-3.5 text-sm font-bold rounded-xl transition-colors duration-300",
+                    loginType === type ? "text-white" : "text-gray-400",
+                  )}
+                >
+                  {type === "customer" ? "👤 Customer" : "🛠️ Helper"}
+                </motion.button>
+              ))}
             </div>
           </motion.div>
-        </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="space-y-2"
+            >
+              <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
+                <Mail size={14} className="text-brand-red" />
+                Email Address
+              </Label>
+              <motion.div
+                whileFocus={{ scale: 1.01 }}
+                className="relative group"
+              >
+                <Mail className="absolute left-4 top-3.5 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10" />
+                <Input
+                  {...register("email")}
+                  className="pl-12 h-14 bg-white/5 backdrop-blur-xl border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
+                  placeholder="name@example.com"
+                />
+                <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
+              </motion.div>
+              {errors.email && (
+                <motion.span
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-400 text-xs ml-1 flex items-center gap-1"
+                >
+                  ⚠️ {errors.email.message as string}
+                </motion.span>
+              )}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="space-y-2"
+            >
+              <div className="flex justify-between items-center">
+                <Label className="text-gray-300 text-xs uppercase tracking-wider font-bold flex items-center gap-2">
+                  <Lock size={14} className="text-brand-red" />
+                  Password
+                </Label>
+                <Link
+                  href="/forgot-password"
+                  className="text-xs text-brand-red hover:text-white transition-colors hover:underline"
+                >
+                  Forgot?
+                </Link>
+              </div>
+              <motion.div
+                whileFocus={{ scale: 1.01 }}
+                className="relative group"
+              >
+                <Lock className="absolute left-4 top-4 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10" />
+                <Input
+                  {...register("password")}
+                  type={showPassword ? "text" : "password"}
+                  className="pl-12 pr-12 h-14 bg-white/5 backdrop-blur-xl border-white/10 text-white focus:ring-2 focus:ring-brand-red/50 focus:border-brand-red rounded-xl transition-all hover:bg-white/10 hover:border-brand-red/50"
+                  placeholder="••••••••"
+                />
+                <motion.button
+                  type="button"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-4 text-gray-500 hover:text-brand-red transition-colors z-10"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </motion.button>
+                <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
+              </motion.div>
+              {errors.password && (
+                <motion.span
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-red-400 text-xs ml-1 flex items-center gap-1"
+                >
+                  ⚠️ {errors.password.message as string}
+                </motion.span>
+              )}
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full h-16 text-lg font-bold bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red bg-size-200 bg-pos-0 hover:bg-pos-100 hover:shadow-2xl hover:shadow-brand-red/50 transition-all duration-500 rounded-xl mt-4 group relative overflow-hidden"
+                style={{ backgroundSize: "200% 100%" }}
+              >
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+                />
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="animate-spin" size={20} />
+                      Signing In...
+                    </>
+                  ) : (
+                    <>
+                      Sign In
+                      <ArrowRight
+                        className="group-hover:translate-x-1 transition-transform"
+                        size={20}
+                      />
+                    </>
+                  )}
+                </span>
+              </Button>
+            </motion.div>
+          </form>
+
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.6 }}
+            className="mt-8 text-center"
+          >
+            <p className="text-gray-500">
+              Don't have an account?{" "}
+              <Link
+                href={`/register?type=${loginType}`}
+                className="text-white font-bold hover:text-brand-red transition-colors relative group"
+              >
+                Create Account
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-brand-red group-hover:w-full transition-all duration-300"></span>
+              </Link>
+            </p>
+          </motion.div>
+        </motion.div>
       </div>
     </div>
   );

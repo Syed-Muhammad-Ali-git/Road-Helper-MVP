@@ -1,361 +1,303 @@
 "use client";
 
 import React from "react";
+import { useParams, useRouter } from "next/navigation";
 import {
-  Title,
-  Text,
-  Paper,
-  Group,
-  Button,
-  Badge,
-  Avatar,
-  Box,
-  Divider,
-  SimpleGrid,
-  ThemeIcon,
-  Timeline,
-} from "@mantine/core";
-import {
-  IconArrowLeft,
-  IconMapPin,
-  IconClock,
-  IconPhone,
-  IconMail,
-  IconCar,
-  IconCreditCard,
-  IconCheck,
-  IconUser,
-  IconAlertCircle,
-} from "@tabler/icons-react";
+  ArrowLeft,
+  MapPin,
+  Calendar,
+  User,
+  Phone,
+  Car,
+  Wrench,
+  CheckCircle,
+  AlertCircle,
+  Clock,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge, Paper, Text, Avatar, Divider, Timeline } from "@mantine/core";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { toast } from "react-toastify";
 
-export default function RequestDetailPage() {
-  const params = useParams();
-  const requestId = params.id;
-
-  // Mock Data for Detail View
-  const requestData = {
-    id: requestId,
+// Enhanced Mock Data (In a real app, fetch from API by ID)
+const getRequestById = (id: string) => {
+  // Return mock data for demo purposes, assume ID matches regex or something
+  return {
+    id: id || "REQ-001",
     user: {
       name: "Ali Raza",
       phone: "+92 300 1234567",
-      email: "ali@gmail.com",
-      image: null,
+      email: "ali@example.com",
+      avatar: null,
     },
     helper: {
-      name: "Ahmed Khan",
+      name: "Ahmed K.",
       phone: "+92 321 7654321",
-      email: "ahmed@helper.com",
       rating: 4.8,
-      image: null,
+      avatar: null,
     },
-    service: {
-      type: "Towing Service",
-      description:
-        "Car broke down near Liberty Market, need towing to Johar Town.",
-      status: "In Progress",
-      startTime: "10:30 AM",
-      estimatedEnd: "11:15 AM",
-    },
-    location: {
-      address: "Gulberg III, Lahore, Pakistan",
-      lat: 31.5204,
-      lng: 74.3587,
-    },
-    payment: {
-      total: 4500,
-      platformFee: 900, // 20%
-      status: "Paid",
-      method: "Cash",
-    },
+    service: "Towing",
+    vehicle: "Honda Civic 2019 (White)",
+    location: "Gulberg III, Lahore, Pakistan",
+    status: "In Progress",
+    createdAt: "2024-02-15 10:30 AM",
+    amount: "Rs 4,500",
+    notes: "Car broke down near Main Boulevard. Engine is not starting.",
+    timeline: [
+      { title: "Request Created", time: "10:30 AM", active: true },
+      { title: "Helper Assigned", time: "10:35 AM", active: true },
+      { title: "Helper Arrived", time: "10:50 AM", active: true },
+      { title: "Job Completed", time: "-", active: false },
+    ],
+  };
+};
+
+export default function RequestDetailPage() {
+  const params = useParams();
+  const router = useRouter();
+  const id = params.id as string;
+  const request = getRequestById(id);
+
+  const handleAssignHelper = () => {
+    toast.info("Assign Helper Logic would go here.");
   };
 
   return (
-    <Box className="p-4 md:p-8 min-h-screen font-satoshi bg-brand-black text-white">
+    <div className="min-h-screen bg-brand-black text-white p-4 md:p-8 font-satoshi">
       <motion.div
-        initial={{ opacity: 0, x: 20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.4 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-5xl mx-auto"
       >
-        <Group mb="lg">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
           <Button
-            component={Link}
-            href="/admin/requests"
-            variant="subtle"
-            color="gray"
-            leftSection={<IconArrowLeft size={18} />}
-            className="hover:bg-white/10 text-gray-400 hover:text-white transition-colors"
+            variant="ghost"
+            onClick={() => router.back()}
+            className="text-gray-400 hover:text-white"
           >
-            Back to Requests
+            <ArrowLeft size={20} className="mr-2" />
+            Back
           </Button>
-        </Group>
-
-        <Group justify="space-between" mb="xl" align="flex-start">
-          <div>
-            <Group gap="sm" mb="xs">
-              <Title className="font-manrope text-3xl font-bold text-white">
-                Request #{requestId}
-              </Title>
-              <Badge size="lg" variant="light" color="blue" className="ml-2">
-                {requestData.service.status}
+          <div className="flex-1">
+            <div className="flex items-center gap-3">
+              <h1 className="text-3xl font-bold font-manrope">
+                Request Details
+              </h1>
+              <Badge
+                size="lg"
+                color={request.status === "In Progress" ? "blue" : "green"}
+              >
+                {request.status}
               </Badge>
-            </Group>
-            <Text className="text-gray-400">
-              Created on Feb 12, 2026 at 10:30 AM
-            </Text>
+            </div>
+            <p className="text-gray-400 text-sm mt-1">ID: {request.id}</p>
           </div>
-          <Group>
-            <Button
-              variant="default"
-              className="border-red-500/30 text-red-400 hover:bg-red-500/10"
-            >
-              Cancel Request
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <Button className="bg-brand-red hover:bg-brand-dark-red">
+              Mark as Completed
             </Button>
-            <Button className="bg-brand-red hover:bg-brand-dark-red text-white">
-              Download Invoice
-            </Button>
-          </Group>
-        </Group>
+          </div>
+        </div>
 
-        <SimpleGrid cols={{ base: 1, lg: 3 }} spacing="lg">
-          {/* Left Column: Details */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* User & Helper Info */}
-            <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
-              <Paper
-                p="lg"
-                radius="xl"
-                className="glass-dark border border-white/10"
-              >
-                <Group mb="md">
-                  <IconUser className="text-brand-red" />
-                  <Text fw={700} className="text-white">
-                    Customer Details
-                  </Text>
-                </Group>
-                <Group mb="md">
-                  <Avatar size="lg" color="red" radius="xl">
-                    {requestData.user.name[0]}
-                  </Avatar>
-                  <div>
-                    <Text fw={600} className="text-white">
-                      {requestData.user.name}
-                    </Text>
-                    <Text size="sm" className="text-gray-400">
-                      Customer
-                    </Text>
-                  </div>
-                </Group>
-                <Divider color="dark.6" mb="md" />
-                <div className="space-y-3">
-                  <Group gap="sm">
-                    <IconPhone size={16} className="text-gray-500" />
-                    <Text size="sm" className="text-gray-300">
-                      {requestData.user.phone}
-                    </Text>
-                  </Group>
-                  <Group gap="sm">
-                    <IconMail size={16} className="text-gray-500" />
-                    <Text size="sm" className="text-gray-300">
-                      {requestData.user.email}
-                    </Text>
-                  </Group>
-                </div>
-              </Paper>
-
-              <Paper
-                p="lg"
-                radius="xl"
-                className="glass-dark border border-white/10"
-              >
-                <Group mb="md">
-                  <IconUser className="text-emerald-500" />
-                  <Text fw={700} className="text-white">
-                    Helper Details
-                  </Text>
-                </Group>
-                <Group mb="md">
-                  <Avatar size="lg" color="green" radius="xl">
-                    {requestData.helper.name[0]}
-                  </Avatar>
-                  <div>
-                    <Text fw={600} className="text-white">
-                      {requestData.helper.name}
-                    </Text>
-                    <Group gap="xs">
-                      <Text size="sm" className="text-gray-400">
-                        Mechanic
-                      </Text>
-                      <Badge size="xs" color="yellow" variant="dot">
-                        4.8 ★
-                      </Badge>
-                    </Group>
-                  </div>
-                </Group>
-                <Divider color="dark.6" mb="md" />
-                <div className="space-y-3">
-                  <Group gap="sm">
-                    <IconPhone size={16} className="text-gray-500" />
-                    <Text size="sm" className="text-gray-300">
-                      {requestData.helper.phone}
-                    </Text>
-                  </Group>
-                  <Group gap="sm">
-                    <IconMail size={16} className="text-gray-500" />
-                    <Text size="sm" className="text-gray-300">
-                      {requestData.helper.email}
-                    </Text>
-                  </Group>
-                </div>
-              </Paper>
-            </SimpleGrid>
-
-            {/* Service Details */}
+            {/* Status & Map Card */}
             <Paper
-              p="lg"
-              radius="xl"
-              className="glass-dark border border-white/10"
+              p="xl"
+              radius="lg"
+              className="bg-brand-charcoal border border-white/5"
             >
-              <Title order={4} className="text-white mb-6">
-                Service Information
-              </Title>
-              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xl">
+              <div className="flex items-start justify-between mb-6">
                 <div>
-                  <Text
-                    size="xs"
-                    className="text-gray-500 uppercase font-bold mb-1"
-                  >
+                  <h3 className="text-xl font-bold mb-1">Current Status</h3>
+                  <p className="text-gray-400 text-sm">
+                    Real-time updates on the service.
+                  </p>
+                </div>
+                <Clock className="text-brand-red" />
+              </div>
+
+              {/* Mock Timeline */}
+              <div className="relative pl-4 space-y-8 border-l border-white/10 ml-2">
+                {request.timeline.map((item, idx) => (
+                  <div key={idx} className="relative pl-6">
+                    <div
+                      className={`absolute -left-[21px] top-1 w-3 h-3 rounded-full border-2 ${item.active ? "bg-brand-red border-brand-red" : "bg-brand-black border-gray-600"}`}
+                    />
+                    <h4
+                      className={`text-sm font-bold ${item.active ? "text-white" : "text-gray-500"}`}
+                    >
+                      {item.title}
+                    </h4>
+                    <p className="text-xs text-gray-500">{item.time}</p>
+                  </div>
+                ))}
+              </div>
+            </Paper>
+
+            {/* Details Card */}
+            <Paper
+              p="xl"
+              radius="lg"
+              className="bg-brand-charcoal border border-white/5"
+            >
+              <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
+                <Wrench size={20} className="text-gray-400" />
+                Service Info
+              </h3>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="text-gray-500 text-sm block mb-1">
                     Service Type
-                  </Text>
-                  <Group gap="xs" mb="md">
-                    <IconCar size={20} className="text-blue-400" />
-                    <Text className="text-white text-lg font-medium">
-                      {requestData.service.type}
-                    </Text>
-                  </Group>
-
-                  <Text
-                    size="xs"
-                    className="text-gray-500 uppercase font-bold mb-1"
-                  >
-                    Description
-                  </Text>
-                  <Text className="text-gray-300 mb-md">
-                    {requestData.service.description}
-                  </Text>
+                  </label>
+                  <p className="font-semibold text-lg">{request.service}</p>
                 </div>
                 <div>
-                  <Text
-                    size="xs"
-                    className="text-gray-500 uppercase font-bold mb-1"
-                  >
-                    Location
-                  </Text>
-                  <Group gap="xs" mb="lg">
-                    <IconMapPin size={20} className="text-brand-red" />
-                    <Text className="text-white">
-                      {requestData.location.address}
-                    </Text>
-                  </Group>
+                  <label className="text-gray-500 text-sm block mb-1">
+                    Vehicle Details
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <Car size={16} className="text-brand-red" />
+                    <p className="font-semibold">{request.vehicle}</p>
+                  </div>
                 </div>
-              </SimpleGrid>
+                <div>
+                  <label className="text-gray-500 text-sm block mb-1">
+                    Location
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <MapPin size={16} className="text-brand-red" />
+                    <p className="font-medium text-sm text-gray-300">
+                      {request.location}
+                    </p>
+                  </div>
+                </div>
+                <div>
+                  <label className="text-gray-500 text-sm block mb-1">
+                    Total Amount
+                  </label>
+                  <p className="font-bold text-xl text-green-400">
+                    {request.amount}
+                  </p>
+                </div>
+              </div>
+
+              <Divider my="lg" color="gray.8" />
+
+              <div>
+                <label className="text-gray-500 text-sm block mb-2">
+                  Customer Notes
+                </label>
+                <p className="text-gray-300 bg-black/20 p-4 rounded-lg italic">
+                  "{request.notes}"
+                </p>
+              </div>
             </Paper>
           </div>
 
-          {/* Right Column: Timeline & Payment */}
+          {/* Sidebar Info */}
           <div className="space-y-6">
+            {/* Customer Info */}
             <Paper
               p="lg"
-              radius="xl"
-              className="glass-dark border border-white/10"
+              radius="lg"
+              className="bg-brand-charcoal border border-white/5"
             >
-              <Title order={4} className="text-white mb-6">
-                Timeline
-              </Title>
-              <Timeline active={1} bulletSize={24} lineWidth={2} color="red">
-                <Timeline.Item
-                  bullet={<IconCheck size={12} />}
-                  title="Request Created"
-                >
-                  <Text c="dimmed" size="xs">
-                    10:30 AM
-                  </Text>
-                </Timeline.Item>
-                <Timeline.Item
-                  bullet={<IconUser size={12} />}
-                  title="Helper Assigned"
-                >
-                  <Text c="dimmed" size="xs">
-                    10:35 AM
-                  </Text>
-                </Timeline.Item>
-                <Timeline.Item
-                  bullet={<IconCar size={12} />}
-                  title="Helper Arrived"
-                  lineVariant="dashed"
-                >
-                  <Text c="dimmed" size="xs">
-                    10:50 AM
-                  </Text>
-                </Timeline.Item>
-                <Timeline.Item title="Service Completed">
-                  <Text c="dimmed" size="xs">
-                    Estimated 11:15 AM
-                  </Text>
-                </Timeline.Item>
-              </Timeline>
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <User size={18} className="text-gray-400" />
+                Customer
+              </h3>
+              <div className="flex items-center gap-4 mb-4">
+                <Avatar color="red" radius="xl" size="lg">
+                  {request.user.name.charAt(0)}
+                </Avatar>
+                <div>
+                  <p className="font-bold">{request.user.name}</p>
+                  <p className="text-xs text-gray-500">Customer since 2023</p>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-sm text-gray-300">
+                  <Phone size={16} className="text-gray-500" />
+                  {request.user.phone}
+                </div>
+                <div className="flex items-center gap-3 text-sm text-gray-300">
+                  <MailIcon size={16} className="text-gray-500" />
+                  {request.user.email}
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="w-full mt-6 border-white/10 hover:bg-white/5"
+              >
+                View Profile
+              </Button>
             </Paper>
 
+            {/* Helper Info */}
             <Paper
               p="lg"
-              radius="xl"
-              className="bg-gradient-to-br from-brand-charcoal to-brand-black border border-white/10"
+              radius="lg"
+              className="bg-brand-charcoal border border-white/5"
             >
-              <Title order={4} className="text-white mb-4">
-                Payment Summary
-              </Title>
-
-              <Group justify="space-between" mb="xs">
-                <Text className="text-gray-400">Service Fee</Text>
-                <Text className="text-white font-medium">
-                  Rs {requestData.payment.total}
-                </Text>
-              </Group>
-              <Group justify="space-between" mb="md">
-                <Text className="text-gray-400">Payment Method</Text>
-                <Badge variant="outline" color="gray">
-                  Cash
-                </Badge>
-              </Group>
-
-              <Divider color="dark.6" mb="md" />
-
-              <Paper
-                p="md"
-                radius="lg"
-                className="bg-white/5 border border-emerald-500/20 mb-2"
+              <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <Wrench size={18} className="text-gray-400" />
+                Assigned Helper
+              </h3>
+              <div className="flex items-center gap-4 mb-4">
+                <Avatar color="blue" radius="xl" size="lg">
+                  {request.helper.name.charAt(0)}
+                </Avatar>
+                <div>
+                  <p className="font-bold">{request.helper.name}</p>
+                  <div className="flex items-center gap-1 text-xs text-yellow-500">
+                    ★ {request.helper.rating} Rating
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3 text-sm text-gray-300">
+                  <Phone size={16} className="text-gray-500" />
+                  {request.helper.phone}
+                </div>
+              </div>
+              <Button
+                onClick={handleAssignHelper}
+                variant="outline"
+                className="w-full mt-6 border-white/10 hover:bg-white/5"
               >
-                <Group justify="space-between">
-                  <Group gap="xs">
-                    <IconAlertCircle size={16} className="text-emerald-400" />
-                    <Text size="sm" className="text-emerald-400 font-bold">
-                      Platform Fee (20%)
-                    </Text>
-                  </Group>
-                  <Text className="text-emerald-300 font-bold">
-                    Rs {requestData.payment.platformFee}
-                  </Text>
-                </Group>
-              </Paper>
-              <Text size="xs" className="text-center text-gray-500">
-                Commission is deducted from Helper's wallet
-              </Text>
+                Reassign Helper
+              </Button>
             </Paper>
           </div>
-        </SimpleGrid>
+        </div>
       </motion.div>
-    </Box>
+    </div>
+  );
+}
+
+function MailIcon(props: any) {
+  return (
+    <svg
+      {...props}
+      xmlns="http://www.w3.org/2000/svg"
+      width="24"
+      height="24"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect width="20" height="16" x="2" y="4" rx="2" />
+      <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
+    </svg>
   );
 }

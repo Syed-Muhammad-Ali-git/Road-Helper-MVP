@@ -1,17 +1,17 @@
 /* ---------------- IMPORTS ---------------- */
-import React from "react";
+import React, { memo, useMemo } from "react";
 import {
   protectedRoutes,
   customerRoutes,
   helperRoutes,
   adminRoutes,
 } from "./routes";
-import HelperSideBar from "../components/helperSidebar/sidebar";
-import HelperHeader from "../components/helperHeader/header";
-import CustomerSideBar from "../components/customerSidebar/sidebar";
-import CustomerHeader from "../components/customerHeader/header";
-import AdminSideBar from "../components/adminSidebar/sidebar";
-import AdminHeader from "../components/adminHeader/header";
+import HelperSideBar from "@/components/helperSidebar/sidebar";
+import HelperHeader from "@/components/helperHeader/header";
+import CustomerSideBar from "@/components/customerSidebar/sidebar";
+import CustomerHeader from "@/components/customerHeader/header";
+import AdminSideBar from "@/components/adminSidebar/sidebar";
+import AdminHeader from "@/components/adminHeader/header";
 
 /* ---------------- INTERFACES ---------------- */
 interface PathCheckerProps {
@@ -23,14 +23,24 @@ interface PathCheckerProps {
 /* ---------------- COMPONENT ---------------- */
 const PathChecker = ({ pathName, open, setOpen }: PathCheckerProps) => {
   // ----- CHECK IF THE CURRENT PATH IS A PROTECTED ROUTE -----
-  const show = protectedRoutes.includes(pathName);
+  const show = useMemo(() => protectedRoutes.includes(pathName), [pathName]);
+
+  // ----- DETERMINE ROUTE TYPE -----
+  const isCustomerRoute = useMemo(
+    () => customerRoutes.includes(pathName),
+    [pathName],
+  );
+  const isHelperRoute = useMemo(
+    () => helperRoutes.includes(pathName),
+    [pathName],
+  );
+  const isAdminRoute = useMemo(
+    () => adminRoutes.includes(pathName),
+    [pathName],
+  );
+
   // ----- RENDER NOTHING IF THE ROUTE IS NOT PROTECTED -----
   if (!show) return null;
-
-  // ----- DETERMINE IF IT'S A CLIENT OR HELPER ROUTE -----
-  const isCustomerRoute = customerRoutes.includes(pathName);
-  const isHelperRoute = helperRoutes.includes(pathName);
-  const isAdminRoute = adminRoutes.includes(pathName);
 
   // ----- RENDER HEADER AND SIDEBAR BASED ON ROUTE TYPE -----
   if (isCustomerRoute) {
@@ -60,4 +70,4 @@ const PathChecker = ({ pathName, open, setOpen }: PathCheckerProps) => {
   return null;
 };
 
-export default PathChecker;
+export default memo(PathChecker);
