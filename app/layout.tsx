@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { SearchProvider } from "./context/searchContext";
 import { LayoutProvider } from "./context/layoutContext";
+import { ReduxProvider } from "@/components/providers/ReduxProvider";
 import ClientLayout from "./client-layout";
 
 /* ---------------- METADATA ---------------- */
@@ -68,6 +69,7 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
         <ColorSchemeScript />
       </head>
       <body className="bg-brand-black text-white">
+        <ReduxProvider>
         <MantineProvider
           defaultColorScheme="dark"
           theme={{
@@ -115,6 +117,7 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
             </SearchProvider>
           </LayoutProvider>
         </MantineProvider>
+        </ReduxProvider>
       </body>
     </html>
   );

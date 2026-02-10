@@ -23,7 +23,7 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { showSuccess, showError } from "@/lib/sweetalert";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
 import { z } from "zod";
@@ -50,9 +50,10 @@ const ForgotPasswordPage = () => {
     try {
       await sendPasswordResetEmail(auth, values.email);
       setSubmitted(true);
-      toast.success("Reset link sent to your email!");
-    } catch (error: any) {
-      toast.error(error.message || "Failed to send reset email");
+      await showSuccess("Reset link sent", "Check your email for the recovery link.");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to send reset email";
+      await showError("Failed", msg);
     } finally {
       setLoading(false);
     }
@@ -90,7 +91,7 @@ const ForgotPasswordPage = () => {
       </div>
 
       <motion.div
-        variants={containerVariants as any}
+        variants={containerVariants}
         initial="hidden"
         animate="visible"
         className="relative z-10 w-full max-w-[480px]"

@@ -7,6 +7,7 @@ import { Group, Avatar, Menu, ActionIcon, Badge, Text } from "@mantine/core";
 import Image from "next/image";
 import { IconMenu2 } from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
+import { clearAuthStorage } from "@/lib/auth-utils";
 
 /* ---------------- INTERFACES ---------------- */
 interface HeaderProps {
@@ -56,7 +57,7 @@ const HelperHeader: React.FC<HeaderProps> = ({
 
   // ---------------- SIGN OUT FUNCTION ----------------
   const handleSignOut = useCallback(() => {
-    localStorage.clear();
+    clearAuthStorage();
     router.push("/login");
   }, [router]);
 
@@ -70,7 +71,7 @@ const HelperHeader: React.FC<HeaderProps> = ({
 
   return (
     <div
-      className="h-16 fixed top-0 right-0 z-40 glass-dark flex items-center justify-between px-4 md:px-6 border-b border-white/10 transition-all duration-200 ease-in-out"
+      className="h-16 fixed top-0 right-0 z-40 flex items-center justify-between px-4 md:px-6 border-b border-white/10 transition-all duration-200 ease-in-out bg-[#0a0a0a]/98 backdrop-blur-xl"
       style={{
         left: headerLeft,
         width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)`,

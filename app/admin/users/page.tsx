@@ -38,7 +38,7 @@ import {
   IconShieldCheck,
 } from "@tabler/icons-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
+import { showSuccess, showError, showConfirm } from "@/lib/sweetalert";
 import { cn } from "@/lib/utils";
 
 const initialUsers = [
@@ -105,9 +105,9 @@ const UsersPage = () => {
 
   useEffect(() => setIsLoaded(true), []);
 
-  const handleAddUser = useCallback(() => {
+  const handleAddUser = useCallback(async () => {
     if (!newUser.firstName || !newUser.email || !newUser.role) {
-      toast.error("Please fill in all required fields.");
+      await showError("Validation", "Please fill in all required fields.");
       return;
     }
     const userToAdd = {
@@ -120,15 +120,20 @@ const UsersPage = () => {
       lastActive: "Just now",
     };
     setUsers([userToAdd, ...users]);
-    toast.success("User added successfully!");
+    await showSuccess("User added successfully!");
     setNewUser({ firstName: "", lastName: "", email: "", role: "", phone: "" });
     close();
   }, [newUser, users, close]);
 
-  const handleDeleteUser = useCallback((id: number) => {
-    if (confirm("Are you sure you want to delete this user?")) {
+  const handleDeleteUser = useCallback(async (id: number) => {
+    const { isConfirmed } = await showConfirm(
+      "Delete User",
+      "Are you sure you want to delete this user?",
+      "Yes, delete"
+    );
+    if (isConfirmed) {
       setUsers((prev) => prev.filter((u) => u.id !== id));
-      toast.success("User deleted.");
+      await showSuccess("User deleted.");
     }
   }, []);
 

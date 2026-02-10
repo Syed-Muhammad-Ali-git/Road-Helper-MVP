@@ -2,7 +2,10 @@
 
 import React, { memo, useCallback } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useAppDispatch } from "@/store/hooks";
+import { logoutUser } from "@/store/slices/authSlice";
+import { clearAuthStorage } from "@/lib/auth-utils";
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -20,7 +23,7 @@ interface SharedSidebarProps {
   open: boolean;
   setOpen: (open: boolean) => void;
   menuItems: MenuItem[];
-  logoSrc: string | any;
+  logoSrc: string;
   title: string;
 }
 
@@ -53,8 +56,16 @@ const SharedSidebarComponent = ({
   title,
 }: SharedSidebarProps) => {
   const pathname = usePathname();
-  // We'll use the same breakpoint as ClientLayout
+  const router = useRouter();
+  const dispatch = useAppDispatch();
   const isDesktop = useMediaQuery("(min-width: 900px)");
+
+  const handleLogout = useCallback(() => {
+    clearAuthStorage();
+    dispatch(logoutUser());
+    const isAdmin = pathname?.includes("/admin");
+    router.push(isAdmin ? "/admin/login" : "/login");
+  }, [dispatch, pathname, router]);
 
   const handleClose = useCallback(() => {
     if (!isDesktop) {
@@ -93,7 +104,7 @@ const SharedSidebarComponent = ({
           <div className="flex items-center gap-3">
             <div className="relative w-8 h-8 bg-white rounded-lg p-1 shrink-0">
               <Image
-                src={typeof logoSrc === "string" ? logoSrc : logoSrc.src}
+                src={logoSrc}
                 alt="Logo"
                 fill
                 className="object-contain"
@@ -163,8 +174,9 @@ const SharedSidebarComponent = ({
         <div className="p-4 border-t border-white/5 min-w-[280px]">
           <Button
             variant="ghost"
+            onClick={handleLogout}
             className={cn(
-              "w-full justify-start text-gray-400 hover:text-red-500 hover:bg-red-500/10 gap-4 px-3.5 h-12 transition-all",
+              "w-full justify-start text-gray-400 hover:text-red-500 hover:bg-red-500/10 gap-4 px-3.5 h-12 transition-all cursor-pointer",
               !open && "px-3",
             )}
           >

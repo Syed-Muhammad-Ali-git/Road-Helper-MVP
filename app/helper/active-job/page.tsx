@@ -22,10 +22,18 @@ import {
   IconNavigation,
   IconCheck,
 } from "@tabler/icons-react";
-import { toast } from "react-toastify";
+import { showSuccess } from "@/lib/sweetalert";
 
 export default function ActiveJobUI() {
-  const [activeJob, setActiveJob] = useState<any>({
+  interface ActiveJobState {
+    customerName: string;
+    customerPhone: string;
+    location: string;
+    vehicleDetails: string;
+    issueDescription: string;
+    status: string;
+  }
+  const [activeJob, setActiveJob] = useState<ActiveJobState>({
     customerName: "Ali Khan",
     customerPhone: "+92 300 1234567",
     location: "Gulshan-e-Iqbal, Karachi",
@@ -34,10 +42,10 @@ export default function ActiveJobUI() {
     status: "accepted", // accepted | in_progress | completed
   });
 
-  const updateStatus = (status: string) => {
-    setActiveJob((prev: any) => ({ ...prev, status }));
+  const updateStatus = async (status: string) => {
+    setActiveJob((prev) => ({ ...prev, status }));
     console.log(`Status updated to ${status}`);
-    toast.success(`Job status updated to ${status.replace("_", " ")}`);
+    await showSuccess(`Job status updated to ${status.replace("_", " ")}`);
   };
 
   // Mock loading state

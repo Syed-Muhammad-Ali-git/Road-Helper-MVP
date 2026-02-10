@@ -8,8 +8,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { showSuccess, showError } from "@/lib/sweetalert";
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
 import { setCookie } from "cookies-next";
 import { Button } from "@/components/ui/button";
@@ -64,8 +64,9 @@ export default function LoginPage() {
         );
         const token = await userCredential.user.getIdToken();
 
-        toast.success(
-          `🎉 Welcome back, ${loginType === "customer" ? "User" : "Partner"}!`,
+        await showSuccess(
+          "Welcome back!",
+          loginType === "customer" ? "User" : "Partner"
         );
 
         if (loginType === "customer") {
@@ -91,7 +92,7 @@ export default function LoginPage() {
         }
       } catch (error: any) {
         console.error(error);
-        toast.error("⚠️ Invalid email or password.");
+        await showError("Login Failed", "Invalid email or password.");
       } finally {
         setIsLoading(false);
       }
@@ -102,6 +103,31 @@ export default function LoginPage() {
   const togglePasswordVisibility = useCallback(() => {
     setShowPassword((prev) => !prev);
   }, []);
+
+  const handleGoogleLogin = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const provider = new GoogleAuthProvider();
+      const userCredential = await signInWithPopup(auth, provider);
+      const token = await userCredential.user.getIdToken();
+      if (loginType === "customer") {
+        setCookie("role", "customer", { maxAge: 60 * 60 * 24 * 7, path: "/" });
+        setCookie("token", token, { maxAge: 60 * 60 * 24 * 7, path: "/" });
+        await showSuccess("Welcome back!", "Signed in with Google.");
+        router.push("/customer/dashboard");
+      } else {
+        setCookie("role", "helper", { maxAge: 60 * 60 * 24 * 7, path: "/" });
+        setCookie("token", token, { maxAge: 60 * 60 * 24 * 7, path: "/" });
+        await showSuccess("Welcome back!", "Signed in with Google.");
+        router.push("/helper/dashboard");
+      }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Google sign-in failed";
+      await showError("Google Sign-in Failed", msg);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [loginType, router]);
 
   const tabIcon = useMemo(
     () => (loginType === "customer" ? "👤" : "🔧"),
@@ -540,7 +566,9 @@ export default function LoginPage() {
               <Button
                 type="button"
                 variant="outline"
-                className="w-full h-14 bg-white/[0.03] border-2 border-white/5 hover:bg-white/10 hover:border-white/20 text-white rounded-xl font-bold flex items-center justify-center gap-3 transition-all active:scale-[0.98] group"
+                onClick={handleGoogleLogin}
+                disabled={isLoading}
+                className="w-full h-14 bg-white/[0.03] border-2 border-white/5 hover:bg-white/10 hover:border-white/20 text-white rounded-xl font-bold flex items-center justify-center gap-3 transition-all active:scale-[0.98] group cursor-pointer"
               >
                 <svg
                   className="w-5 h-5 group-hover:scale-110 transition-transform"

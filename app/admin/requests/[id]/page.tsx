@@ -36,7 +36,7 @@ import {
 } from "@mantine/core";
 import { motion, Variants } from "framer-motion";
 import Link from "next/link";
-import { toast } from "react-toastify";
+import { showSuccess, showInfo } from "@/lib/sweetalert";
 import { cn } from "@/lib/utils";
 
 const getRequestById = (id: string) => {
@@ -90,7 +90,7 @@ const getRequestById = (id: string) => {
   };
 };
 
-const IconTruck = (props: any) => <IconTools {...props} />; // Placeholder as IconTruck import was missed
+const IconTruck = (props: React.SVGProps<SVGSVGElement>) => <IconTools {...props} />;
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -108,8 +108,8 @@ const RequestDetailPage = () => {
   const id = params.id as string;
   const request = useMemo(() => getRequestById(id), [id]);
 
-  const handleAction = () => {
-    toast.success("Job status updated successfully.");
+  const handleAction = async () => {
+    await showSuccess("Job status updated successfully.");
   };
 
   return (
@@ -502,7 +502,7 @@ const RequestDetailPage = () => {
                 </div>
 
                 <Button
-                  onClick={() => toast.info("Reassigning...")}
+                  onClick={() => showInfo("Reassigning...")}
                   className="w-full bg-transparent hover:bg-brand-red border-2 border-brand-red/30 hover:border-brand-red text-white h-14 rounded-2xl font-black uppercase text-[10px] tracking-widest transition-all"
                 >
                   Reassign Specialist

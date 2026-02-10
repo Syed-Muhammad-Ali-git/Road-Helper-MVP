@@ -56,19 +56,21 @@ export const HowItWorks = () => {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            <Text className="text-brand-red font-black uppercase tracking-[0.4em] text-[10px] mb-4">
+            <Text className="text-brand-red font-black uppercase tracking-[0.4em] text-[10px] pb-4">
               The Process
             </Text>
-            <Title className="text-5xl md:text-6xl font-black text-white tracking-tighter mb-6">
+            <Title className="text-5xl md:text-6xl font-black text-white tracking-tighter pb-6">
               How{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-white to-gray-500">
                 It Works
               </span>
             </Title>
-            <Text className="text-gray-400 text-lg max-w-2xl mx-auto font-medium">
-              We've streamlined roadside assistance into three simple steps to
-              ensure you're never left stranded for long.
-            </Text>
+            <center>
+              <Text className="text-gray-400 text-lg max-w-2xl mx-auto font-medium">
+                We&apos;ve streamlined roadside assistance into three simple
+                steps to ensure you&apos;re never left stranded for long.
+              </Text>
+            </center>
           </motion.div>
         </Box>
 
@@ -83,7 +85,7 @@ export const HowItWorks = () => {
               className="group relative"
             >
               <Box className="glass-dark p-10 rounded-[40px] border border-white/5 hover:border-brand-red/30 transition-all duration-500 relative overflow-hidden h-full">
-                <div className="absolute top-0 right-0 p-8 text-white/[0.02] group-hover:text-brand-red/5 transition-colors">
+                <div className="absolute top-0 right-0 p-8 text-white/2 group-hover:text-brand-red/5 transition-colors">
                   <step.icon size={120} stroke={1} />
                 </div>
 

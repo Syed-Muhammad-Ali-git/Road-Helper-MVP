@@ -1,0 +1,81 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper to check if user is authenticated
+    function isAuth() {
+      return request.auth != null;
+    }
+    
+    // Helper to check if user owns the doc
+    function isOwner(uid) {
+      return isAuth() && request.auth.uid == uid;
+    }
+    
+    // Users - basic profile data
+    match /users/{userId} {
+      allow read, write: if isOwner(userId);
+    }
+    
+    // Admins - admin profiles
+    match /admins/{adminId} {
+      allow read: if isAuth();
+      allow write: if isOwner(adminId);
+    }
+    
+    // Helpers - helper profiles
+    match /helpers/{helperId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update, delete: if isOwner(helperId);
+    }
+    
+    // Customers - customer profiles
+    match /customers/{customerId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update, delete: if isOwner(customerId);
+    }
+    
+    // Services - read-only for all authenticated
+    match /services/{serviceId} {
+      allow read: if isAuth();
+      allow write: if false;
+    }
+    
+    // Rides / Requests
+    match /rides/{rideId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isAuth();
+    }
+    
+    match /requests/{requestId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isAuth();
+    }
+    
+    // Plans - read-only
+    match /plans/{planId} {
+      allow read: if isAuth();
+      allow write: if false;
+    }
+    
+    // Payments - users can read their own
+    match /payments/{paymentId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update, delete: if false;
+    }
+    
+    // Notifications - users can read their own
+    match /notifications/{notificationId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+    }
+  }
+}

@@ -28,7 +28,7 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { toast } from "react-toastify";
+import { showSuccess, showError } from "@/lib/sweetalert";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
 import { cn } from "@/lib/utils";
@@ -198,10 +198,11 @@ const AdminSignup = () => {
                   maxAge: 60 * 60 * 24 * 7,
                   path: "/",
                 });
-                toast.success("🎉 Admin profile established.");
+                await showSuccess("Admin profile established");
                 router.push("/admin/dashboard");
-              } catch (error: any) {
-                toast.error(`⚠️ ${error.message}`);
+              } catch (err: unknown) {
+                const msg = err instanceof Error ? err.message : "Signup failed";
+                await showError("Signup Failed", msg);
               }
             })}
             className="space-y-6"

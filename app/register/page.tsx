@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { toast } from "react-toastify";
+import { showSuccess, showError } from "@/lib/sweetalert";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
 import { setCookie } from "cookies-next";
@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { MultiSelect, Modal, Button as MantineButton } from "@mantine/core";
 import {
   Phone,
   Mail,
@@ -39,6 +40,15 @@ const customerSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
+const SERVICE_OPTIONS = [
+  { value: "mechanic", label: "🔧 Mobile Mechanic" },
+  { value: "tow", label: "🚗 Towing Truck" },
+  { value: "fuel", label: "⛽ Fuel Delivery" },
+  { value: "medical", label: "🚑 Medical Assistance" },
+  { value: "battery", label: "🔋 Battery Jump" },
+  { value: "lockout", label: "🔑 Lockout Service" },
+] as const;
+
 const helperSchema = z.object({
   fullName: z.string().min(2, "Name is required"),
   email: z.string().email("Invalid email"),
@@ -48,7 +58,7 @@ const helperSchema = z.object({
     .min(13, "CNIC must be 13 digits")
     .regex(/^\d+$/, "CNIC must be numbers only"),
   password: z.string().min(6, "Password must be at least 6 characters"),
-  serviceType: z.string().min(1, "Service type is required"),
+  services: z.array(z.string()).min(1, "Select at least one service"),
 });
 
 function RegisterPageContent() {
@@ -56,7 +66,7 @@ function RegisterPageContent() {
   const defaultType =
     searchParams.get("type") === "helper" ? "helper" : "customer";
   const [registerType, setRegisterType] = useState<"customer" | "helper">(
-    defaultType as any,
+    defaultType as "customer" | "helper"
   );
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -74,11 +84,17 @@ function RegisterPageContent() {
     register: registerHelper,
     handleSubmit: handleSubmitHelper,
     formState: { errors: errorsHelper },
-  } = useForm({
+    setValue: setHelperValue,
+    watch: watchHelper,
+  } = useForm<z.infer<typeof helperSchema>>({
     resolver: zodResolver(helperSchema),
+    defaultValues: { services: [] },
   });
+  const watchHelperServices = watchHelper("services") ?? [];
 
-  const onCustomerSubmit = async (data: any) => {
+  const [showPlansModal, setShowPlansModal] = useState(false);
+
+  const onCustomerSubmit = async (data: z.infer<typeof customerSchema>) => {
     setIsLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -96,16 +112,17 @@ function RegisterPageContent() {
         maxAge: 60 * 60 * 24 * 7,
         path: "/",
       });
-      toast.success("🎉 Account created successfully!");
+      await showSuccess("Account created successfully!");
       router.push("/customer/dashboard");
-    } catch (error: any) {
-      toast.error(`⚠️ ${error.message}`);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Registration failed";
+      await showError("Registration Failed", msg);
     } finally {
       setIsLoading(false);
     }
   };
 
-  const onHelperSubmit = async (data: any) => {
+  const onHelperSubmit = async (data: z.infer<typeof helperSchema>) => {
     setIsLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(
@@ -120,10 +137,10 @@ function RegisterPageContent() {
         maxAge: 60 * 60 * 24 * 7,
         path: "/",
       });
-      toast.success("🎉 Application submitted successfully!");
-      router.push("/helper/dashboard");
-    } catch (error: any) {
-      toast.error(`⚠️ ${error.message || "Registration failed"}`);
+      setShowPlansModal(true);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Registration failed";
+      await showError("Registration Failed", msg);
     } finally {
       setIsLoading(false);
     }
@@ -272,7 +289,7 @@ function RegisterPageContent() {
               ].map((item) => (
                 <motion.button
                   key={item.type}
-                  onClick={() => setRegisterType(item.type as any)}
+                  onClick={() => setRegisterType(item.type as "customer" | "helper")}
                   whileHover={{ scale: 1.02, y: -2 }}
                   whileTap={{ scale: 0.98 }}
                   className={cn(
@@ -388,9 +405,10 @@ function RegisterPageContent() {
                     error={errorsHelper.cnic?.message as string}
                     delay={0.25}
                   />
-                  <ServiceTypeField
-                    register={registerHelper("serviceType")}
-                    error={errorsHelper.serviceType?.message as string}
+                  <ServicesMultiSelectField
+                    value={watchHelperServices}
+                    onChange={(v) => setHelperValue("services", v)}
+                    error={errorsHelper.services?.message as string}
                     delay={0.3}
                   />
                   <PasswordField
@@ -507,11 +525,64 @@ function RegisterPageContent() {
           ))}
         </motion.div>
       </motion.div>
+
+      {/* Plans Modal - shown after helper signup */}
+      <Modal
+        opened={showPlansModal}
+        onClose={() => {}}
+        title={
+          <span className="text-xl font-bold text-white">Your Helper Plan</span>
+        }
+        centered
+        size="lg"
+        classNames={{
+          header: "bg-[#0a0a0a] border-b border-white/10",
+          body: "bg-[#0a0a0a] text-white",
+          content: "bg-[#0a0a0a] border border-white/10",
+        }}
+        withCloseButton={false}
+        closeOnClickOutside={false}
+      >
+        <div className="space-y-6">
+          <p className="text-gray-300">
+            Welcome! You&apos;re on the <strong className="text-brand-red">Free Plan</strong>.
+          </p>
+          <div className="p-6 rounded-2xl bg-white/5 border border-brand-red/30">
+            <h3 className="font-bold text-lg mb-2">Free Plan includes:</h3>
+            <ul className="list-disc list-inside space-y-1 text-gray-300">
+              <li><strong className="text-white">10 rides</strong> included</li>
+              <li>After the limit, payment will be required</li>
+              <li>Payment methods: JazzCash, EasyPaisa, Bank Account</li>
+            </ul>
+          </div>
+          <MantineButton
+            fullWidth
+            size="lg"
+            className="bg-brand-red hover:bg-brand-dark-red"
+            onClick={() => {
+              setShowPlansModal(false);
+              showSuccess("Application submitted successfully!");
+              router.push("/helper/dashboard");
+            }}
+          >
+            Get Started
+          </MantineButton>
+        </div>
+      </Modal>
     </div>
   );
 }
 
 // Reusable Components
+interface FormFieldProps {
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  label: string;
+  register: Record<string, unknown>;
+  placeholder: string;
+  error?: string;
+  delay: number;
+}
+
 const FormField = ({
   icon: Icon,
   label,
@@ -519,7 +590,7 @@ const FormField = ({
   placeholder,
   error,
   delay,
-}: any) => (
+}: FormFieldProps) => (
   <motion.div
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}
@@ -551,13 +622,21 @@ const FormField = ({
   </motion.div>
 );
 
+interface PasswordFieldProps {
+  register: Record<string, unknown>;
+  error?: string;
+  showPassword: boolean;
+  setShowPassword: (v: boolean) => void;
+  delay: number;
+}
+
 const PasswordField = ({
   register,
   error,
   showPassword,
   setShowPassword,
   delay,
-}: any) => (
+}: PasswordFieldProps) => (
   <motion.div
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}
@@ -599,7 +678,19 @@ const PasswordField = ({
   </motion.div>
 );
 
-const ServiceTypeField = ({ register, error, delay }: any) => (
+interface ServicesMultiSelectFieldProps {
+  value: string[];
+  onChange: (value: string[]) => void;
+  error?: string;
+  delay: number;
+}
+
+const ServicesMultiSelectField = ({
+  value,
+  onChange,
+  error,
+  delay,
+}: ServicesMultiSelectFieldProps) => (
   <motion.div
     initial={{ opacity: 0, x: -20 }}
     animate={{ opacity: 1, x: 0 }}
@@ -608,45 +699,46 @@ const ServiceTypeField = ({ register, error, delay }: any) => (
   >
     <Label className="uppercase text-xs font-bold text-gray-400 tracking-wider flex items-center gap-2">
       <Briefcase size={14} className="text-brand-red" />
-      Service Type
+      Service Types (select multiple)
     </Label>
     <motion.div whileFocus={{ scale: 1.01 }} className="relative group">
-      <Briefcase className="absolute left-4 top-4 h-5 w-5 text-gray-500 group-focus-within:text-brand-red transition-colors z-10 pointer-events-none" />
-      <select
-        {...register}
-        className="w-full pl-12 h-14 rounded-xl bg-white/5 backdrop-blur-xl border border-white/10 text-white focus:ring-2 focus:ring-brand-red focus:border-brand-red appearance-none transition-all hover:bg-white/10 hover:border-brand-red/50 cursor-pointer"
-      >
-        <option value="" className="bg-brand-black">
-          Select Service...
-        </option>
-        <option value="mechanic" className="bg-brand-black">
-          🔧 Mobile Mechanic
-        </option>
-        <option value="tow" className="bg-brand-black">
-          🚗 Towing Truck
-        </option>
-        <option value="fuel" className="bg-brand-black">
-          ⛽ Fuel Delivery
-        </option>
-        <option value="medical" className="bg-brand-black">
-          🚑 Medical Assistance
-        </option>
-      </select>
-      <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
+      <MultiSelect
+        data={SERVICE_OPTIONS}
+        value={value}
+        onChange={onChange}
+        placeholder="Select services you offer..."
+        classNames={{
+          input:
+            "pl-12 h-14 rounded-xl bg-white/5 backdrop-blur-xl border-2 border-white/10 text-white focus:border-brand-red",
+          pill: "bg-brand-red/80 text-white border-0",
+          dropdown: "bg-[#1f1f1f] border border-white/10",
+          option: "text-white hover:bg-white/10",
+        }}
+        leftSection={<Briefcase size={18} className="text-gray-500" />}
+        withCheckIcon={false}
+        hidePickedOptions
+        clearable
+      />
+      {error && (
+        <motion.span
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-red-400 text-xs flex items-center gap-1 mt-1"
+        >
+          ⚠️ {error}
+        </motion.span>
+      )}
     </motion.div>
-    {error && (
-      <motion.span
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-red-400 text-xs flex items-center gap-1"
-      >
-        ⚠️ {error}
-      </motion.span>
-    )}
   </motion.div>
 );
 
-const SubmitButton = ({ isLoading, text, delay }: any) => (
+interface SubmitButtonProps {
+  isLoading: boolean;
+  text: string;
+  delay: number;
+}
+
+const SubmitButton = ({ isLoading, text, delay }: SubmitButtonProps) => (
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
@@ -683,7 +775,12 @@ const SubmitButton = ({ isLoading, text, delay }: any) => (
   </motion.div>
 );
 
-const CTA = ({ delay, type }: any) => (
+interface CTAProps {
+  delay: number;
+  type: "customer" | "helper";
+}
+
+const CTA = ({ delay, type }: CTAProps) => (
   <motion.div
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}

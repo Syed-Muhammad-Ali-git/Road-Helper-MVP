@@ -8,7 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion } from "framer-motion";
-import { toast } from "react-toastify";
+import { showSuccess, showError } from "@/lib/sweetalert";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase/config";
 import { setCookie } from "cookies-next";
@@ -50,23 +50,24 @@ export default function AdminLoginPage() {
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: z.infer<typeof loginSchema>) => {
     setIsLoading(true);
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
         data.email,
-        data.password,
+        data.password
       );
       const token = await userCredential.user.getIdToken();
       setCookie("role", "admin", { maxAge: 60 * 60 * 24 * 7, path: "/" });
       setCookie("token", token, { maxAge: 60 * 60 * 24 * 7, path: "/" });
-      toast.success("🎉 Access Granted. Welcome, Administrator.");
+      await showSuccess("Access Granted", "Welcome, Administrator.");
       router.push("/admin/dashboard");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      toast.error(
-        "⚠️ Security Breach: Invalid credentials or unauthorized access.",
+      await showError(
+        "Access Denied",
+        "Invalid credentials or unauthorized access."
       );
     } finally {
       setIsLoading(false);
@@ -242,17 +243,6 @@ export default function AdminLoginPage() {
             </div>
 
             <div className="space-y-2">
-              <div className="flex justify-between items-center px-1">
-                <Label className="uppercase text-[10px] font-black text-gray-500 tracking-[0.2em]">
-                  Security Key
-                </Label>
-                <Link
-                  href="/forgot-password"
-                  className="text-[10px] font-black text-brand-red/70 hover:text-brand-red transition-colors uppercase tracking-widest no-underline"
-                >
-                  Reset Link?
-                </Link>
-              </div>
               <div className="relative group">
                 <Lock className="absolute left-5 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-600 group-focus-within:text-brand-red transition-all" />
                 <Input
@@ -274,6 +264,17 @@ export default function AdminLoginPage() {
                   ⚠ {errors.password.message as string}
                 </p>
               )}
+            </div>
+            <div className="flex justify-between items-center px-1">
+              <Label className="uppercase text-[10px] font-black text-gray-500 tracking-[0.2em]">
+                Security Key
+              </Label>
+              <Link
+                href="/forgot-password"
+                className="text-[10px] font-black text-brand-red/70 hover:text-brand-red transition-colors uppercase tracking-widest no-underline"
+              >
+                Forgot Password?
+              </Link>
             </div>
 
             <Button
@@ -305,9 +306,18 @@ export default function AdminLoginPage() {
             </Button>
           </form>
 
-          <div className="mt-12 pt-8 border-t border-white/5 text-center">
+          <div className="mt-12 pt-8 border-t border-white/5 text-center space-y-4">
             <p className="text-[10px] font-black text-gray-600 uppercase tracking-[0.4em]">
               System Operator Priority Access Only
+            </p>
+            <p className="text-sm text-gray-400">
+              Don&apos;t have an admin account?{" "}
+              <Link
+                href="/admin/signup"
+                className="text-brand-red font-bold hover:text-brand-red/80 transition-colors"
+              >
+                Create Admin ID
+              </Link>
             </p>
           </div>
         </motion.div>

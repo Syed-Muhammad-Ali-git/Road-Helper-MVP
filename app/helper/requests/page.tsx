@@ -21,7 +21,7 @@ import {
   IconPhone,
   IconBrandWhatsapp,
 } from "@tabler/icons-react";
-import { toast } from "react-toastify";
+import { showSuccess } from "@/lib/sweetalert";
 import { motion } from "framer-motion";
 
 export default function NearbyRequestsUI() {
@@ -185,7 +185,7 @@ export default function NearbyRequestsUI() {
                         className="bg-green-600 hover:bg-green-700 h-12 rounded-xl transition-all font-bold hover:scale-105 active:scale-95"
                         leftSection={<IconCheck size={20} />}
                         disabled={!userData.isOnline}
-                        onClick={() => toast.success("Job accepted!")}
+                        onClick={() => showSuccess("Job accepted!")}
                       >
                         Accept Job
                       </Button>

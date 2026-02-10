@@ -27,7 +27,7 @@ import {
 } from "@tabler/icons-react";
 import { useForm } from "@mantine/form";
 import z from "zod";
-import { toast } from "react-toastify";
+import { showSuccess, showError } from "@/lib/sweetalert";
 import { zodResolver } from "mantine-form-zod-resolver";
 
 const requestHelpSchema = z.object({
@@ -53,22 +53,21 @@ function RequestHelpContent() {
 
   const nextStep = () => setActive((prev) => prev + 1);
   const prevStep = () => setActive((prev) => prev - 1);
-  const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
+  const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     if (!form.validate().hasErrors) {
       setLoading(true);
       const values = form.values;
       console.log("Request Help Form Submitted:", values);
 
-      // Simulate API call
-      setTimeout(() => {
+      // Simulate API call - TODO: Replace with Firebase
+      setTimeout(async () => {
         setActive(3); // Complete step
         setLoading(false);
-        toast.success("Request submitted successfully!");
-        console.log("Request submitted successfully!");
+        await showSuccess("Request submitted successfully!");
       }, 1000);
     } else {
-      toast.error("Please fill in all required fields correctly.");
+      await showError("Validation Error", "Please fill in all required fields correctly.");
     }
   };
 

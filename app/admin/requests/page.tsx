@@ -32,7 +32,7 @@ import {
   IconUser,
   IconSearch,
 } from "@tabler/icons-react";
-import { toast } from "react-toastify";
+import { showSuccess } from "@/lib/sweetalert";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -136,7 +136,7 @@ const RequestsPage = () => {
     });
   }, [activeTab, search]);
 
-  const handleDownloadReport = useCallback(() => {
+  const handleDownloadReport = useCallback(async () => {
     const headers = [
       "ID",
       "User",
@@ -168,7 +168,7 @@ const RequestsPage = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    toast.success("Operational log exported successfully.");
+    await showSuccess("Export Complete", "Operational log exported successfully.");
   }, [filteredRequests, activeTab]);
 
   const containerVariants = {
