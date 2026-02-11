@@ -1,53 +1,85 @@
 "use client";
 
 import Link from "next/link";
-import { Title, Text, Button, Container } from "@mantine/core";
 import { motion } from "framer-motion";
-import { IconArrowLeft } from "@tabler/icons-react";
+import { useAppTheme } from "@/app/context/ThemeContext";
 
 export default function NotFound() {
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-brand-black relative overflow-hidden font-satoshi">
-      {/* Background Gradients */}
-      <div className="absolute top-0 right-0 w-[40vw] h-[40vw] bg-brand-red/10 rounded-full blur-[100px] pointer-events-none -translate-y-1/2 translate-x-1/2" />
-      <div className="absolute bottom-0 left-0 w-[30vw] h-[30vw] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none translate-y-1/2 -translate-x-1/2" />
+  const { isDark } = useAppTheme();
 
-      <Container className="relative z-10 text-center flex flex-col items-center justify-center h-full">
+  return (
+    <div
+      className={`min-h-screen flex items-center justify-center relative overflow-hidden ${
+        isDark ? "bg-gray-900" : "bg-gray-50"
+      }`}
+    >
+      {/* Animated background blobs */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-red-500/20 rounded-full blur-3xl -translate-x-1/2 -translate-y-1/2" />
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl translate-x-1/2 translate-y-1/2" />
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.8 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 text-center px-4"
+      >
+        {/* 404 Number */}
         <motion.div
-          className="absolute z-0 select-none opacity-20"
-          initial={{ opacity: 0, scale: 0.8 }}
-          animate={{ opacity: 0.2, scale: 1 }}
-          transition={{ duration: 0.8 }}
+          initial={{ opacity: 0, y: -50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.5 }}
         >
-          <Text className="text-[12rem] md:text-[20rem] font-black text-transparent bg-clip-text bg-gradient-to-b from-brand-charcoal to-brand-black leading-none">
+          <h1
+            className={`text-8xl font-bold mb-4 ${
+              isDark ? "text-white" : "text-gray-900"
+            }`}
+          >
             404
-          </Text>
+          </h1>
         </motion.div>
 
+        {/* Message */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2, duration: 0.5 }}
-          className="relative z-10"
         >
-          <Title className="text-white text-4xl md:text-6xl font-bold mb-6 font-manrope">
+          <p
+            className={`text-2xl font-semibold mb-3 ${
+              isDark ? "text-gray-300" : "text-gray-700"
+            }`}
+          >
             Page Not Found
-          </Title>
-          <Text className="text-gray-400 text-lg md:text-xl mb-10 max-w-lg mx-auto">
-            The page you are looking for might have been removed, had its name
-            changed, or is temporarily unavailable.
-          </Text>
-          <Link href="/">
-            <Button
-              size="xl"
-              className="bg-brand-red hover:bg-brand-dark-red text-white rounded-full px-10 h-14 transition-all duration-300 hover:shadow-[0_0_20px_rgba(255,0,0,0.4)] hover:scale-105 active:scale-95"
-              leftSection={<IconArrowLeft size={24} />}
-            >
-              Back to Home
-            </Button>
+          </p>
+          <p
+            className={`text-lg mb-8 ${
+              isDark ? "text-gray-400" : "text-gray-600"
+            }`}
+          >
+            The page you're looking for doesn't exist or has been moved.
+          </p>
+        </motion.div>
+
+        {/* Home Button */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.5 }}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Link
+            href="/"
+            className={`inline-block px-8 py-3 rounded-lg font-semibold transition-all duration-300 ${
+              isDark
+                ? "bg-red-600 text-white hover:bg-red-700"
+                : "bg-red-500 text-white hover:bg-red-600"
+            }`}
+          >
+            Back to Home
           </Link>
         </motion.div>
-      </Container>
+      </motion.div>
     </div>
   );
 }

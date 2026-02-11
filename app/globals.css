@@ -2,18 +2,28 @@
 @import "tailwindcss";
 
 :root {
+  color-scheme: dark;
   --background: #0a0a0a;
   --foreground: #ededed;
 }
 
 .light {
+  color-scheme: light;
   --background: #ffffff;
   --foreground: #0a0a0a;
 }
 
 .dark {
+  color-scheme: dark;
   --background: #0a0a0a;
   --foreground: #ededed;
+}
+
+/* Tailwind dark mode support */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    color-scheme: dark;
+  }
 }
 
 /* Scrollbar Customization */
@@ -44,6 +54,17 @@
     max-width: 1920px;
     margin: 0 auto;
     overflow-x: hidden;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  body.dark {
+    background-color: rgb(17, 24, 39);
+    color: rgb(243, 244, 246);
+  }
+
+  body.light {
+    background-color: rgb(255, 255, 255);
+    color: rgb(17, 24, 39);
   }
 }
 

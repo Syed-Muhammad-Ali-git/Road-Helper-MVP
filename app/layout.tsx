@@ -72,7 +72,7 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
         <link rel="icon" href="/favicon.ico" />
         <ColorSchemeScript defaultColorScheme="dark" />
       </head>
-      <body className="antialiased font-satoshi" style={{ margin: "0 auto" }}>
+      <body className="antialiased font-satoshi light dark:bg-gray-950 dark:text-gray-100 bg-white text-gray-900" style={{ margin: "0 auto" }}>
         <ReduxProvider>
           <MantineProvider
             defaultColorScheme="dark"
@@ -118,13 +118,9 @@ const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
             <ThemeProvider>
               <LanguageProvider>
                 <LayoutProvider>
-                  <LoadingProvider>
-                    <GlobalLoaderProvider>
-                      <SearchProvider>
-                        <ClientLayout>{children}</ClientLayout>
-                      </SearchProvider>
-                    </GlobalLoaderProvider>
-                  </LoadingProvider>
+                  <SearchProvider>
+                    <ClientLayout>{children}</ClientLayout>
+                  </SearchProvider>
                 </LayoutProvider>
               </LanguageProvider>
             </ThemeProvider>

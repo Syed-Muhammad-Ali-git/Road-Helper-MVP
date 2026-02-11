@@ -12,7 +12,7 @@ interface SplashScreenProps {
 
 export const SplashScreen: React.FC<SplashScreenProps> = ({
   onComplete,
-  duration = 5000,
+  duration = 2000,
 }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [progress, setProgress] = useState(0);
@@ -143,9 +143,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
               <h1 className="font-manrope font-black text-5xl tracking-tight text-white">
                 Road<span className="text-brand-yellow">Helper</span>
               </h1>
-              <p className="text-gray-400 text-lg font-medium mt-3">
-                Initializing Live Rescue
-              </p>
             </motion.div>
 
             {/* Boot sequence label */}
@@ -222,16 +219,6 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                 />
               ))}
             </motion.div>
-
-            {/* Status text */}
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.8, delay: 1.2 }}
-              className="text-center text-sm text-gray-400 mt-4"
-            >
-              Preparing dispatch, tracking, and verification systems...
-            </motion.p>
 
             {/* Skip button */}
             <motion.div

@@ -171,7 +171,9 @@ const HeroSectionComponent = () => {
                   src="/assets/images/hero-illustration.png"
                   alt="Roadside Assistance App Interface"
                   fill
-                  className="object-cover mix-blend-overlay opacity-60 group-hover:scale-105 transition-transform duration-700"
+                  className={`object-cover group-hover:scale-105 transition-transform duration-700 ${
+                    isDark ? "mix-blend-overlay opacity-60" : "opacity-90"
+                  }`}
                 />
 
                 {/* Floating Elements */}

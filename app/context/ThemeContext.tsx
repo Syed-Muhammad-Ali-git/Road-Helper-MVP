@@ -21,6 +21,25 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
+const applyThemeToDOM = (newTheme: Theme) => {
+  if (typeof window === "undefined") return;
+  
+  const htmlElement = document.documentElement;
+  const bodyElement = document.body;
+
+  htmlElement.setAttribute("data-theme", newTheme);
+  htmlElement.classList.remove("light", "dark");
+  htmlElement.classList.add(newTheme);
+
+  if (newTheme === "dark") {
+    bodyElement.classList.add("dark");
+    bodyElement.classList.remove("light");
+  } else {
+    bodyElement.classList.add("light");
+    bodyElement.classList.remove("dark");
+  }
+};
+
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const { setColorScheme } = useMantineColorScheme();
   const [theme, setThemeState] = useState<Theme>("dark");
@@ -28,21 +47,17 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
 
   // Initialize theme from localStorage
   useEffect(() => {
-    const savedTheme = localStorage.getItem("rh_theme") as Theme;
-    if (savedTheme) {
-      setThemeState(savedTheme);
-      setColorScheme(savedTheme);
-    }
+    const savedTheme = (localStorage.getItem("rh_theme") || "dark") as Theme;
+    setThemeState(savedTheme);
+    setColorScheme(savedTheme);
+    applyThemeToDOM(savedTheme);
     setMounted(true);
   }, [setColorScheme]);
 
-  // Apply theme to document
+  // Update theme when it changes
   useEffect(() => {
     if (!mounted) return;
-    const htmlElement = document.documentElement;
-    htmlElement.setAttribute("data-theme", theme);
-    htmlElement.classList.remove("light", "dark");
-    htmlElement.classList.add(theme);
+    applyThemeToDOM(theme);
   }, [theme, mounted]);
 
   const toggleTheme = useCallback(() => {
@@ -50,13 +65,18 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     setThemeState(newTheme);
     setColorScheme(newTheme);
     localStorage.setItem("rh_theme", newTheme);
+    applyThemeToDOM(newTheme);
   }, [theme, setColorScheme]);
 
-  const setTheme = useCallback((newTheme: Theme) => {
-    setThemeState(newTheme);
-    setColorScheme(newTheme);
-    localStorage.setItem("rh_theme", newTheme);
-  }, [setColorScheme]);
+  const setTheme = useCallback(
+    (newTheme: Theme) => {
+      setThemeState(newTheme);
+      setColorScheme(newTheme);
+      localStorage.setItem("rh_theme", newTheme);
+      applyThemeToDOM(newTheme);
+    },
+    [setColorScheme]
+  );
 
   const isDark = theme === "dark";
 

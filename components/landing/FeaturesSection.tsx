@@ -124,7 +124,7 @@ const FeaturesSectionComponent = () => {
                 <ThemeIcon
                   size={60}
                   radius="md"
-                  className={`${isDark ? "bg-brand-red/10 text-brand-red" : "bg-brand-yellow/10 text-brand-gold"} mb-6 group-hover:scale-110 transition-transform duration-300`}
+                  className={`${isDark ? "bg-brand-red/10 text-brand-red" : "bg-brand-yellow/10 text-brand-gold"} mb-6 group-hover:scale-110 group-hover:rotate-6 transition-transform duration-300`}
                 >
                   <f.icon size={30} stroke={1.5} />
                 </ThemeIcon>

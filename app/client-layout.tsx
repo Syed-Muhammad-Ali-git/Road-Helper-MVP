@@ -8,6 +8,7 @@ import { helperRoutes, customerRoutes, adminRoutes, publicRoutes } from "./utils
 import useMediaQuery from "@mui/material/useMediaQuery";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { RouteChangeLoader } from "@/components/RouteChangeLoader";
 
 import { useLanguage } from "@/app/context/LanguageContext";
 
@@ -70,6 +71,7 @@ const ClientLayout = ({ children }: ClientLayoutProps) => {
 
   return (
     <>
+      <RouteChangeLoader />
       {/* Toast Notification Container */}
       <ToastContainer
         position="top-right"

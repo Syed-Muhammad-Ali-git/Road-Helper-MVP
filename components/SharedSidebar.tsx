@@ -116,17 +116,19 @@ const SharedSidebarComponent = ({
         variants={sidebarVariants}
         custom={isDesktop}
         className={cn(
-          `fixed top-0 h-full z-50 flex flex-col shadow-2xl overflow-hidden border-r border-white/10 transition-all duration-300 ${
+          `fixed top-0 h-full z-50 flex flex-col shadow-2xl overflow-hidden transition-all duration-300 ${
             isDark ? "bg-brand-black" : "bg-white"
           }`,
-          isRTL ? "right-0" : "left-0",
+          isRTL
+            ? "right-0 border-l border-white/10"
+            : "left-0 border-r border-white/10",
           !isDesktop && !open && "pointer-events-none",
         )}
       >
         {/* Header */}
         <div
           className={cn(
-            `h-20 flex items-center justify-between px-6 border-b transition-colors duration-300 min-w-[280px]`,
+            `h-20 flex items-center justify-between px-6 border-b transition-colors duration-300 min-w-70`,
             isDark ? "border-white/5" : "border-black/5",
           )}
         >
@@ -223,8 +225,8 @@ const SharedSidebarComponent = ({
                     className={cn(
                       `absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity`,
                       isDark
-                        ? "bg-gradient-to-r from-white/5 to-transparent"
-                        : "bg-gradient-to-r from-black/5 to-transparent",
+                        ? "bg-linear-to-r from-white/5 to-transparent"
+                        : "bg-linear-to-r from-black/5 to-transparent",
                     )}
                   />
                 )}
@@ -236,7 +238,7 @@ const SharedSidebarComponent = ({
         {/* Footer */}
         <div
           className={cn(
-            `p-4 border-t min-w-[280px] transition-colors duration-300`,
+            `p-4 border-t min-w-70 transition-colors duration-300`,
             isDark ? "border-white/5" : "border-black/5",
           )}
         >
