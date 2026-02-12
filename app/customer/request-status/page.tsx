@@ -102,7 +102,7 @@ export default function RequestStatusList() {
             <Title
               order={1}
               className={cn(
-                "font-manrope text-3xl font-bold bg-linear-to-r bg-clip-text text-transparent",
+                "font-manrope text-3xl font-bold bg-gradient-to-r bg-clip-text text-transparent",
                 isDark ? "from-white to-gray-400" : "from-gray-900 to-gray-600"
               )}
             >

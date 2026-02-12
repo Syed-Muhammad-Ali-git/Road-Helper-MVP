@@ -2,6 +2,7 @@ import {
   addDoc,
   collection,
   doc,
+  limit,
   onSnapshot,
   orderBy,
   query,
@@ -14,7 +15,8 @@ import {
 
 function toDate(v: unknown): Date {
   if (v instanceof Date) return v;
-  if (v && typeof (v as Timestamp).toDate === "function") return (v as Timestamp).toDate();
+  if (v && typeof (v as Timestamp).toDate === "function")
+    return (v as Timestamp).toDate();
   return new Date();
 }
 import { db } from "@/lib/firebase/config";
@@ -171,7 +173,54 @@ export function subscribeHelperCompletedCount(
     where("helperId", "==", helperId),
     where("status", "==", "completed"),
   );
-  return onSnapshot(q, (snap) => cb(snap.size), (err) => console.error("[subscribeHelperCompletedCount]", err));
+  return onSnapshot(
+    q,
+    (snap) => cb(snap.size),
+    (err) => console.error("[subscribeHelperCompletedCount]", err),
+  );
+}
+
+export function subscribeHelperCompletedJobs(fnParams: {
+  helperId: string;
+  cb: (reqs: Array<{ id: string } & RideRequestDoc>) => void;
+}): Unsubscribe {
+  const q = query(
+    collection(db, COLLECTIONS.RIDE_REQUESTS),
+    where("helperId", "==", fnParams.helperId),
+    where("status", "==", "completed"),
+    // Removed orderBy to avoid composite index requirement
+    limit(50),
+  );
+  return onSnapshot(
+    q,
+    (snap) => {
+      const jobs = snap.docs
+        .map((d) => {
+          const data = d.data() as Record<string, unknown>;
+          return {
+            id: d.id,
+            ...data,
+            createdAt: toDate(data.createdAt),
+            updatedAt: toDate(data.updatedAt),
+            acceptedAt: data.acceptedAt ? toDate(data.acceptedAt) : undefined,
+            completedAt: data.completedAt
+              ? toDate(data.completedAt)
+              : undefined,
+          } as { id: string } & RideRequestDoc;
+        })
+        .sort((a, b) => {
+          const tA = a.completedAt?.getTime() ?? 0;
+          const tB = b.completedAt?.getTime() ?? 0;
+          return tB - tA;
+        })
+        .slice(0, 20);
+      fnParams.cb(jobs);
+    },
+    (err) => {
+      // Fallback if index missing
+      console.error("[subscribeHelperCompletedJobs]", err);
+    },
+  );
 }
 
 export function subscribeHelperActiveJobs(params: {
@@ -223,7 +272,9 @@ export function subscribeCustomerRequests(params: {
             createdAt: toDate(data.createdAt),
             updatedAt: toDate(data.updatedAt),
             acceptedAt: data.acceptedAt ? toDate(data.acceptedAt) : undefined,
-            completedAt: data.completedAt ? toDate(data.completedAt) : undefined,
+            completedAt: data.completedAt
+              ? toDate(data.completedAt)
+              : undefined,
           } as { id: string } & RideRequestDoc;
         }),
       );
@@ -251,7 +302,9 @@ export function subscribeAllRequests(params: {
             createdAt: toDate(data.createdAt),
             updatedAt: toDate(data.updatedAt),
             acceptedAt: data.acceptedAt ? toDate(data.acceptedAt) : undefined,
-            completedAt: data.completedAt ? toDate(data.completedAt) : undefined,
+            completedAt: data.completedAt
+              ? toDate(data.completedAt)
+              : undefined,
           } as { id: string } & RideRequestDoc;
         }),
       );
@@ -280,7 +333,8 @@ export async function submitFeedback(params: {
   });
   // Update ride request with rating
   const rideRef = doc(db, COLLECTIONS.RIDE_REQUESTS, params.requestId);
-  const field = params.fromRole === "customer" ? "customerRating" : "helperRating";
+  const field =
+    params.fromRole === "customer" ? "customerRating" : "helperRating";
   await updateDoc(rideRef, {
     [field]: params.rating,
     updatedAt: serverTimestamp(),

@@ -77,7 +77,7 @@ export const HowItWorks = () => {
             >
               {dict.how_it_works.title}{" "}
               <span
-                className={`text-transparent bg-clip-text ${isDark ? "bg-linear-to-r from-white to-gray-500" : "bg-linear-to-r from-black to-gray-500"}`}
+                className={`text-transparent bg-clip-text ${isDark ? "bg-gradient-to-r from-white to-gray-500" : "bg-gradient-to-r from-black to-gray-500"}`}
               >
                 {dict.how_it_works.subtitle}
               </span>

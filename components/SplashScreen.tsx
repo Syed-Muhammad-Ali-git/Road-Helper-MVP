@@ -92,7 +92,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
           initial={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="fixed inset-0 z-9999 bg-linear-to-br from-brand-black via-brand-charcoal to-brand-black flex flex-col items-center justify-center overflow-hidden"
+          className="fixed inset-0 z-9999 bg-gradient-to-br from-brand-black via-brand-charcoal to-brand-black flex flex-col items-center justify-center overflow-hidden"
         >
           {/* Animated background blobs */}
           <motion.div
@@ -169,7 +169,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                   transition={{ delay: 0.7 }}
                 >
                   <motion.div
-                    className="h-full bg-linear-to-r from-brand-red via-brand-yellow to-brand-red"
+                    className="h-full bg-gradient-to-r from-brand-red via-brand-yellow to-brand-red"
                     animate={{ width: `${bootProgress}%` }}
                     transition={{ type: "spring", stiffness: 80, damping: 15 }}
                   />
@@ -193,7 +193,7 @@ export const SplashScreen: React.FC<SplashScreenProps> = ({
                   transition={{ delay: 0.8 }}
                 >
                   <motion.div
-                    className="h-full bg-linear-to-r from-brand-red via-brand-yellow to-brand-red shadow-lg shadow-brand-yellow/50"
+                    className="h-full bg-gradient-to-r from-brand-red via-brand-yellow to-brand-red shadow-lg shadow-brand-yellow/50"
                     animate={{ width: `${progress}%` }}
                     transition={{ type: "spring", stiffness: 100, damping: 20 }}
                   />

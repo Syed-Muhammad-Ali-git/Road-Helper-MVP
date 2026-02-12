@@ -33,12 +33,18 @@ import {
   subscribePendingRequests,
 } from "@/lib/services/requestService";
 import type { RideRequestDoc } from "@/types";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { useAppTheme } from "@/app/context/ThemeContext";
 
 export default function NearbyRequestsUI() {
   const router = useRouter();
   const live = useLiveLocation({
-    onSuccess: () => toast.success("GPS enabled! You can now accept nearby jobs."),
+    onSuccess: () =>
+      toast.success("GPS enabled! You can now accept nearby jobs."),
   });
+  const { dict, isRTL } = useLanguage();
+  const { isDark } = useAppTheme();
+
   const [requests, setRequests] = useState<
     Array<{ id: string } & RideRequestDoc>
   >([]);
@@ -63,44 +69,53 @@ export default function NearbyRequestsUI() {
     visible: { y: 0, opacity: 1 },
   };
 
+  const bgClass = isDark ? "bg-transparent" : "bg-gray-50";
+  const paperClass = isDark
+    ? "glass-dark border border-white/10"
+    : "bg-white border border-gray-200 shadow-xl";
+  const textPrimary = isDark ? "text-white" : "text-gray-900";
+  const textSecondary = isDark ? "text-gray-400" : "text-gray-500";
+
   return (
-    <Box className="p-4 md:p-8 font-satoshi min-h-screen bg-transparent">
+    <Box className={`p-4 md:p-8 font-satoshi min-h-screen ${bgClass}`}>
       <motion.div
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
         <motion.div variants={itemVariants}>
-          <Box mb="xl">
-            <Text className="text-gray-400 font-medium mb-1 uppercase tracking-wider text-xs">
-              Job Requests
+          <Box mb="xl" className={isRTL ? "text-right" : "text-left"}>
+            <Text
+              className={`${textSecondary} font-medium mb-1 uppercase tracking-wider text-xs`}
+            >
+              {dict.helper_requests.job_requests}
             </Text>
             <Title
               order={1}
-              className="text-3xl md:text-4xl font-bold text-white font-manrope mb-2"
+              className={`text-3xl md:text-4xl font-bold ${textPrimary} font-manrope mb-2`}
             >
-              Available Jobs
+              {dict.helper_requests.available_jobs}
             </Title>
-            <Text className="text-gray-400">
-              Nearby customers needing your assistance.
+            <Text className={textSecondary}>
+              {dict.helper_requests.nearby_customers_desc}
             </Text>
           </Box>
         </motion.div>
 
         {!isOnline && (
           <motion.div variants={itemVariants as any}>
-            <Paper
-              p="md"
-              radius="xl"
-              className="glass-dark border border-white/10 mb-6"
-            >
-              <Group justify="space-between" align="center">
-                <Box>
-                  <Text fw={700} className="text-white">
-                    Enable live location to accept jobs
+            <Paper p="md" radius="xl" className={`${paperClass} mb-6`}>
+              <Group
+                justify="space-between"
+                align="center"
+                className={isRTL ? "flex-row-reverse" : ""}
+              >
+                <Box className={isRTL ? "text-right" : "text-left"}>
+                  <Text fw={700} className={textPrimary}>
+                    {dict.helper_requests.enable_gps_title}
                   </Text>
-                  <Text size="sm" className="text-gray-400">
-                    We use your GPS to show nearby requests and calculate ETA.
+                  <Text size="sm" className={textSecondary}>
+                    {dict.helper_requests.enable_gps_desc}
                   </Text>
                 </Box>
                 <Button
@@ -108,7 +123,7 @@ export default function NearbyRequestsUI() {
                   leftSection={<IconCurrentLocation size={18} />}
                   onClick={() => live.requestPermission()}
                 >
-                  Turn On GPS
+                  {dict.helper_requests.turn_on_gps}
                 </Button>
               </Group>
             </Paper>
@@ -120,7 +135,11 @@ export default function NearbyRequestsUI() {
             <Paper
               p="xl"
               radius="xl"
-              className="glass-dark border-2 border-dashed border-white/10 py-20"
+              className={
+                isDark
+                  ? "glass-dark border-2 border-dashed border-white/10 py-20"
+                  : "bg-gray-50 border-2 border-dashed border-gray-300 py-20"
+              }
             >
               <Stack align="center" gap="sm">
                 <ThemeIcon
@@ -130,11 +149,11 @@ export default function NearbyRequestsUI() {
                 >
                   <IconAlertCircle size={40} />
                 </ThemeIcon>
-                <Text fw={600} className="text-white text-lg">
-                  No requests in your area right now.
+                <Text fw={600} className={`${textPrimary} text-lg`}>
+                  {dict.helper_requests.no_requests_title}
                 </Text>
-                <Text size="sm" className="text-gray-400">
-                  Jobs matching your service ( live) will appear here.
+                <Text size="sm" className={textSecondary}>
+                  {dict.helper_requests.no_requests_desc}
                 </Text>
               </Stack>
             </Paper>
@@ -151,16 +170,20 @@ export default function NearbyRequestsUI() {
                 <Paper
                   p="xl"
                   radius="xl"
-                  className="glass-dark border border-white/10 hover:border-brand-red/30 transition-all duration-300 group h-full"
+                  className={`${paperClass} hover:border-brand-red/30 transition-all duration-300 group h-full`}
                 >
-                  <Group justify="space-between" mb="md">
+                  <Group
+                    justify="space-between"
+                    mb="md"
+                    className={isRTL ? "flex-row-reverse" : ""}
+                  >
                     <Badge
                       size="lg"
                       className="bg-brand-red text-white font-bold"
                     >
-                      PENDING
+                      {dict.helper_requests.pending_badge}
                     </Badge>
-                    <Text size="xs" className="text-gray-400">
+                    <Text size="xs" className={textSecondary}>
                       {req.createdAt.toLocaleTimeString([], {
                         hour: "2-digit",
                         minute: "2-digit",
@@ -169,7 +192,10 @@ export default function NearbyRequestsUI() {
                   </Group>
 
                   <Stack gap="md">
-                    <Group gap="md">
+                    <Group
+                      gap="md"
+                      className={isRTL ? "flex-row-reverse text-right" : ""}
+                    >
                       <Avatar
                         color="blue"
                         radius="xl"
@@ -179,33 +205,51 @@ export default function NearbyRequestsUI() {
                         {(req.customerName || "C").toString().charAt(0)}
                       </Avatar>
                       <Box>
-                        <Text fw={700} className="text-white text-lg">
+                        <Text fw={700} className={`${textPrimary} text-lg`}>
                           {req.customerName ?? "Customer"}
                         </Text>
-                        <Text size="sm" className="text-gray-400">
-                          {req.vehicleDetails ?? "Vehicle details not provided"}
+                        <Text size="sm" className={textSecondary}>
+                          {req.vehicleDetails ??
+                            dict.helper_requests.vehicle_details_missing}
                         </Text>
                       </Box>
                     </Group>
 
                     <Group
                       gap="xs"
-                      className="glass p-3 rounded-lg border border-white/5"
+                      className={
+                        isDark
+                          ? "glass p-3 rounded-lg border border-white/5"
+                          : "bg-gray-100 p-3 rounded-lg border border-gray-200"
+                      }
+                      style={isRTL ? { flexDirection: "row-reverse" } : {}}
                     >
                       <IconMapPin size={18} className="text-brand-red" />
-                      <Text size="sm" fw={600} className="text-white">
-                        {req.location?.address ??
-                          `${req.location?.lat?.toFixed?.(4) ?? ""}, ${req.location?.lng?.toFixed?.(4) ?? ""}`}
+                      <Text size="sm" fw={600} className={textPrimary}>
+                        {typeof req.location === "object" &&
+                        req.location?.address
+                          ? req.location.address
+                          : `${req.location?.lat?.toFixed?.(4) ?? ""}, ${req.location?.lng?.toFixed?.(4) ?? ""}`}
                       </Text>
                     </Group>
 
                     <Paper
                       p="md"
                       radius="lg"
-                      className="bg-white/5 border border-white/5"
+                      className={
+                        isDark
+                          ? "bg-white/5 border border-white/5"
+                          : "bg-gray-50 border border-gray-200"
+                      }
                     >
-                      <Text size="sm" lineClamp={3} className="text-gray-300">
-                        {req.issueDescription ?? "No description provided."}
+                      <Text
+                        size="sm"
+                        lineClamp={3}
+                        className={isDark ? "text-gray-300" : "text-gray-700"}
+                        ta={isRTL ? "right" : "left"}
+                      >
+                        {req.issueDescription ??
+                          dict.helper_requests.no_description}
                       </Text>
                     </Paper>
 
@@ -217,7 +261,10 @@ export default function NearbyRequestsUI() {
                         disabled={!isOnline || acceptingId !== null}
                         onClick={async () => {
                           const helperId = auth.currentUser?.uid;
-                          const helperName = auth.currentUser?.displayName ?? auth.currentUser?.email?.split("@")[0] ?? "Helper";
+                          const helperName =
+                            auth.currentUser?.displayName ??
+                            auth.currentUser?.email?.split("@")[0] ??
+                            "Helper";
                           if (!helperId) {
                             await showError(
                               "Not signed in",
@@ -256,7 +303,7 @@ export default function NearbyRequestsUI() {
                           }
                         }}
                       >
-                        Accept Job
+                        {dict.helper_requests.accept_job}
                       </Button>
                     </Group>
 
@@ -266,11 +313,15 @@ export default function NearbyRequestsUI() {
                         className="border-blue-500/30 text-blue-400 hover:bg-blue-500/10 h-11 rounded-xl transition-all"
                         leftSection={<IconPhone size={18} />}
                         component="a"
-                        href={req.customerPhone ? `tel:${String(req.customerPhone).replace(/[^\d+]/g, "")}` : "#"}
+                        href={
+                          req.customerPhone
+                            ? `tel:${String(req.customerPhone).replace(/[^\d+]/g, "")}`
+                            : "#"
+                        }
                         target={req.customerPhone ? "_blank" : undefined}
                         disabled={!req.customerPhone}
                       >
-                        Call
+                        {dict.helper_requests.call}
                       </Button>
                       <Button
                         variant="outline"
@@ -285,7 +336,7 @@ export default function NearbyRequestsUI() {
                         target={req.customerPhone ? "_blank" : undefined}
                         disabled={!req.customerPhone}
                       >
-                        WhatsApp
+                        {dict.helper_requests.whatsapp}
                       </Button>
                     </Group>
 
@@ -294,7 +345,7 @@ export default function NearbyRequestsUI() {
                         size="xs"
                         className="text-red-400 font-semibold text-center"
                       >
-                        ⚠ Go Online to accept jobs
+                        {dict.helper_requests.go_online_warning}
                       </Text>
                     )}
                   </Stack>

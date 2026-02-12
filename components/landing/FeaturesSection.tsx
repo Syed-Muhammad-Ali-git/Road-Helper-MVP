@@ -150,7 +150,7 @@ const FeaturesSectionComponent = () => {
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
-          className={`${isDark ? "bg-linear-to-br from-brand-charcoal to-brand-black text-white" : "bg-white shadow-xl text-black"} rounded-[3rem] p-8 md:p-16 relative overflow-hidden border ${isDark ? "border-white/10" : "border-black/5"}`}
+          className={`${isDark ? "bg-gradient-to-br from-brand-charcoal to-brand-black text-white" : "bg-white shadow-xl text-black"} rounded-[3rem] p-8 md:p-16 relative overflow-hidden border ${isDark ? "border-white/10" : "border-black/5"}`}
         >
           {/* Glow Effect */}
           <div

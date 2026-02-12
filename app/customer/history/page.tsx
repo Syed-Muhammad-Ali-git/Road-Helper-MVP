@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Title,
   Text,
@@ -10,49 +10,105 @@ import {
   Table,
   Badge,
   Button,
+  Loader,
 } from "@mantine/core";
 import Link from "next/link";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { auth, db } from "@/lib/firebase/config";
+import {
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+} from "firebase/firestore";
+import type { RideRequestDoc } from "@/types";
 
 export default function ServiceHistoryUI() {
-  // Hardcoded service history data
-  const history = [
-    {
-      id: "1",
-      createdAt: new Date("2026-01-20T10:30:00"),
-      serviceType: "car_mechanic",
-      location: "Gulshan-e-Iqbal, Karachi",
-      helperName: "Ali Khan",
-      status: "completed",
-    },
-    {
-      id: "2",
-      createdAt: new Date("2026-01-21T14:45:00"),
-      serviceType: "bike_mechanic",
-      location: "DHA Phase 5, Karachi",
-      helperName: "Sara Ahmed",
-      status: "pending",
-    },
-    {
-      id: "3",
-      createdAt: new Date("2026-01-22T09:15:00"),
-      serviceType: "towing",
-      location: "Clifton, Karachi",
-      helperName: "Usman Ali",
-      status: "in_progress",
-    },
-  ];
+  const { dict, isRTL } = useLanguage();
+  const [history, setHistory] = useState<
+    Array<{ id: string } & RideRequestDoc>
+  >([]);
+  const [loading, setLoading] = useState(true);
+  const [uid, setUid] = useState<string | null>(null);
+
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged((u) => {
+      setUid(u?.uid ?? null);
+      if (!u) setLoading(false);
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    if (!uid) return;
+
+    const q = query(
+      collection(db, "rideRequests"),
+      where("customerId", "==", uid),
+      orderBy("createdAt", "desc"),
+    );
+
+    const unsub = onSnapshot(
+      q,
+      (snapshot) => {
+        const reqs = snapshot.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            createdAt: data.createdAt?.toDate
+              ? data.createdAt.toDate()
+              : new Date(),
+          } as any;
+        });
+        setHistory(reqs);
+        setLoading(false);
+      },
+      (err) => {
+        console.error("Error fetching history:", err);
+        setLoading(false);
+      },
+    );
+
+    return () => unsub();
+  }, [uid]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "yellow";
+      case "accepted":
+        return "blue";
+      case "in_progress":
+        return "grape";
+      case "completed":
+        return "green";
+      case "cancelled":
+        return "red";
+      default:
+        return "gray";
+    }
+  };
 
   return (
-    <Box className="p-4 md:p-8">
+    <Box className={`p-4 md:p-8 ${isRTL ? "text-right" : "text-left"}`}>
       <Stack gap="xl">
         <Box>
           <Title order={1} className="text-3xl font-bold">
-            Service History
+            {dict.sidebar.service_history || "Service History"}
           </Title>
-          <Text c="dimmed">Track all your past help requests.</Text>
+          <Text c="dimmed">
+            {dict.sidebar.track_past_requests ||
+              "Track all your past help requests."}
+          </Text>
         </Box>
 
-        {history.length === 0 ? (
+        {loading ? (
+          <div className="flex justify-center py-20">
+            <Loader color="red" />
+          </div>
+        ) : history.length === 0 ? (
           <Paper
             p="xl"
             radius="xl"
@@ -60,9 +116,12 @@ export default function ServiceHistoryUI() {
             py={60}
             className="text-center bg-slate-50 border-dashed"
           >
-            <Text c="dimmed">You haven&apos;t made any requests yet.</Text>
+            <Text c="dimmed">
+              {dict.sidebar.no_requests_history ||
+                "You haven't made any requests yet."}
+            </Text>
             <Button mt="md" component={Link} href="/customer/request-help">
-              Get Help Now
+              {dict.sidebar.get_help_now || "Get Help Now"}
             </Button>
           </Paper>
         ) : (
@@ -70,11 +129,21 @@ export default function ServiceHistoryUI() {
             <Table highlightOnHover verticalSpacing="md" horizontalSpacing="lg">
               <Table.Thead>
                 <Table.Tr>
-                  <Table.Th>Date</Table.Th>
-                  <Table.Th>Service</Table.Th>
-                  <Table.Th>Helper</Table.Th>
-                  <Table.Th>Status</Table.Th>
-                  <Table.Th>Action</Table.Th>
+                  <Table.Th className={isRTL ? "text-right" : ""}>
+                    {dict.sidebar.date || "Date"}
+                  </Table.Th>
+                  <Table.Th className={isRTL ? "text-right" : ""}>
+                    {dict.sidebar.service || "Service"}
+                  </Table.Th>
+                  <Table.Th className={isRTL ? "text-right" : ""}>
+                    {dict.sidebar.helper || "Helper"}
+                  </Table.Th>
+                  <Table.Th className={isRTL ? "text-right" : ""}>
+                    {dict.sidebar.status || "Status"}
+                  </Table.Th>
+                  <Table.Th className={isRTL ? "text-right" : ""}>
+                    {dict.sidebar.action || "Action"}
+                  </Table.Th>
                 </Table.Tr>
               </Table.Thead>
 
@@ -84,41 +153,38 @@ export default function ServiceHistoryUI() {
                     {/* Date */}
                     <Table.Td>
                       <Text size="sm">
-                        {req.createdAt.toLocaleDateString()}
+                        {req.createdAt instanceof Date
+                          ? req.createdAt.toLocaleDateString()
+                          : "N/A"}
                       </Text>
                       <Text size="xs" c="dimmed">
-                        {req.createdAt.toLocaleTimeString()}
+                        {req.createdAt instanceof Date
+                          ? req.createdAt.toLocaleTimeString()
+                          : ""}
                       </Text>
                     </Table.Td>
 
                     {/* Service */}
                     <Table.Td>
                       <Text size="sm" fw={600} tt="capitalize">
-                        {req.serviceType.replace("_", " ")}
+                        {req.serviceType?.replace("_", " ") || "N/A"}
                       </Text>
                       <Text size="xs" c="dimmed" lineClamp={1}>
-                        {req.location}
+                        {typeof req.location === "object"
+                          ? req.location.address
+                          : req.location}
                       </Text>
                     </Table.Td>
 
                     {/* Helper */}
                     <Table.Td>
-                      <Text size="sm">{req.helperName}</Text>
+                      <Text size="sm">{req.helperName || "-"}</Text>
                     </Table.Td>
 
                     {/* Status */}
                     <Table.Td>
-                      <Badge
-                        variant="light"
-                        color={
-                          req.status === "completed"
-                            ? "green"
-                            : req.status === "pending"
-                              ? "orange"
-                              : "blue"
-                        }
-                      >
-                        {req.status.replace("_", " ")}
+                      <Badge variant="light" color={getStatusColor(req.status)}>
+                        {req.status}
                       </Badge>
                     </Table.Td>
 
@@ -128,9 +194,15 @@ export default function ServiceHistoryUI() {
                         variant="subtle"
                         size="xs"
                         component={Link}
-                        href={`/customer/request-status?id=${req.id}`}
+                        href={
+                          req.status === "pending" ||
+                          req.status === "accepted" ||
+                          req.status === "in_progress"
+                            ? `/journey/${req.id}`
+                            : `/customer/request-status?id=${req.id}`
+                        }
                       >
-                        View
+                        {dict.sidebar.view || "View"}
                       </Button>
                     </Table.Td>
                   </Table.Tr>

@@ -81,7 +81,7 @@ export default function IntroOverlay() {
             className={`w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-[36px] p-8 md:p-10 relative overflow-hidden ${isRTL ? "text-right" : "text-left"}`}
           >
             <motion.div
-              className={`absolute inset-0 bg-linear-to-r from-brand-yellow/10 via-white/5 to-transparent`}
+              className={`absolute inset-0 bg-gradient-to-r from-brand-yellow/10 via-white/5 to-transparent`}
               animate={{ x: isRTL ? ["60%", "-60%"] : ["-60%", "60%"] }}
               transition={{ duration: 2.2, repeat: Infinity, ease: "linear" }}
             />
@@ -118,7 +118,7 @@ export default function IntroOverlay() {
               <div className="mt-8">
                 <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
                   <motion.div
-                    className="h-full bg-linear-to-r from-brand-yellow to-brand-gold rounded-full"
+                    className="h-full bg-gradient-to-r from-brand-yellow to-brand-gold rounded-full"
                     initial={{ width: "0%" }}
                     animate={{ width: `${progress}%` }}
                     transition={{ ease: "easeOut" }}

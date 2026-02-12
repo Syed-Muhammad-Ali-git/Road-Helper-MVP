@@ -96,7 +96,7 @@ const HeroSectionComponent = () => {
                 <Link href="/register?type=customer">
                   <Button
                     size="xl"
-                    className={`bg-linear-to-r ${isDark ? "from-brand-red to-brand-dark-red hover:from-brand-dark-red hover:to-brand-red" : "from-brand-yellow to-brand-gold hover:from-brand-gold hover:to-brand-yellow text-black"} transition-all hover:scale-105 active:scale-95 shadow-xl ${isDark ? "shadow-red-600/20" : "shadow-yellow-500/20"} rounded-full px-8 h-14 font-bold`}
+                    className={`bg-gradient-to-r ${isDark ? "from-brand-red to-brand-dark-red hover:from-brand-dark-red hover:to-brand-red" : "from-brand-yellow to-brand-gold hover:from-brand-gold hover:to-brand-yellow text-black"} transition-all hover:scale-105 active:scale-95 shadow-xl ${isDark ? "shadow-red-600/20" : "shadow-yellow-500/20"} rounded-full px-8 h-14 font-bold`}
                     leftSection={<IconMapPin size={22} stroke={2} />}
                   >
                     {dict.hero.request_help}
@@ -164,7 +164,7 @@ const HeroSectionComponent = () => {
             >
               <div className="relative rounded-[2.5rem] overflow-hidden shadow-2xl shadow-black/50 border border-white/10 aspect-4/3 group">
                 <div
-                  className={`absolute inset-0 z-0 ${isDark ? "bg-linear-to-br from-brand-charcoal to-brand-black" : "bg-linear-to-br from-gray-100 to-white"}`}
+                  className={`absolute inset-0 z-0 ${isDark ? "bg-gradient-to-br from-brand-charcoal to-brand-black" : "bg-gradient-to-br from-gray-100 to-white"}`}
                 />
 
                 <Image

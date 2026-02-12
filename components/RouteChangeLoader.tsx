@@ -60,7 +60,7 @@ const RouteChangeLoaderContent = () => {
                 transition={{ duration: 0.8, repeat: Infinity, ease: "linear" }}
               />
               <div
-                className={`absolute inset-4 rounded-full bg-linear-to-br ${
+                className={`absolute inset-4 rounded-full bg-gradient-to-br ${
                   isDark ? "from-brand-red/20 to-brand-yellow/20" : "from-brand-red/10 to-brand-gold/10"
                 } flex items-center justify-center`}
               >
@@ -79,7 +79,7 @@ const RouteChangeLoaderContent = () => {
               initial={{ width: 0 }}
               animate={{ width: "100%" }}
               transition={{ duration: 0.4, ease: "easeOut" }}
-              className="h-1 w-32 rounded-full bg-linear-to-r from-brand-red via-brand-yellow to-brand-red overflow-hidden"
+              className="h-1 w-32 rounded-full bg-gradient-to-r from-brand-red via-brand-yellow to-brand-red overflow-hidden"
             >
               <motion.div
                 animate={{ x: ["-100%", "100%"] }}

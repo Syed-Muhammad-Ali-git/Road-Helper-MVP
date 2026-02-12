@@ -128,8 +128,8 @@ function RegisterPageContent() {
       className={cn(
         "min-h-screen flex font-satoshi overflow-hidden relative",
         isDark
-          ? "bg-linear-to-br from-black via-brand-black to-black text-white"
-          : "bg-linear-to-br from-gray-50 via-white to-gray-100 text-gray-900",
+          ? "bg-gradient-to-br from-black via-brand-black to-black text-white"
+          : "bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900",
         isRTL ? "font-urdu" : "font-satoshi",
       )}
     >
@@ -210,7 +210,7 @@ function RegisterPageContent() {
         transition={{ duration: 1, ease: "easeOut" }}
         className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 z-10"
       >
-        <div className="absolute inset-0 z-0 bg-linear-to-br from-black via-brand-charcoal/50 to-transparent">
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-brand-charcoal/50 to-transparent">
           <Image
             src="/assets/images/login-sidebar.png"
             alt="Background"
@@ -219,7 +219,7 @@ function RegisterPageContent() {
             className="object-cover opacity-30 grayscale"
             priority
           />
-          <div className="absolute inset-0 bg-linear-to-r from-black via-black/90 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent" />
         </div>
 
         <motion.div
@@ -261,7 +261,7 @@ function RegisterPageContent() {
             className="text-7xl font-bold leading-tight mb-6"
           >
             Start Your <br />
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
               Journey
             </span>
             <br />
@@ -357,8 +357,8 @@ function RegisterPageContent() {
               className={cn(
                 "inline-block mb-4 p-4 rounded-2xl border",
                 isDark
-                  ? "bg-linear-to-br from-brand-red/20 to-orange-500/20 border-brand-red/30"
-                  : "bg-linear-to-br from-brand-red/10 to-orange-500/10 border-brand-red/20",
+                  ? "bg-gradient-to-br from-brand-red/20 to-orange-500/20 border-brand-red/30"
+                  : "bg-gradient-to-br from-brand-red/10 to-orange-500/10 border-brand-red/20",
               )}
             >
               <Sparkles size={40} className="text-brand-red" />
@@ -367,8 +367,8 @@ function RegisterPageContent() {
               className={cn(
                 "font-manrope text-4xl font-bold mb-2 bg-clip-text text-transparent",
                 isDark
-                  ? "bg-linear-to-r from-white to-gray-300"
-                  : "bg-linear-to-r from-gray-900 to-gray-700",
+                  ? "bg-gradient-to-r from-white to-gray-300"
+                  : "bg-gradient-to-r from-gray-900 to-gray-700",
               )}
             >
               {dict.auth.create_account}

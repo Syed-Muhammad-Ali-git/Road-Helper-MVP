@@ -71,7 +71,7 @@ export default function LoginPage() {
           email: data.email,
           password: data.password,
         });
-        await showSuccess(
+        showSuccess(
           dict.auth.welcome_back,
           loginType === "customer" ? dict.auth.customer : dict.auth.helper,
         );
@@ -80,7 +80,8 @@ export default function LoginPage() {
             ? "/customer/dashboard"
             : "/helper/dashboard",
         );
-        // Keep loader visible until navigation completes; do not set false on success
+        // We pulse the loader but allow navigation to proceed in background
+        setTimeout(() => setIsLoading(false), 5000); // Safety timeout
       } catch (error: unknown) {
         console.error(error);
         const message =
@@ -104,11 +105,11 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await loginWithGoogle({ role: loginType });
-      await showSuccess(dict.auth.welcome_back, "Signed in with Google.");
+      showSuccess(dict.auth.welcome_back, "Signed in with Google.");
       router.push(
         loginType === "customer" ? "/customer/dashboard" : "/helper/dashboard",
       );
-      // Keep loader until navigation completes
+      setTimeout(() => setIsLoading(false), 5000); // Safety timeout
     } catch (err: unknown) {
       const msg =
         err instanceof AuthRuleError
@@ -138,8 +139,8 @@ export default function LoginPage() {
       className={cn(
         "min-h-screen flex font-satoshi overflow-hidden relative",
         isDark
-          ? "bg-linear-to-br from-black via-brand-black to-black text-white"
-          : "bg-linear-to-br from-gray-50 via-white to-gray-100 text-gray-900",
+          ? "bg-gradient-to-br from-black via-brand-black to-black text-white"
+          : "bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900",
         isRTL ? "font-urdu" : "font-satoshi",
       )}
     >
@@ -207,7 +208,7 @@ export default function LoginPage() {
         transition={{ duration: 1, ease: "easeOut" }}
         className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 z-10"
       >
-        <div className="absolute inset-0 z-0 bg-linear-to-br from-black via-brand-charcoal/50 to-transparent">
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-brand-charcoal/50 to-transparent">
           <Image
             src="/assets/images/login-sidebar.png"
             alt="Background"
@@ -216,7 +217,7 @@ export default function LoginPage() {
             className="object-cover opacity-30 grayscale"
             priority
           />
-          <div className="absolute inset-0 bg-linear-to-r from-black via-black/90 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent" />
         </div>
 
         <motion.div
@@ -250,7 +251,7 @@ export default function LoginPage() {
             className="text-7xl font-bold leading-tight mb-6"
           >
             Roadside <br />
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
               Assistance
             </span>
             <br />
@@ -345,14 +346,14 @@ export default function LoginPage() {
             >
               <div
                 className={cn(
-                  "p-6 rounded-3xl bg-linear-to-br border-2 shadow-2xl backdrop-blur-xl relative overflow-hidden transition-all duration-500",
+                  "p-6 rounded-3xl bg-gradient-to-br border-2 shadow-2xl backdrop-blur-xl relative overflow-hidden transition-all duration-500",
                   loginType === "customer"
                     ? "from-blue-600/30 to-indigo-600/30 border-blue-500/30 shadow-blue-500/30"
                     : "from-orange-600/30 to-red-600/30 border-orange-500/30 shadow-orange-500/30",
                 )}
               >
                 <motion.div
-                  className="absolute inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent"
                   animate={{ x: ["-200%", "200%"] }}
                   transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
                 />
@@ -381,8 +382,8 @@ export default function LoginPage() {
               className={cn(
                 "text-4xl font-bold mb-2 bg-clip-text text-transparent",
                 isDark
-                  ? "bg-linear-to-r from-white to-gray-400"
-                  : "bg-linear-to-r from-gray-900 to-gray-600",
+                  ? "bg-gradient-to-r from-white to-gray-400"
+                  : "bg-gradient-to-r from-gray-900 to-gray-600",
               )}
             >
               {dict.auth.welcome_back}
@@ -416,8 +417,8 @@ export default function LoginPage() {
                     ? "right-1.5"
                     : "left-1.5",
                 loginType === "customer"
-                  ? "bg-linear-to-r from-blue-600 to-blue-800 shadow-blue-500/40 border-blue-400/50"
-                  : "bg-linear-to-r from-orange-600 to-orange-800 shadow-orange-500/40 border-orange-400/50",
+                  ? "bg-gradient-to-r from-blue-600 to-blue-800 shadow-blue-500/40 border-blue-400/50"
+                  : "bg-gradient-to-r from-orange-600 to-orange-800 shadow-orange-500/40 border-orange-400/50",
               )}
               transition={{ type: "spring", stiffness: 500, damping: 30 }}
             />
@@ -490,7 +491,7 @@ export default function LoginPage() {
                   placeholder="name@example.com"
                   dir="ltr" // Email is usually LTR
                 />
-                <motion.div className="absolute inset-0 rounded-xl bg-linear-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
+                <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
               </motion.div>
               {errors.email && (
                 <motion.span
@@ -546,7 +547,7 @@ export default function LoginPage() {
                 >
                   {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
                 </motion.button>
-                <motion.div className="absolute inset-0 rounded-xl bg-linear-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
+                <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
               </motion.div>
               {errors.password && (
                 <motion.span
@@ -581,13 +582,13 @@ export default function LoginPage() {
                 className={cn(
                   "w-full h-16 text-lg font-bold rounded-xl mt-4 group relative overflow-hidden border-2 transition-all duration-500 cursor-pointer",
                   isDark
-                    ? "bg-linear-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 border-brand-red/50 hover:border-brand-red"
-                    : "bg-linear-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 border-brand-red hover:border-brand-red",
+                    ? "bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 border-brand-red/50 hover:border-brand-red"
+                    : "bg-gradient-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 border-brand-red hover:border-brand-red",
                 )}
                 style={{ backgroundSize: "200% 100%" }}
               >
                 <motion.div
-                  className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                   animate={{ x: ["-100%", "100%"] }}
                   transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
                 />

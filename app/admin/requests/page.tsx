@@ -310,7 +310,7 @@ const RequestsPage = () => {
                         className="group hover:bg-white/[0.03] transition-colors border-b border-white/[0.05] last:border-0"
                       >
                         <Table.Td className="font-mono text-[11px] font-black text-white/40">
-                          {req.id}
+                          {req.id.slice(0, 8)}
                         </Table.Td>
                         <Table.Td>
                           <Group gap="sm">
@@ -319,14 +319,14 @@ const RequestsPage = () => {
                               radius="10px"
                               className="bg-brand-red/20 text-brand-red border border-brand-red/10 font-black"
                             >
-                              {req.user[0]}
+                              {(req.customerName || "?")[0]}
                             </Avatar>
                             <div>
                               <Text fw={800} size="sm">
-                                {req.user}
+                                {req.customerName || "Unknown"}
                               </Text>
-                              <Text size="xs" color="dimmed" fw={600}>
-                                {req.phone}
+                              <Text size="xs" c="dimmed" fw={600}>
+                                {req.customerPhone || "N/A"}
                               </Text>
                             </div>
                           </Group>
@@ -338,10 +338,10 @@ const RequestsPage = () => {
                               fw={900}
                               className="text-brand-red uppercase tracking-widest"
                             >
-                              {req.service}
+                              {req.serviceType?.replace("_", " ") || "SERVICE"}
                             </Text>
                             <Text size="xs" className="text-gray-500 font-bold">
-                              {req.vehicle}
+                              {req.vehicleDetails || "N/A"}
                             </Text>
                           </div>
                         </Table.Td>
@@ -353,7 +353,10 @@ const RequestsPage = () => {
                               fw={700}
                               className="text-gray-500 max-w-[150px] truncate"
                             >
-                              {req.location}
+                              {typeof req.location === "object" &&
+                              req.location?.address
+                                ? req.location.address
+                                : "Location pin"}
                             </Text>
                           </div>
                         </Table.Td>
@@ -361,9 +364,9 @@ const RequestsPage = () => {
                           <div
                             className={cn(
                               "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest",
-                              req.status === "Completed"
+                              req.status === "completed"
                                 ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                                : req.status === "Pending"
+                                : req.status === "pending"
                                   ? "bg-orange-500/10 border-orange-500/20 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.1)]"
                                   : "bg-blue-500/10 border-blue-500/20 text-blue-400",
                             )}
@@ -371,9 +374,9 @@ const RequestsPage = () => {
                             <div
                               className={cn(
                                 "w-1.5 h-1.5 rounded-full animate-pulse",
-                                req.status === "Completed"
+                                req.status === "completed"
                                   ? "bg-emerald-400"
-                                  : req.status === "Pending"
+                                  : req.status === "pending"
                                     ? "bg-orange-400"
                                     : "bg-blue-400",
                               )}
@@ -384,18 +387,19 @@ const RequestsPage = () => {
                         <Table.Td>
                           <div className="flex flex-col">
                             <Text fw={900} className="text-white">
-                              Rs {req.amount}
+                              {/* Amount not yet in schema, standard placeholder */}
+                              Rs {(req as any).amount || "0"}
                             </Text>
                             <Text
                               size="xs"
                               className={cn(
                                 "font-black text-[9px]",
-                                req.paymentStatus === "Paid"
+                                (req as any).paymentStatus === "Paid"
                                   ? "text-emerald-500"
                                   : "text-brand-red",
                               )}
                             >
-                              {req.paymentStatus}
+                              {(req as any).paymentStatus || "Pending"}
                             </Text>
                           </div>
                         </Table.Td>

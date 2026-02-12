@@ -224,8 +224,8 @@ const SharedSidebarComponent = ({
                     className={cn(
                       `absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity`,
                       isDark
-                        ? "bg-linear-to-r from-white/5 to-transparent"
-                        : "bg-linear-to-r from-black/5 to-transparent",
+                        ? "bg-gradient-to-r from-white/5 to-transparent"
+                        : "bg-gradient-to-r from-black/5 to-transparent",
                     )}
                   />
                 )}

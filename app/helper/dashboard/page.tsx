@@ -38,36 +38,50 @@ import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useAppTheme } from "@/app/context/ThemeContext";
 import { auth } from "@/lib/firebase/config";
-import { subscribeHelperCompletedCount } from "@/lib/services/requestService";
+import {
+  subscribeHelperCompletedCount,
+  subscribeHelperCompletedJobs,
+} from "@/lib/services/requestService";
+import { useLanguage } from "@/app/context/LanguageContext";
+import type { RideRequestDoc } from "@/types";
 
 const HelperDashboard = () => {
   const { isDark } = useAppTheme();
+  const { dict, isRTL } = useLanguage();
   const [isOnline, setIsOnline] = useState(true);
   const [isLoaded, setIsLoaded] = useState(false);
   const [helperName, setHelperName] = useState("Helper");
   const [completedCount, setCompletedCount] = useState(0);
+  const [completedJobs, setCompletedJobs] = useState<
+    Array<{ id: string } & RideRequestDoc>
+  >([]);
   const [uid, setUid] = useState<string | null>(null);
 
   useEffect(() => {
-    const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
+    const unsub = auth.onAuthStateChanged((u) => {
+      setUid(u?.uid ?? null);
+      setHelperName(u?.displayName ?? u?.email?.split("@")[0] ?? "Helper");
+    });
     return () => unsub();
   }, []);
 
   useEffect(() => {
     if (!uid) return;
-    const unsub = subscribeHelperCompletedCount(uid, setCompletedCount);
-    return () => unsub();
+    const unsubCount = subscribeHelperCompletedCount(uid, setCompletedCount);
+    // Fetch completed jobs for history and earnings
+    const unsubJobs = subscribeHelperCompletedJobs({
+      helperId: uid,
+      cb: (jobs) => setCompletedJobs(jobs),
+    });
+
+    return () => {
+      unsubCount();
+      unsubJobs();
+    };
   }, [uid]);
 
   useEffect(() => {
     setIsLoaded(true);
-    const loginData = localStorage.getItem("loginData");
-    if (loginData) {
-      try {
-        const parsed = JSON.parse(loginData);
-        if (parsed.fullName) setHelperName(parsed.fullName.split(" ")[0]);
-      } catch (e) {}
-    }
   }, []);
 
   const [particles, setParticles] = useState<any[]>([]);
@@ -86,21 +100,37 @@ const HelperDashboard = () => {
   const ridesRemaining = Math.max(0, freeRidesLimit - completedCount);
   const commissionRate = 20;
 
+  // Calculate earnings from completed jobs for today
+  const todaysEarnings = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return completedJobs.reduce((acc, job) => {
+      if (job.completedAt && job.completedAt >= today) {
+        return acc + (Number((job as any).amount) || 0); // Assuming amount field exists
+      }
+      return acc;
+    }, 0);
+  }, [completedJobs]);
+
+  const recentSettlements = useMemo(() => {
+    // Use completed jobs as proxy for settlements for now
+    return completedJobs.slice(0, 3).map((job) => ({
+      date: job.completedAt ? job.completedAt.toLocaleDateString() : "N/A",
+      amount: Number((job as any).amount) || 0,
+      status: "Paid", // Default for now
+    }));
+  }, [completedJobs]);
+
   const userData = useMemo(
     () => ({
       fullName: helperName,
       totalJobs: completedCount,
-      rating: 0,
-      todaysEarnings: 0,
+      rating: 0, // Need rating specific query
+      todaysEarnings: todaysEarnings,
       pendingPayment: 0,
       paymentDue: completedCount > freeRidesLimit,
     }),
-    [helperName, completedCount],
-  );
-
-  const paymentHistory = useMemo(
-    () => [] as { date: string; amount: number; status: string }[],
-    [],
+    [helperName, completedCount, todaysEarnings],
   );
 
   const containerVariants = {
@@ -124,11 +154,13 @@ const HelperDashboard = () => {
     setIsOnline(checked);
   }, []);
 
+  const bgClass = isDark ? "bg-[#0a0a0a]" : "bg-gray-50";
+
   return (
     <Box
       className={cn(
         "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi",
-        isDark ? "bg-[#0a0a0a]" : "bg-gray-50",
+        bgClass,
       )}
     >
       {/* Premium Background Effects */}
@@ -181,22 +213,27 @@ const HelperDashboard = () => {
         className="relative z-10 max-w-7xl mx-auto"
       >
         {/* HEADER SECTION */}
-        <Group justify="space-between" mb={40} align="center">
-          <Box>
+        <Group
+          justify="space-between"
+          mb={40}
+          align="center"
+          className={isRTL ? "flex-row-reverse" : ""}
+        >
+          <Box className={isRTL ? "text-right" : "text-left"}>
             <motion.div
               variants={itemVariants as any}
-              className="flex items-center gap-2 mb-2"
+              className={`flex items-center gap-2 mb-2 ${isRTL ? "flex-row-reverse" : ""}`}
             >
               <div className="h-[1px] w-8 bg-orange-500" />
               <Text className="text-orange-500 font-bold uppercase tracking-[0.2em] text-[10px]">
-                Professional Workstation
+                {dict.helper_dashboard.professional_workstation}
               </Text>
             </motion.div>
             <Title
               order={1}
-              className="font-manrope font-extrabold text-4xl md:text-5xl text-white tracking-tight"
+              className={`font-manrope font-extrabold text-4xl md:text-5xl tracking-tight ${isDark ? "text-white" : "text-gray-900"}`}
             >
-              Welcome back,{" "}
+              {dict.auth.welcome_back},{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-yellow-400">
                 {userData.fullName}
               </span>
@@ -208,16 +245,17 @@ const HelperDashboard = () => {
               p="md"
               radius="24px"
               className={cn(
-                "glass-dark border transition-all duration-500 px-6",
+                "border transition-all duration-500 px-6",
+                isDark ? "glass-dark" : "bg-white",
                 isOnline
                   ? "border-green-500/30 shadow-xl shadow-green-500/10"
-                  : "border-white/10",
+                  : "border-gray-200",
               )}
             >
-              <Group gap="xl">
-                <div>
+              <Group gap="xl" className={isRTL ? "flex-row-reverse" : ""}>
+                <div className={isRTL ? "text-right" : "text-left"}>
                   <Text className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mb-0.5">
-                    Availability Status
+                    {dict.helper_dashboard.availability_status}
                   </Text>
                   <Text
                     className={cn(
@@ -225,7 +263,9 @@ const HelperDashboard = () => {
                       isOnline ? "text-green-400" : "text-gray-400",
                     )}
                   >
-                    {isOnline ? "OPERATIONAL" : "OFF-DUTY"}
+                    {isOnline
+                      ? dict.helper_dashboard.operational
+                      : dict.helper_dashboard.off_duty}
                   </Text>
                 </div>
                 <Switch
@@ -254,13 +294,19 @@ const HelperDashboard = () => {
 
               <div className="relative z-10 h-full flex flex-col justify-between">
                 <div>
-                  <Group justify="space-between" mb={20}>
-                    <div className="flex items-center gap-3">
+                  <Group
+                    justify="space-between"
+                    mb={20}
+                    className={isRTL ? "flex-row-reverse" : ""}
+                  >
+                    <div
+                      className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : ""}`}
+                    >
                       <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center text-white border border-white/10">
                         <IconWallet size={24} />
                       </div>
                       <Text className="font-bold text-white/80 uppercase tracking-widest text-xs">
-                        Today's Revenue
+                        {dict.helper_dashboard.todays_revenue}
                       </Text>
                     </div>
                     <Badge
@@ -268,29 +314,33 @@ const HelperDashboard = () => {
                       variant="filled"
                       className="bg-orange-500 shadow-lg shadow-orange-500/20"
                     >
-                      LIVE
+                      {dict.helper_dashboard.live}
                     </Badge>
                   </Group>
                   <Title
                     order={1}
-                    className="font-manrope text-7xl font-black tracking-tighter mb-4 italic italic"
+                    className={`font-manrope text-7xl font-black tracking-tighter mb-4 italic ${isRTL ? "text-right" : "text-left"}`}
                   >
                     PKR {(userData.todaysEarnings || 0).toLocaleString("en-PK")}
                   </Title>
-                  <Group gap="xs">
+                  <Group gap="xs" className={isRTL ? "flex-row-reverse" : ""}>
                     <div className="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-bold rounded-full border border-green-500/30">
                       {completedCount > 0
-                        ? `${completedCount} completed`
-                        : "Start earning"}
+                        ? `${completedCount} ${dict.helper_dashboard.completed}`
+                        : dict.helper_dashboard.start_earning}
                     </div>
                   </Group>
                 </div>
 
-                <div className="mt-8 pt-6 border-t border-white/10 flex justify-between items-center text-xs font-semibold uppercase tracking-wider text-white/50">
-                  <span>Net after platform fee</span>
-                  <div className="flex items-center gap-2">
+                <div
+                  className={`mt-8 pt-6 border-t border-white/10 flex justify-between items-center text-xs font-semibold uppercase tracking-wider text-white/50 ${isRTL ? "flex-row-reverse" : ""}`}
+                >
+                  <span>{dict.helper_dashboard.net_after_fee}</span>
+                  <div
+                    className={`flex items-center gap-2 ${isRTL ? "flex-row-reverse" : ""}`}
+                  >
                     <IconShieldCheck size={14} className="text-orange-500" />
-                    Secure Payout
+                    {dict.helper_dashboard.secure_payout}
                   </div>
                 </div>
               </div>
@@ -302,7 +352,10 @@ const HelperDashboard = () => {
             <Paper
               p={32}
               radius="32px"
-              className="glass-dark border border-white/10 h-full flex flex-col justify-between group hover:bg-white/5 transition-all"
+              className={cn(
+                "border border-white/10 h-full flex flex-col justify-between group hover:bg-white/5 transition-all",
+                isDark ? "glass-dark" : "bg-white border-gray-200",
+              )}
             >
               <ThemeIcon
                 size={64}
@@ -313,14 +366,17 @@ const HelperDashboard = () => {
               </ThemeIcon>
               <div>
                 <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
-                  Completion Rate
+                  {dict.helper_dashboard.completion_rate}
                 </Text>
-                <Title order={2} className="text-white text-4xl font-black">
+                <Title
+                  order={2}
+                  className={`text-4xl font-black ${isDark ? "text-white" : "text-gray-900"}`}
+                >
                   {userData.totalJobs > 0 ? "98" : "0"}{" "}
                   <span className="text-xl text-blue-400">%</span>
                 </Title>
                 <Text className="text-gray-500 text-xs mt-2 font-medium">
-                  {userData.totalJobs} Jobs Completed
+                  {userData.totalJobs} {dict.helper_dashboard.jobs_completed}
                 </Text>
               </div>
             </Paper>
@@ -331,7 +387,10 @@ const HelperDashboard = () => {
             <Paper
               p={32}
               radius="32px"
-              className="glass-dark border border-white/10 h-full flex flex-col justify-between group hover:bg-white/5 transition-all"
+              className={cn(
+                "border border-white/10 h-full flex flex-col justify-between group hover:bg-white/5 transition-all",
+                isDark ? "glass-dark" : "bg-white border-gray-200",
+              )}
             >
               <ThemeIcon
                 size={64}
@@ -342,20 +401,20 @@ const HelperDashboard = () => {
               </ThemeIcon>
               <div>
                 <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-2">
-                  Free Rides Policy
+                  {dict.helper_dashboard.free_rides_policy}
                 </Text>
-                <Title order={2} className="text-white text-4xl font-black">
+                <Title
+                  order={2}
+                  className={`text-4xl font-black ${isDark ? "text-white" : "text-gray-900"}`}
+                >
                   {ridesRemaining}{" "}
                   <span className="text-xl text-yellow-500">
                     / {freeRidesLimit}
                   </span>
                 </Title>
                 <Text className="text-gray-500 text-xs mt-2 font-medium">
-                  Free rides left. After {freeRidesLimit}: {commissionRate}%
-                  commission
-                </Text>
-                <Text className="text-gray-600 text-[10px] mt-1">
-                  Completed: {completedCount}
+                  {dict.helper_dashboard.free_rides_left}. {freeRidesLimit}{" "}
+                  {dict.helper_dashboard.commission_after}
                 </Text>
               </div>
             </Paper>
@@ -371,19 +430,24 @@ const HelperDashboard = () => {
               className="relative overflow-hidden bg-gradient-to-r from-yellow-500/5 to-orange-500/5 border-2 border-yellow-500/20"
             >
               <div className="absolute top-0 right-0 w-32 h-32 bg-yellow-500/10 blur-[60px] rounded-full" />
-              <Group justify="space-between" align="center">
-                <Group gap={20}>
+              <Group
+                justify="space-between"
+                align="center"
+                className={isRTL ? "flex-row-reverse" : ""}
+              >
+                <Group gap={20} className={isRTL ? "flex-row-reverse" : ""}>
                   <div className="h-14 w-14 rounded-2xl bg-yellow-500/20 text-yellow-500 flex items-center justify-center border border-yellow-500/30 animate-pulse">
                     <IconAlertCircle size={30} />
                   </div>
-                  <div>
-                    <Text className="text-white font-extrabold text-xl tracking-tight">
-                      System Fee Overdue: PKR{" "}
+                  <div className={isRTL ? "text-right" : "text-left"}>
+                    <Text
+                      className={`font-extrabold text-xl tracking-tight ${isDark ? "text-white" : "text-gray-900"}`}
+                    >
+                      {dict.helper_dashboard.system_fee_overdue}: PKR{" "}
                       {userData.pendingPayment.toLocaleString("en-PK")}
                     </Text>
                     <Text className="text-gray-400 font-medium">
-                      To maintain your priority status, please settle the
-                      outstanding commission.
+                      To maintain priority, settle overdue commission.
                     </Text>
                   </div>
                 </Group>
@@ -391,7 +455,7 @@ const HelperDashboard = () => {
                   className="bg-yellow-600 hover:bg-yellow-500 text-black font-black px-8 h-12 rounded-xl border-b-4 border-yellow-800 transition-all hover:translate-y-[-2px] active:translate-y-[2px]"
                   rightSection={<IconArrowRight size={18} />}
                 >
-                  Clear Balance
+                  {dict.helper_dashboard.clear_balance}
                 </Button>
               </Group>
             </Paper>
@@ -404,22 +468,30 @@ const HelperDashboard = () => {
             <Paper
               p={40}
               radius="32px"
-              className="glass-dark border border-white/10 h-full relative overflow-hidden"
+              className={cn(
+                "border border-white/10 h-full relative overflow-hidden",
+                isDark ? "glass-dark" : "bg-white border-gray-200",
+              )}
             >
               <div className="absolute top-0 right-0 p-8 text-white/5">
                 <IconMap2 size={200} />
               </div>
 
-              <Group justify="space-between" mb={40} align="flex-end">
-                <div>
+              <Group
+                justify="space-between"
+                mb={40}
+                align="flex-end"
+                className={isRTL ? "flex-row-reverse" : ""}
+              >
+                <div className={isRTL ? "text-right" : "text-left"}>
                   <Title
                     order={3}
-                    className="font-manrope font-black text-3xl text-white tracking-tight"
+                    className={`font-manrope font-black text-3xl tracking-tight ${isDark ? "text-white" : "text-gray-900"}`}
                   >
-                    Active Job Radar
+                    {dict.helper_dashboard.active_job_radar}
                   </Title>
                   <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">
-                    Real-time rescue requests
+                    {dict.helper_dashboard.real_time_requests}
                   </Text>
                 </div>
                 <Button
@@ -429,12 +501,14 @@ const HelperDashboard = () => {
                   component={Link}
                   href="/helper/requests"
                 >
-                  Browse Jobs
+                  {dict.helper_dashboard.browse_jobs}
                 </Button>
               </Group>
 
               {/* RADAR SEARCHING UI */}
-              <Box className="flex flex-col items-center justify-center py-20 bg-white/5 rounded-[32px] border border-white/5 relative">
+              <Box
+                className={`flex flex-col items-center justify-center py-20 rounded-[32px] border relative ${isDark ? "bg-white/5 border-white/5" : "bg-gray-100/50 border-gray-200"}`}
+              >
                 <div className="relative mb-8">
                   <motion.div
                     animate={{ scale: [1, 1.5, 1], opacity: [0.1, 0.3, 0.1] }}
@@ -446,11 +520,13 @@ const HelperDashboard = () => {
                   </div>
                 </div>
 
-                <Text className="text-white font-black text-xl mb-1 tracking-tight">
-                  Searching your area...
+                <Text
+                  className={`font-black text-xl mb-1 tracking-tight ${isDark ? "text-white" : "text-gray-900"}`}
+                >
+                  {dict.helper_dashboard.searching_area}
                 </Text>
                 <Text className="text-gray-500 font-bold text-[10px] uppercase tracking-[0.3em] mb-10">
-                  Beacon Active in 10KM Radius
+                  {dict.helper_dashboard.beacon_active}
                 </Text>
 
                 <Button
@@ -465,7 +541,7 @@ const HelperDashboard = () => {
                     />
                   }
                 >
-                  Browse Job List
+                  {dict.helper_dashboard.browse_jobs}
                 </Button>
               </Box>
             </Paper>
@@ -481,7 +557,11 @@ const HelperDashboard = () => {
               >
                 <div className="absolute top-0 left-0 w-32 h-32 bg-orange-600/10 blur-[60px] rounded-full" />
 
-                <Group mb={40} justify="space-between">
+                <Group
+                  mb={40}
+                  justify="space-between"
+                  className={isRTL ? "flex-row-reverse" : ""}
+                >
                   <div className="h-10 w-10 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-500">
                     <IconClock size={20} />
                   </div>
@@ -490,7 +570,7 @@ const HelperDashboard = () => {
                     color="gray"
                     className="text-gray-500 border-gray-800"
                   >
-                    1h 12m On Duty
+                    {dict.helper_dashboard.on_duty_mock}
                   </Badge>
                 </Group>
 
@@ -498,29 +578,19 @@ const HelperDashboard = () => {
                   order={4}
                   className="font-manrope text-white font-black text-xl mb-2"
                 >
-                  Shift Insights
+                  {dict.helper_dashboard.shift_insights}
                 </Title>
                 <Text className="text-gray-500 font-medium text-sm mb-8">
-                  No active assignments. Current ETA for new requests is{" "}
-                  <span className="text-white font-bold">~4 mins</span> based on
-                  demand.
+                  {dict.helper_dashboard.shift_insights_desc}
                 </Text>
 
                 <div className="space-y-4">
                   <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between">
                     <Text className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                      Global Demand
+                      {dict.helper_dashboard.global_demand}
                     </Text>
                     <Text className="text-xs font-black text-green-400">
-                      HIGH
-                    </Text>
-                  </div>
-                  <div className="p-4 rounded-2xl bg-white/5 border border-white/5 flex items-center justify-between">
-                    <Text className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                      Surge Bonus
-                    </Text>
-                    <Text className="text-xs font-black text-yellow-500">
-                      ACTIVE
+                      {dict.helper_dashboard.high_simulated}
                     </Text>
                   </div>
                 </div>
@@ -531,19 +601,33 @@ const HelperDashboard = () => {
               <Paper
                 p={30}
                 radius="32px"
-                className="glass-dark border border-white/10 hover:border-orange-500/30 transition-all shadow-2xl cursor-pointer group"
+                className={cn(
+                  "border border-white/10 hover:border-orange-500/30 transition-all shadow-2xl cursor-pointer group",
+                  isDark ? "glass-dark" : "bg-white border-gray-200",
+                )}
               >
-                <Group justify="space-between">
-                  <div className="flex items-center gap-4">
+                <Group
+                  justify="space-between"
+                  className={isRTL ? "flex-row-reverse" : ""}
+                >
+                  <div
+                    className={`flex items-center gap-4 ${isRTL ? "flex-row-reverse text-right" : ""}`}
+                  >
                     <div className="h-12 w-12 rounded-2xl bg-orange-500/10 text-orange-500 flex items-center justify-center">
                       <IconSparkles size={24} />
                     </div>
                     <div>
-                      <Text className="text-white font-bold">
-                        Get Pro Perks
+                      <Text
+                        className={
+                          isDark
+                            ? "text-white font-bold"
+                            : "text-gray-900 font-bold"
+                        }
+                      >
+                        {dict.helper_dashboard.get_pro_perks}
                       </Text>
                       <Text className="text-gray-500 text-xs font-medium">
-                        Earn 5% more per job
+                        {dict.helper_dashboard.earn_more}
                       </Text>
                     </div>
                   </div>
@@ -562,44 +646,61 @@ const HelperDashboard = () => {
           <Paper
             p={40}
             radius="32px"
-            className="glass-dark border border-white/10 shadow-2xl"
+            className={cn(
+              "border shadow-2xl",
+              isDark
+                ? "glass-dark border-white/10"
+                : "bg-white border-gray-200",
+            )}
           >
-            <Group justify="space-between" mb={32}>
-              <div>
+            <Group
+              justify="space-between"
+              mb={32}
+              className={isRTL ? "flex-row-reverse" : ""}
+            >
+              <div className={isRTL ? "text-right" : "text-left"}>
                 <Title
                   order={4}
-                  className="font-manrope text-2xl font-black text-white tracking-tight"
+                  className={`font-manrope text-2xl font-black tracking-tight ${isDark ? "text-white" : "text-gray-900"}`}
                 >
-                  Financial History
+                  {dict.helper_dashboard.financial_history}
                 </Title>
                 <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">
-                  Platform Settlements & Fees
+                  {dict.helper_dashboard.platform_settlements}
                 </Text>
               </div>
               <Button
                 variant="outline"
                 color="gray"
-                className="border-white/10 text-gray-400 hover:bg-white/5 px-6 rounded-xl"
+                className={cn(
+                  "border-white/10 text-gray-400 px-6 rounded-xl",
+                  isDark ? "hover:bg-white/5" : "hover:bg-gray-100",
+                )}
               >
-                Export PDF
+                {dict.helper_dashboard.export_pdf}
               </Button>
             </Group>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {paymentHistory.length === 0 ? (
+              {recentSettlements.length === 0 ? (
                 <div className="col-span-full py-12 text-center">
                   <Text className="text-gray-500">
-                    No settlement history yet. Complete jobs to see earnings.
+                    {dict.helper_dashboard.no_settlement_history}
                   </Text>
                 </div>
               ) : (
-                paymentHistory.map((payment, idx) => (
+                recentSettlements.map((payment, idx) => (
                   <motion.div
                     key={idx}
                     whileHover={{ y: -5 }}
-                    className="flex items-center justify-between p-6 rounded-3xl bg-white/5 border border-white/5 hover:border-green-500/20 transition-all"
+                    className={cn(
+                      "flex items-center justify-between p-6 rounded-3xl border transition-all",
+                      isDark
+                        ? "bg-white/5 border-white/5 hover:border-green-500/20"
+                        : "bg-gray-50 border-gray-200",
+                    )}
                   >
-                    <Group gap="xl">
+                    <Group gap="xl" className={isRTL ? "flex-row-reverse" : ""}>
                       <ThemeIcon
                         size={48}
                         radius="xl"
@@ -607,9 +708,11 @@ const HelperDashboard = () => {
                       >
                         <IconTrendingUp size={24} />
                       </ThemeIcon>
-                      <div>
-                        <Text className="text-white font-black text-xl">
-                          PKR {(payment.amount * 100).toLocaleString("en-PK")}
+                      <div className={isRTL ? "text-right" : "text-left"}>
+                        <Text
+                          className={`font-black text-xl ${isDark ? "text-white" : "text-gray-900"}`}
+                        >
+                          PKR {payment.amount.toLocaleString("en-PK")}
                         </Text>
                         <Text className="text-gray-500 text-[10px] font-bold uppercase tracking-widest mt-0.5">
                           {payment.date}

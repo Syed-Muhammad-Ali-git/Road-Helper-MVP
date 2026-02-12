@@ -32,6 +32,7 @@ export const showSuccess = (title: string, text?: string) =>
     title,
     text: text ?? "",
     ...getThemeConfig(),
+    iconColor: "#10b981", // Override green for success
     timer: 2500,
     timerProgressBar: true,
     customClass: {
@@ -72,7 +73,7 @@ export const showWarning = (title: string, text?: string) =>
 export const showConfirm = (
   title: string,
   text: string,
-  confirmText = "Yes"
+  confirmText = "Yes",
 ): Promise<{ isConfirmed: boolean }> =>
   Swal.fire({
     icon: "question",

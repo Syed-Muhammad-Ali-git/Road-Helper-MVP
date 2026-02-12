@@ -168,7 +168,7 @@ function RequestHelpContent() {
           <Stepper.Step
             label={dict.request_help_page.service_step_title}
             description={dict.request_help_page.service_step_desc}
-            icon={<IconCar size={rem(18)} />}
+            icon={<IconCar size={18} />}
             className="w-full"
           >
             <Stack mt="xl">
@@ -205,6 +205,7 @@ function RequestHelpContent() {
                   <Button
                     variant="subtle"
                     size="xs"
+                    loading={live.isWatching && !live.coords && !live.error}
                     onClick={(e) => {
                       e.preventDefault();
                       live.requestPermission();
@@ -228,7 +229,7 @@ function RequestHelpContent() {
           <Stepper.Step
             label={dict.request_help_page.details_step_title}
             description={dict.request_help_page.details_step_desc}
-            icon={<IconMessage2 size={rem(18)} />}
+            icon={<IconMessage2 size={18} />}
             className="w-full"
           >
             <Stack mt="xl">
@@ -250,7 +251,7 @@ function RequestHelpContent() {
           <Stepper.Step
             label={dict.request_help_page.review_step_title}
             description={dict.request_help_page.review_step_desc}
-            icon={<IconCheck size={rem(18)} />}
+            icon={<IconCheck size={18} />}
             className="w-full"
           >
             <Stack mt="xl">
@@ -375,12 +376,7 @@ function RequestHelpContent() {
             {active < 2 ? (
               <Button onClick={nextStep}>{dict.request_help_page.next}</Button>
             ) : (
-              <Button
-                loading={loading}
-                onClick={handleSubmit}
-                type="submit"
-                disabled={!uid}
-              >
+              <Button loading={loading} onClick={handleSubmit} type="submit">
                 {dict.request_help_page.send_request}
               </Button>
             )}

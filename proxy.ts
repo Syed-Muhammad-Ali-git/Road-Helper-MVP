@@ -9,7 +9,7 @@ import {
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = request.cookies.get("token")?.value;
+  const token = request.cookies.get("authToken")?.value;
   const role = request.cookies.get("role")?.value;
 
   // Check if it's a public route

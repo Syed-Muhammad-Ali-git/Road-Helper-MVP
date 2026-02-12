@@ -354,13 +354,13 @@ export const HelperRegisterForm: React.FC<HelperRegisterFormProps> = ({
         className={cn(
           "w-full font-semibold py-2 rounded-lg transition-all h-12 relative overflow-hidden group",
           isDark
-            ? "bg-linear-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 text-white border-2 border-brand-red/50 hover:border-brand-red"
-            : "bg-linear-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 text-white border-2 border-brand-red hover:border-brand-red",
+            ? "bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 text-white border-2 border-brand-red/50 hover:border-brand-red"
+            : "bg-gradient-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 text-white border-2 border-brand-red hover:border-brand-red",
         )}
         style={{ backgroundSize: "200% 100%" }}
       >
         <motion.div
-          className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
+          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
           animate={{ x: ["-100%", "100%"] }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
         />

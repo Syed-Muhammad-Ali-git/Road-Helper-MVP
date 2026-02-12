@@ -21,17 +21,36 @@ import {
   IconMail,
   IconCamera,
   IconTool,
+  IconCheck,
+  IconX,
 } from "@tabler/icons-react";
 import { auth } from "@/lib/firebase/config";
-import { getUserByUid } from "@/lib/services/userService";
+import { getUserByUid, updateUserProfile } from "@/lib/services/userService";
 import { showConfirm, showError, showSuccess } from "@/lib/sweetalert";
 import { deleteAccountFully } from "@/lib/services/authService";
+import {
+  uploadImageToCloudinary,
+  validateImageFile,
+} from "@/lib/services/cloudinaryService";
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 export default function HelperProfileUI() {
+  const { isDark } = useAppTheme();
+  const { dict, isRTL } = useLanguage();
   const [uid, setUid] = useState<string | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
+  const [editing, setEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  // Editable fields
+  const [displayName, setDisplayName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [serviceType, setServiceType] = useState<string | null>("mechanic");
+  const [email, setEmail] = useState("");
 
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
@@ -49,6 +68,10 @@ export default function HelperProfileUI() {
       const p = await getUserByUid(uid);
       if (!alive) return;
       setProfile(p);
+      setDisplayName(p?.displayName ?? "");
+      setPhone(p?.phone ?? "");
+      setServiceType(p?.serviceType ?? "mechanic");
+      setEmail(p?.email ?? "");
       setLoading(false);
     })();
     return () => {
@@ -63,119 +86,339 @@ export default function HelperProfileUI() {
 
   if (loading) {
     return (
-      <Box className="min-h-screen flex items-center justify-center bg-brand-black">
+      <Box
+        className={`min-h-screen flex items-center justify-center ${isDark ? "bg-[#0a0a0a]" : "bg-gray-50"}`}
+      >
         <Loader size="xl" color="red" />
       </Box>
     );
   }
 
+  // Styles
+  const bgClass = isDark
+    ? "bg-[#0a0a0a] text-white"
+    : "bg-gray-50 text-gray-900";
+  const paperClass = isDark
+    ? "glass-dark border border-white/10"
+    : "bg-white border border-gray-200 shadow-sm";
+  const inputClass = isDark
+    ? "bg-white/5 border-white/10 text-white placeholder:text-gray-500"
+    : "bg-gray-50 border-gray-300 text-gray-900";
+
+  const handleImageUpload = async (file: File | null) => {
+    if (!file || !uid) return;
+
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      showError("Invalid image", validation.error || "Image upload failed");
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const imageUrl = await uploadImageToCloudinary(file);
+      await updateUserProfile(uid, { profileImage: imageUrl });
+      setProfile((prev: any) => ({ ...prev, profileImage: imageUrl }));
+      showSuccess("Success", "Profile image updated");
+    } catch (error) {
+      const msg =
+        error instanceof Error ? error.message : "Failed to upload image";
+      showError("Upload failed", msg);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    if (!uid) return;
+
+    if (!displayName.trim()) {
+      showError("Validation", "Name cannot be empty");
+      return;
+    }
+
+    try {
+      setSaving(true);
+      await updateUserProfile(uid, {
+        displayName: displayName.trim(),
+        phone: phone.trim(),
+        serviceType: serviceType || "mechanic",
+        // Email is tricky to update in Firebase Auth, usually requires re-auth.
+        // We'll update it in Firestore for display purposes or handle auth update separately if needed.
+        // For now, let's keep it sync with Firestore profile.
+        email: email.trim(),
+      });
+      setProfile((prev: any) => ({
+        ...prev,
+        displayName: displayName.trim(),
+        phone: phone.trim(),
+        serviceType,
+        email: email.trim(),
+      }));
+      setEditing(false);
+      showSuccess(
+        "Success",
+        dict.profile.update_profile + " " + dict.profile.save_changes,
+      );
+    } catch (error) {
+      const msg =
+        error instanceof Error ? error.message : "Failed to update profile";
+      showError("Update failed", msg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleCancel = () => {
+    setDisplayName(profile?.displayName ?? "");
+    setPhone(profile?.phone ?? "");
+    setServiceType(profile?.serviceType ?? "mechanic");
+    setEmail(profile?.email ?? "");
+    setEditing(false);
+  };
+
   return (
-    <Box className="min-h-screen p-4 md:p-8 max-w-2xl mx-auto bg-brand-black text-white">
+    <Box
+      className={`min-h-screen p-4 md:p-8 max-w-2xl mx-auto ${bgClass} transition-colors duration-300`}
+    >
       <Stack gap="xl">
-        <Box>
-          <Text className="text-gray-400 text-xs uppercase tracking-wider mb-1">
-            Account
+        <Box className={isRTL ? "text-right" : "text-left"}>
+          <Text
+            className={`uppercase tracking-wider text-xs font-bold mb-1 ${isDark ? "text-gray-400" : "text-gray-500"}`}
+          >
+            {dict.profile.account}
           </Text>
           <Title order={1} className="font-manrope text-3xl md:text-4xl">
-            My Profile
+            {dict.profile.my_profile}
           </Title>
         </Box>
 
-        <Paper p="xl" radius="xl" className="glass-dark border border-white/10 text-center">
-          <Box className="relative inline-block mx-auto mb-6">
-            <Avatar size={120} radius="xl" color="red">
+        <Paper
+          p="xl"
+          radius="32px"
+          className={`${paperClass} text-center relative overflow-hidden`}
+        >
+          <div
+            className={`absolute top-0 left-0 w-full h-32 ${isDark ? "bg-brand-charcoal/50" : "bg-gray-100/50"} z-0`}
+          />
+
+          <Box className="relative inline-block mx-auto mb-4 z-10 mt-8">
+            <Avatar
+              size={120}
+              radius="100%"
+              color="red"
+              src={profile?.profileImage}
+              className="border-4 border-white dark:border-[#1a1a1a] shadow-xl"
+            >
               {initials}
             </Avatar>
-            <Box className="absolute bottom-0 right-0 bg-black/60 p-2 rounded-full shadow-md border border-white/10 cursor-not-allowed opacity-70">
-              <IconCamera size={20} className="text-white" />
-            </Box>
+
+            <div className="absolute bottom-0 right-0">
+              <input
+                id={`profile-upload-${uid ?? "anon"}`}
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="hidden"
+                disabled={uploading}
+                onChange={(e) =>
+                  handleImageUpload(e.target.files ? e.target.files[0] : null)
+                }
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById(
+                    `profile-upload-${uid ?? "anon"}`,
+                  ) as HTMLInputElement | null;
+                  if (el) el.click();
+                }}
+                className={`p-2 rounded-full shadow-lg cursor-pointer hover:scale-110 transition-transform ${isDark ? "bg-brand-red text-white" : "bg-white text-brand-red"}`}
+                title={dict.profile.change_photo}
+              >
+                <IconCamera size={18} />
+              </button>
+            </div>
           </Box>
-          <Title order={2} className="text-white">
-            {profile?.displayName ?? "Helper"}
-          </Title>
-          <Text c="dimmed" fw={700}>
-            VERIFIED HELPER
-          </Text>
+          <div className="relative z-10">
+            <Title
+              order={2}
+              className={`mb-1 ${isDark ? "text-white" : "text-gray-900"}`}
+            >
+              {profile?.displayName ?? "Helper"}
+            </Title>
+            <Text c="dimmed" size="sm" tt="uppercase" fw={700} >
+              {dict.profile.verified_helper}
+            </Text>
+          </div>
         </Paper>
 
-        <Paper p="xl" radius="xl" className="glass-dark border border-white/10">
+        <Paper p="xl" radius="32px" className={paperClass}>
           <Stack gap="md">
             <TextInput
-              label="Full Name"
-              value={profile?.displayName ?? ""}
-              disabled
+              label={dict.profile.full_name}
+              placeholder={dict.profile.full_name}
+              value={displayName}
+              onChange={(e) => setDisplayName(e.currentTarget.value)}
+              disabled={!editing}
               leftSection={<IconUser size={18} />}
+              classNames={{ input: inputClass }}
+              variant="filled"
+              radius="md"
             />
+
             <TextInput
-              label="Email Address"
-              value={profile?.email ?? ""}
-              disabled
+              label={dict.profile.email_address}
+              placeholder={dict.profile.email_address}
+              value={email}
+              onChange={(e) => setEmail(e.currentTarget.value)}
+              disabled={!editing}
               leftSection={<IconMail size={18} />}
+              classNames={{ input: inputClass }}
+              variant="filled"
+              radius="md"
             />
+
             <TextInput
-              label="Phone Number"
-              value={profile?.phone ?? ""}
-              disabled
+              label={dict.profile.phone_number}
+              placeholder={dict.profile.phone_number}
+              value={phone}
+              onChange={(e) => setPhone(e.currentTarget.value)}
+              disabled={!editing}
               leftSection={<IconPhone size={18} />}
+              classNames={{ input: inputClass }}
+              variant="filled"
+              radius="md"
             />
+
             <Select
-              label="Primary Service"
-              value={profile?.serviceType ?? "mechanic"}
-              disabled
+              label={dict.profile.primary_service}
+              placeholder={dict.profile.primary_service}
+              value={serviceType}
+              onChange={setServiceType} // Select passes value directly
+              disabled={!editing}
               data={[
-                { value: "mechanic", label: "Mobile Mechanic" },
-                { value: "tow", label: "Towing Truck" },
-                { value: "fuel", label: "Fuel Delivery" },
-                { value: "battery", label: "Battery Jump" },
-                { value: "lockout", label: "Lockout Service" },
+                {
+                  value: "mechanic",
+                  label:
+                    dict.request_help_page?.mobile_mechanic ||
+                    "Mobile Mechanic",
+                },
+                {
+                  value: "tow",
+                  label: dict.request_help_page?.towing_truck || "Towing Truck",
+                },
+                {
+                  value: "fuel",
+                  label:
+                    dict.request_help_page?.fuel_delivery || "Fuel Delivery",
+                },
+                {
+                  value: "battery",
+                  label: dict.request_help_page?.battery_jump || "Battery Jump",
+                },
+                {
+                  value: "lockout",
+                  label:
+                    dict.request_help_page?.lockout_service ||
+                    "Lockout Service",
+                },
               ]}
               leftSection={<IconTool size={18} />}
+              classNames={{ input: inputClass }}
+              variant="filled"
+              radius="md"
             />
 
-            <Divider my="md" label="Security" labelPosition="center" />
+            <Divider my="md" color={isDark ? "white" : "gray"} opacity={0.1} />
 
-            <Button variant="light" color="red" fullWidth h={48} radius="md">
-              Change Password
-            </Button>
-            <Button variant="filled" color="red" fullWidth h={48} radius="md">
-              Update Profile
-            </Button>
+            {/* Action Buttons */}
+            {!editing ? (
+              <Group grow>
+                {/* <Button variant="light" color="red" h={48} radius="xl">
+                  {dict.profile.change_password}
+                </Button> */}
+                <Button
+                  variant="filled"
+                  className={`${isDark ? "bg-white text-black hover:bg-gray-200" : "bg-black text-white hover:bg-gray-800"} h-12 rounded-xl font-bold transition-all shadow-lg hover:shadow-xl`}
+                  h={48}
+                  radius="xl"
+                  onClick={() => setEditing(true)}
+                >
+                  {dict.profile.edit_profile}
+                </Button>
+              </Group>
+            ) : (
+              <Group grow>
+                <Button
+                  variant="filled"
+                  color="green"
+                  h={48}
+                  radius="xl"
+                  loading={saving}
+                  leftSection={<IconCheck size={18} />}
+                  onClick={handleSaveChanges}
+                  className="font-bold shadow-green-500/20 shadow-lg"
+                >
+                  {dict.profile.save_changes}
+                </Button>
+                <Button
+                  variant="subtle"
+                  color="gray"
+                  h={48}
+                  radius="xl"
+                  disabled={saving}
+                  leftSection={<IconX size={18} />}
+                  onClick={handleCancel}
+                >
+                  {dict.profile.cancel}
+                </Button>
+              </Group>
+            )}
 
-            <Divider my="md" label="Danger Zone" labelPosition="center" />
-            <Group>
-              <Button
-                color="red"
-                variant="outline"
-                fullWidth
-                h={48}
-                radius="md"
-                loading={deleting}
-                onClick={async () => {
-                  const res = await showConfirm(
-                    "Delete account?",
-                    "This will permanently delete your account from RoadHelper. This action cannot be undone.",
-                    "Delete my account",
+            <Divider
+              my="md"
+              label={dict.profile.danger_zone}
+              labelPosition="center"
+              color="red"
+              style={{ opacity: 0.3 }}
+            />
+
+            <Button
+              color="red"
+              variant="subtle"
+              fullWidth
+              h={48}
+              radius="xl"
+              className="hover:bg-red-50 dark:hover:bg-red-900/10"
+              loading={deleting}
+              onClick={async () => {
+                const res = await showConfirm(
+                  dict.profile.delete_account_confirm,
+                  dict.profile.delete_account_desc,
+                  dict.profile.delete_btn,
+                );
+                if (!res.isConfirmed) return;
+                try {
+                  setDeleting(true);
+                  await deleteAccountFully();
+                  await showSuccess(
+                    "Account deleted",
+                    "We’re sorry to see you go.",
                   );
-                  if (!res.isConfirmed) return;
-                  try {
-                    setDeleting(true);
-                    await deleteAccountFully();
-                    await showSuccess("Account deleted", "We’re sorry to see you go.");
-                    window.location.href = "/";
-                  } catch (e: unknown) {
-                    const msg =
-                      e instanceof Error
-                        ? e.message
-                        : "Unable to delete account. Please re-login and try again.";
-                    await showError("Delete failed", msg);
-                  } finally {
-                    setDeleting(false);
-                  }
-                }}
-              >
-                Delete Account
-              </Button>
-            </Group>
+                  window.location.href = "/";
+                } catch (e: unknown) {
+                  const msg =
+                    e instanceof Error
+                      ? e.message
+                      : "Unable to delete account. Please re-login and try again.";
+                  await showError("Delete failed", msg);
+                } finally {
+                  setDeleting(false);
+                }
+              }}
+            >
+              {dict.profile.delete_account}
+            </Button>
           </Stack>
         </Paper>
       </Stack>

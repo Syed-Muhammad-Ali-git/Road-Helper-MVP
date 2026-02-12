@@ -51,7 +51,7 @@ const AboutPage = () => {
   return (
     <div className="min-h-screen bg-brand-black text-white font-satoshi">
       {/* Header with Back Button */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-linear-to-b from-black/95 via-black/90 to-transparent backdrop-blur-xl py-4 border-b border-white/5">
+      <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/95 via-black/90 to-transparent backdrop-blur-xl py-4 border-b border-white/5">
         <Container size="xl" className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-3 group">
             <IconArrowLeft
@@ -91,7 +91,7 @@ const AboutPage = () => {
           >
             <Title className="text-6xl md:text-7xl font-bold mb-6 tracking-tight">
               We&apos;re Building the Future of{" "}
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-red to-orange-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
                 Roadside Assistance
               </span>
             </Title>
@@ -114,7 +114,7 @@ const AboutPage = () => {
                     transition={{ delay: idx * 0.1 }}
                   >
                     <Card className="bg-white/5 backdrop-blur-xl border border-white/10 hover:border-brand-red/50 transition-all duration-300 group p-8 text-center">
-                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-linear-to-br from-brand-red/20 to-orange-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-brand-red/20 to-orange-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                         <Icon size={32} className="text-brand-red" />
                       </div>
                       <Text className="text-4xl font-bold mb-2 text-white">
@@ -131,7 +131,7 @@ const AboutPage = () => {
       </section>
 
       {/* Mission Section */}
-      <section className="py-20 bg-linear-to-b from-transparent via-white/2 to-transparent">
+      <section className="py-20 bg-gradient-to-b from-transparent via-white/2 to-transparent">
         <Container size="xl">
           <Grid gutter={60} align="center">
             <Grid.Col span={{ base: 12, md: 6 }}>
@@ -175,7 +175,7 @@ const AboutPage = () => {
                   fill
                   className="object-cover"
                 />
-                <div className="absolute inset-0 bg-linear-to-tr from-brand-red/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-tr from-brand-red/20 to-transparent" />
               </motion.div>
             </Grid.Col>
           </Grid>
@@ -208,7 +208,7 @@ const AboutPage = () => {
                     transition={{ delay: idx * 0.1 }}
                   >
                     <Card className="bg-white/5 backdrop-blur-xl border border-white/10 hover:border-brand-red/50 transition-all duration-300 p-8 h-full group">
-                      <div className="w-14 h-14 mb-6 rounded-xl bg-linear-to-br from-brand-red/20 to-orange-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <div className="w-14 h-14 mb-6 rounded-xl bg-gradient-to-br from-brand-red/20 to-orange-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
                         <Icon size={28} className="text-brand-red" />
                       </div>
                       <Title
@@ -238,7 +238,7 @@ const AboutPage = () => {
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center bg-linear-to-br from-brand-red/10 to-orange-500/10 backdrop-blur-xl border border-white/10 rounded-3xl p-12"
+            className="text-center bg-gradient-to-br from-brand-red/10 to-orange-500/10 backdrop-blur-xl border border-white/10 rounded-3xl p-12"
           >
             <Title className="text-4xl md:text-5xl font-bold mb-6">
               Ready to Get Started?
@@ -252,7 +252,7 @@ const AboutPage = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="px-8 py-4 bg-linear-to-r from-brand-red to-brand-dark-red text-white font-bold rounded-xl shadow-xl shadow-brand-red/20 hover:shadow-brand-red/40 transition-all"
+                  className="px-8 py-4 bg-gradient-to-r from-brand-red to-brand-dark-red text-white font-bold rounded-xl shadow-xl shadow-brand-red/20 hover:shadow-brand-red/40 transition-all"
                 >
                   Sign Up as Customer
                 </motion.button>

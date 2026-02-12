@@ -67,7 +67,12 @@ export const metadata: Metadata = {
 /* ---------------- COMPONENT ---------------- */
 const RootLayout = ({ children }: Readonly<{ children: ReactNode }>) => {
   return (
-    <html lang="en" {...mantineHtmlProps} suppressHydrationWarning>
+    <html
+      lang="en"
+      {...mantineHtmlProps}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <head>
         <meta charSet="UTF-8" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />

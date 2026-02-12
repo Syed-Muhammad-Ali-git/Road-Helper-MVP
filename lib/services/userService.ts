@@ -24,7 +24,9 @@ export interface AppUserRecord {
   authProvider: AuthProviderType;
   displayName: string;
   photoURL?: string | null;
+  profileImage?: string | null;
   phone?: string | null;
+  serviceType?: string | null;
   createdAt: unknown;
   updatedAt: unknown;
 }
@@ -132,6 +134,7 @@ export async function updateUserProfile(
     phone: string;
     email: string;
     profileImage: string;
+    serviceType: string;
   }>,
 ) {
   const ref = doc(db, COLLECTIONS.USERS, uid);
@@ -140,4 +143,3 @@ export async function updateUserProfile(
     updatedAt: serverTimestamp(),
   } as any);
 }
-

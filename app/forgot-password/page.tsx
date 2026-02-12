@@ -75,8 +75,8 @@ export default function ForgotPasswordPage() {
       className={cn(
         "min-h-screen flex font-satoshi overflow-hidden relative",
         isDark
-          ? "bg-linear-to-br from-black via-brand-black to-black text-white"
-          : "bg-linear-to-br from-gray-50 via-white to-gray-100 text-gray-900",
+          ? "bg-gradient-to-br from-black via-brand-black to-black text-white"
+          : "bg-gradient-to-br from-gray-50 via-white to-gray-100 text-gray-900",
         isRTL ? "font-urdu" : "font-satoshi",
       )}
     >
@@ -157,7 +157,7 @@ export default function ForgotPasswordPage() {
         transition={{ duration: 1, ease: "easeOut" }}
         className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 z-10"
       >
-        <div className="absolute inset-0 z-0 bg-linear-to-br from-black via-brand-charcoal/50 to-transparent">
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-brand-charcoal/50 to-transparent">
           <Image
             src="/assets/images/login-sidebar.png"
             alt="Background"
@@ -166,7 +166,7 @@ export default function ForgotPasswordPage() {
             className="object-cover opacity-30 grayscale"
             priority
           />
-          <div className="absolute inset-0 bg-linear-to-r from-black via-black/90 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent" />
         </div>
 
         <motion.div
@@ -208,7 +208,7 @@ export default function ForgotPasswordPage() {
             className="text-7xl font-bold leading-tight mb-6"
           >
             Reset Your <br />
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red via-orange-500 to-yellow-500 animate-pulse">
               Password
             </span>
             <br />
@@ -305,8 +305,8 @@ export default function ForgotPasswordPage() {
                     className={cn(
                       "inline-block mb-4 p-4 rounded-2xl border",
                       isDark
-                        ? "bg-linear-to-br from-brand-red/20 to-orange-500/20 border-brand-red/30"
-                        : "bg-linear-to-br from-brand-red/10 to-orange-500/10 border-brand-red/20",
+                        ? "bg-gradient-to-br from-brand-red/20 to-orange-500/20 border-brand-red/30"
+                        : "bg-gradient-to-br from-brand-red/10 to-orange-500/10 border-brand-red/20",
                     )}
                   >
                     <Mail size={40} className="text-brand-red" />
@@ -315,8 +315,8 @@ export default function ForgotPasswordPage() {
                     className={cn(
                       "font-manrope text-4xl font-bold mb-2 bg-clip-text text-transparent",
                       isDark
-                        ? "bg-linear-to-r from-white to-gray-300"
-                        : "bg-linear-to-r from-gray-900 to-gray-700",
+                        ? "bg-gradient-to-r from-white to-gray-300"
+                        : "bg-gradient-to-r from-gray-900 to-gray-700",
                     )}
                   >
                     Forgot Password?
@@ -362,7 +362,7 @@ export default function ForgotPasswordPage() {
                         placeholder="name@example.com"
                         dir="ltr"
                       />
-                      <motion.div className="absolute inset-0 rounded-xl bg-linear-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
+                      <motion.div className="absolute inset-0 rounded-xl bg-gradient-to-r from-brand-red/20 to-transparent opacity-0 group-focus-within:opacity-100 blur-xl transition-opacity pointer-events-none" />
                     </motion.div>
                     {errors.email && (
                       <motion.span
@@ -386,13 +386,13 @@ export default function ForgotPasswordPage() {
                       className={cn(
                         "w-full h-16 text-lg font-bold rounded-xl group relative overflow-hidden border-2 transition-all duration-500 cursor-pointer",
                         isDark
-                          ? "bg-linear-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 border-brand-red/50 hover:border-brand-red"
-                          : "bg-linear-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 border-brand-red hover:border-brand-red",
+                          ? "bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 border-brand-red/50 hover:border-brand-red"
+                          : "bg-gradient-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 border-brand-red hover:border-brand-red",
                       )}
                       style={{ backgroundSize: "200% 100%" }}
                     >
                       <motion.div
-                        className="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
+                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
                         animate={{ x: ["-100%", "100%"] }}
                         transition={{
                           duration: 2,
@@ -524,8 +524,8 @@ export default function ForgotPasswordPage() {
                       className={cn(
                         "w-full h-12 font-semibold",
                         isDark
-                          ? "bg-linear-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 border-2 border-brand-red/50 text-white"
-                          : "bg-linear-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 border-2 border-brand-red text-white",
+                          ? "bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 border-2 border-brand-red/50 text-white"
+                          : "bg-gradient-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 border-2 border-brand-red text-white",
                       )}
                     >
                       Back to Sign In

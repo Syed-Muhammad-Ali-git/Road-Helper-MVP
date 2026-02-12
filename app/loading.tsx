@@ -30,7 +30,7 @@ export default function GlobalLoading() {
           className="glass-dark border border-white/10 rounded-3xl p-8 relative overflow-hidden"
         >
           <motion.div
-            className="absolute inset-0 bg-linear-to-r from-brand-red/10 via-white/5 to-transparent"
+            className="absolute inset-0 bg-gradient-to-r from-brand-red/10 via-white/5 to-transparent"
             animate={{ x: ["-50%", "50%"] }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "linear" }}
           />
@@ -58,7 +58,7 @@ export default function GlobalLoading() {
           <div className="relative z-10 mt-6">
             <div className="h-2 w-full rounded-full bg-white/10 overflow-hidden">
               <motion.div
-                className="h-full bg-linear-to-r from-brand-red to-brand-dark-red rounded-full"
+                className="h-full bg-gradient-to-r from-brand-red to-brand-dark-red rounded-full"
                 initial={{ width: "0%" }}
                 animate={{ width: `${progress}%` }}
                 transition={{ ease: "easeOut" }}

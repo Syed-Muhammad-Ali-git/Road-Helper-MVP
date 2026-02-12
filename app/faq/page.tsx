@@ -86,7 +86,7 @@ const FAQPage = () => {
               className={`text-4xl md:text-6xl font-bold mb-6 ${isDark ? "text-white" : "text-black"}`}
             >
               Frequently Asked{" "}
-              <span className="text-transparent bg-clip-text bg-linear-to-r from-brand-yellow to-brand-gold">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-yellow to-brand-gold">
                 Questions
               </span>
             </Title>
