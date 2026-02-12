@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   Title,
   Text,
@@ -12,136 +12,405 @@ import {
   ThemeIcon,
   Table,
   Badge,
+  ScrollArea,
+  Loader,
+  Center,
+  ActionIcon,
 } from "@mantine/core";
-import { IconWallet, IconTrendingUp, IconChecklist } from "@tabler/icons-react";
+import {
+  IconWallet,
+  IconTrendingUp,
+  IconChecklist,
+  IconClock,
+  IconReceipt,
+  IconDownload,
+} from "@tabler/icons-react";
+import { motion } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { auth } from "@/lib/firebase/config";
+import {
+  subscribeToHelperEarnings,
+  formatPKR,
+  getHelperEarningsStats,
+} from "@/lib/services/earningsService";
+import type { EarningRecord } from "@/lib/services/earningsService";
 
-export default function EarningsUI() {
-  // Hardcoded data
-  const earnings = [
-    {
-      id: "1",
-      clientName: "Ali Khan",
-      serviceType: "car_mechanic",
-      price: 80,
-      completedAt: new Date("2026-01-20T10:30:00"),
-    },
-    {
-      id: "2",
-      clientName: "Sara Ahmed",
-      serviceType: "bike_mechanic",
-      price: 50,
-      completedAt: new Date("2026-01-21T14:45:00"),
-    },
-    {
-      id: "3",
-      clientName: "Usman Ali",
-      serviceType: "towing",
-      price: 100,
-      completedAt: new Date("2026-01-22T09:15:00"),
-    },
-  ];
+export default function EarningsPage() {
+  const { isDark } = useAppTheme();
+  const { dict, isRTL } = useLanguage();
+  const [earnings, setEarnings] = useState<EarningRecord[]>([]);
+  const [stats, setStats] = useState({
+    totalEarned: 0,
+    pendingAmount: 0,
+    paidAmount: 0,
+    totalJobs: 0,
+    averageEarningPerJob: 0,
+  });
+  const [uid, setUid] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const totalEarnings = earnings.reduce((sum, item) => sum + item.price, 0);
+  // Get current user
+  useEffect(() => {
+    const unsub = auth.onAuthStateChanged((u) => {
+      setUid(u?.uid ?? null);
+    });
+    return () => unsub();
+  }, []);
+
+  // Subscribe to earnings real-time updates
+  useEffect(() => {
+    if (!uid) return;
+    setIsLoading(true);
+    const unsub = subscribeToHelperEarnings(uid, (data) => {
+      setEarnings(data);
+      setIsLoading(false);
+    });
+    return () => unsub();
+  }, [uid]);
+
+  // Load stats
+  useEffect(() => {
+    if (!uid) return;
+    getHelperEarningsStats(uid).then(setStats);
+  }, [uid, earnings]);
+
+  const containerVariants: any = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.1 },
+    },
+  };
+
+  const itemVariants: any = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: { type: "spring", stiffness: 100 },
+    },
+  };
 
   return (
-    <Box className="p-4 md:p-8">
-      <Stack gap="xl">
-        <Box>
-          <Title order={1} className="text-3xl font-bold">
-            Earnings Summary
-          </Title>
-          <Text c="dimmed">Track your payouts and completed jobs.</Text>
-        </Box>
+    <Box
+      className={cn(
+        "relative min-h-screen p-4 md:p-8 transition-colors duration-300",
+        isDark ? "bg-[#0a0a0a]" : "bg-gray-50",
+      )}
+    >
+      {/* Background Effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div
+          animate={{
+            scale: [1.2, 1, 1.2],
+            rotate: [0, -90, 0],
+            opacity: [0.1, 0.15, 0.1],
+          }}
+          transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[10%] -right-[10%] w-[60%] h-[60%] bg-green-600/15 blur-[120px] rounded-full"
+        />
+      </div>
 
-        <SimpleGrid cols={{ base: 1, md: 3 }} spacing="lg">
-          <Paper
-            p="xl"
-            radius="xl"
-            withBorder
-            className="bg-green-600 text-white shadow-lg shadow-green-100"
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+        className="relative z-10 space-y-8"
+      >
+        {/* Header */}
+        <motion.div variants={itemVariants}>
+          <Title
+            order={1}
+            className={cn(
+              "text-3xl md:text-4xl font-black",
+              isDark ? "text-white" : "text-gray-900",
+            )}
           >
-            <Group justify="space-between" mb="sm">
-              <ThemeIcon size={48} radius="lg" color="green.4" variant="filled">
-                <IconWallet size={24} />
-              </ThemeIcon>
-              <Badge color="green.8">Total Payout</Badge>
-            </Group>
-            <Title order={1}>${totalEarnings}</Title>
-            <Text size="sm" opacity={0.8}>
-              Current Balance
-            </Text>
-          </Paper>
-
-          <Paper p="xl" radius="xl" withBorder className="bg-white">
-            <Group justify="space-between" mb="xs">
-              <ThemeIcon size={48} radius="lg" color="blue" variant="light">
-                <IconChecklist size={24} />
-              </ThemeIcon>
-              <Text size="xs" fw={700} c="dimmed">
-                COMPLETED
-              </Text>
-            </Group>
-            <Title order={2}>{earnings.length}</Title>
-            <Text size="sm" c="dimmed">
-              Finished Jobs
-            </Text>
-          </Paper>
-
-          <Paper p="xl" radius="xl" withBorder className="bg-white">
-            <Group justify="space-between" mb="xs">
-              <ThemeIcon size={48} radius="lg" color="orange" variant="light">
-                <IconTrendingUp size={24} />
-              </ThemeIcon>
-              <Text size="xs" fw={700} c="dimmed">
-                RATING
-              </Text>
-            </Group>
-            <Title order={2}>4.9</Title>
-            <Text size="sm" c="dimmed">
-              Performance Score
-            </Text>
-          </Paper>
-        </SimpleGrid>
-
-        <Paper
-          p="xl"
-          radius="xl"
-          withBorder
-          className="bg-white overflow-hidden"
-        >
-          <Title order={4} mb="xl">
-            Recent Transactions
+            Earnings
           </Title>
-          <Table verticalSpacing="md" horizontalSpacing="lg">
-            <Table.Thead>
-              <Table.Tr>
-                <Table.Th>Date</Table.Th>
-                <Table.Th>Client</Table.Th>
-                <Table.Th>Service</Table.Th>
-                <Table.Th>Amount</Table.Th>
-                <Table.Th>Status</Table.Th>
-              </Table.Tr>
-            </Table.Thead>
-            <Table.Tbody>
-              {earnings.map((job) => (
-                <Table.Tr key={job.id}>
-                  <Table.Td>{job.completedAt.toLocaleDateString()}</Table.Td>
-                  <Table.Td>{job.clientName}</Table.Td>
-                  <Table.Td>{job.serviceType.replace("_", " ")}</Table.Td>
-                  <Table.Td fw={700} c="green.7">
-                    ${job.price}
-                  </Table.Td>
-                  <Table.Td>
-                    <Badge color="green" variant="light">
-                      PAID
-                    </Badge>
-                  </Table.Td>
-                </Table.Tr>
-              ))}
-            </Table.Tbody>
-          </Table>
-        </Paper>
-      </Stack>
+          <Text c="dimmed" size="lg" mt="xs">
+            Track your income and payouts
+          </Text>
+        </motion.div>
+
+        {/* Statistics Cards */}
+        <motion.div variants={itemVariants}>
+          <SimpleGrid cols={{ base: 1, md: 2, lg: 4 }} spacing="lg">
+            {/* Total Earned */}
+            <Paper
+              p="xl"
+              radius="xl"
+              className={cn(
+                "relative overflow-hidden transition-all hover:shadow-lg",
+                isDark
+                  ? "bg-gradient-to-br from-green-900/40 to-green-800/20 border border-green-700/30"
+                  : "bg-gradient-to-br from-green-50 to-emerald-50 border border-green-200",
+              )}
+            >
+              <Group justify="space-between" mb="md">
+                <ThemeIcon
+                  size="lg"
+                  radius="xl"
+                  variant="light"
+                  color="green"
+                  className="group-hover:scale-110 transition-transform"
+                >
+                  <IconWallet size={20} />
+                </ThemeIcon>
+                <Badge variant="light" color="green">
+                  Total
+                </Badge>
+              </Group>
+              <Title
+                order={2}
+                className={cn(
+                  "text-2xl font-bold",
+                  isDark ? "text-green-300" : "text-green-600",
+                )}
+              >
+                {formatPKR(stats.totalEarned)}
+              </Title>
+              <Text size="sm" c="dimmed" mt="xs">
+                Lifetime Earnings
+              </Text>
+            </Paper>
+
+            {/* Pending */}
+            <Paper
+              p="xl"
+              radius="xl"
+              className={cn(
+                "relative overflow-hidden transition-all hover:shadow-lg",
+                isDark
+                  ? "bg-gradient-to-br from-yellow-900/40 to-orange-800/20 border border-yellow-700/30"
+                  : "bg-gradient-to-br from-yellow-50 to-orange-50 border border-yellow-200",
+              )}
+            >
+              <Group justify="space-between" mb="md">
+                <ThemeIcon size="lg" radius="xl" variant="light" color="yellow">
+                  <IconClock size={20} />
+                </ThemeIcon>
+                <Badge variant="light" color="yellow">
+                  Pending
+                </Badge>
+              </Group>
+              <Title
+                order={2}
+                className={cn(
+                  "text-2xl font-bold",
+                  isDark ? "text-yellow-300" : "text-yellow-600",
+                )}
+              >
+                {formatPKR(stats.pendingAmount)}
+              </Title>
+              <Text size="sm" c="dimmed" mt="xs">
+                Awaiting Payout
+              </Text>
+            </Paper>
+
+            {/* Paid */}
+            <Paper
+              p="xl"
+              radius="xl"
+              className={cn(
+                "relative overflow-hidden transition-all hover:shadow-lg",
+                isDark
+                  ? "bg-gradient-to-br from-blue-900/40 to-blue-800/20 border border-blue-700/30"
+                  : "bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200",
+              )}
+            >
+              <Group justify="space-between" mb="md">
+                <ThemeIcon size="lg" radius="xl" variant="light" color="blue">
+                  <IconChecklist size={20} />
+                </ThemeIcon>
+                <Badge variant="light" color="blue">
+                  Paid
+                </Badge>
+              </Group>
+              <Title
+                order={2}
+                className={cn(
+                  "text-2xl font-bold",
+                  isDark ? "text-blue-300" : "text-blue-600",
+                )}
+              >
+                {formatPKR(stats.paidAmount)}
+              </Title>
+              <Text size="sm" c="dimmed" mt="xs">
+                Completed Payouts
+              </Text>
+            </Paper>
+
+            {/* Average per Job */}
+            <Paper
+              p="xl"
+              radius="xl"
+              className={cn(
+                "relative overflow-hidden transition-all hover:shadow-lg",
+                isDark
+                  ? "bg-gradient-to-br from-purple-900/40 to-pink-800/20 border border-purple-700/30"
+                  : "bg-gradient-to-br from-purple-50 to-pink-50 border border-purple-200",
+              )}
+            >
+              <Group justify="space-between" mb="md">
+                <ThemeIcon size="lg" radius="xl" variant="light" color="grape">
+                  <IconTrendingUp size={20} />
+                </ThemeIcon>
+                <Badge variant="light" color="grape">
+                  Average
+                </Badge>
+              </Group>
+              <Title
+                order={2}
+                className={cn(
+                  "text-2xl font-bold",
+                  isDark ? "text-purple-300" : "text-purple-600",
+                )}
+              >
+                {formatPKR(stats.averageEarningPerJob)}
+              </Title>
+              <Text size="sm" c="dimmed" mt="xs">
+                Per Job ({stats.totalJobs})
+              </Text>
+            </Paper>
+          </SimpleGrid>
+        </motion.div>
+
+        {/* Earnings Table */}
+        <motion.div variants={itemVariants}>
+          <Paper
+            p="lg"
+            radius="xl"
+            className={cn(
+              "border transition-all",
+              isDark
+                ? "bg-gray-900 border-gray-800"
+                : "bg-white border-gray-200",
+            )}
+          >
+            <Group justify="space-between" mb="lg">
+              <Title
+                order={3}
+                size="lg"
+                className={isDark ? "text-white" : "text-gray-900"}
+              >
+                Recent Earnings
+              </Title>
+              {earnings.length > 0 && (
+                <ActionIcon variant="light" size="lg">
+                  <IconDownload size={18} />
+                </ActionIcon>
+              )}
+            </Group>
+
+            {isLoading ? (
+              <Center py="xl">
+                <Loader />
+              </Center>
+            ) : earnings.length === 0 ? (
+              <Center py="xl">
+                <Text c="dimmed">No earnings yet</Text>
+              </Center>
+            ) : (
+              <ScrollArea>
+                <Table striped highlightOnHover>
+                  <Table.Thead>
+                    <Table.Tr className={isDark ? "bg-gray-800" : "bg-gray-50"}>
+                      <Table.Th
+                        className={isDark ? "text-gray-300" : "text-gray-700"}
+                      >
+                        Service
+                      </Table.Th>
+                      <Table.Th
+                        className={isDark ? "text-gray-300" : "text-gray-700"}
+                      >
+                        Customer
+                      </Table.Th>
+                      <Table.Th
+                        className={isDark ? "text-gray-300" : "text-gray-700"}
+                      >
+                        Amount
+                      </Table.Th>
+                      <Table.Th
+                        className={isDark ? "text-gray-300" : "text-gray-700"}
+                      >
+                        Commission
+                      </Table.Th>
+                      <Table.Th
+                        className={isDark ? "text-gray-300" : "text-gray-700"}
+                      >
+                        Your Earning
+                      </Table.Th>
+                      <Table.Th
+                        className={isDark ? "text-gray-300" : "text-gray-700"}
+                      >
+                        Status
+                      </Table.Th>
+                      <Table.Th
+                        className={isDark ? "text-gray-300" : "text-gray-700"}
+                      >
+                        Date
+                      </Table.Th>
+                    </Table.Tr>
+                  </Table.Thead>
+                  <Table.Tbody>
+                    {earnings.map((earning) => (
+                      <Table.Tr
+                        key={earning.id}
+                        className={
+                          isDark ? "hover:bg-gray-800" : "hover:bg-gray-50"
+                        }
+                      >
+                        <Table.Td className="font-medium">
+                          {earning.serviceType}
+                        </Table.Td>
+                        <Table.Td>{earning.customerName}</Table.Td>
+                        <Table.Td className="font-semibold">
+                          {formatPKR(earning.amount)}
+                        </Table.Td>
+                        <Table.Td
+                          className={isDark ? "text-red-400" : "text-red-600"}
+                        >
+                          {formatPKR(earning.platformFee)}
+                        </Table.Td>
+                        <Table.Td
+                          className={
+                            isDark ? "text-green-400" : "text-green-600"
+                          }
+                        >
+                          <strong>{formatPKR(earning.helperEarning)}</strong>
+                        </Table.Td>
+                        <Table.Td>
+                          <Badge
+                            color={
+                              earning.status === "paid" ? "green" : "yellow"
+                            }
+                            variant="light"
+                          >
+                            {earning.status === "paid" ? "Paid" : "Pending"}
+                          </Badge>
+                        </Table.Td>
+                        <Table.Td c="dimmed">
+                          {new Date(earning.createdAt).toLocaleDateString(
+                            isRTL ? "ur-PK" : "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "numeric",
+                            },
+                          )}
+                        </Table.Td>
+                      </Table.Tr>
+                    ))}
+                  </Table.Tbody>
+                </Table>
+              </ScrollArea>
+            )}
+          </Paper>
+        </motion.div>
+      </motion.div>
     </Box>
   );
 }
