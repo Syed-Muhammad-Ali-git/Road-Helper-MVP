@@ -121,3 +121,23 @@ export async function deleteUserDataCompletely(uid: string) {
     toDelete.map((d) => deleteDoc(doc(db, COLLECTIONS.RIDE_REQUESTS, d.id))),
   );
 }
+
+/**
+ * Update user profile fields
+ */
+export async function updateUserProfile(
+  uid: string,
+  updates: Partial<{
+    displayName: string;
+    phone: string;
+    email: string;
+    profileImage: string;
+  }>,
+) {
+  const ref = doc(db, COLLECTIONS.USERS, uid);
+  await updateDoc(ref, {
+    ...updates,
+    updatedAt: serverTimestamp(),
+  } as any);
+}
+
