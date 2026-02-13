@@ -29,6 +29,9 @@ import { showConfirm, showError, showSuccess } from "@/lib/sweetalert";
 import { deleteAccountFully } from "@/lib/services/authService";
 import { updateEmail, updatePassword, updateProfile } from "firebase/auth";
 import type { AppUserRecord } from "@/lib/services/userService";
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { cn } from "@/lib/utils";
 
 export default function AdminProfilePage() {
   const [uid, setUid] = useState<string | null>(null);
@@ -39,6 +42,8 @@ export default function AdminProfilePage() {
   const [deleting, setDeleting] = useState(false);
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const { isDark } = useAppTheme();
+  const { dict } = useLanguage();
 
   // Editable fields
   const [displayName, setDisplayName] = useState("");
@@ -118,14 +123,24 @@ export default function AdminProfilePage() {
 
   if (loading) {
     return (
-      <Box className="min-h-screen flex items-center justify-center bg-brand-black">
+      <Box
+        className={cn(
+          "min-h-screen flex items-center justify-center transition-colors",
+          isDark ? "bg-[#0a0a0a]" : "bg-gray-50",
+        )}
+      >
         <Loader size="xl" color="red" />
       </Box>
     );
   }
 
   return (
-    <Box className="min-h-screen p-4 md:p-8 max-w-2xl mx-auto bg-brand-black text-white pt-24">
+    <Box
+      className={cn(
+        "min-h-screen p-4 md:p-8 max-w-2xl mx-auto pt-24 transition-colors",
+        isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
+      )}
+    >
       <Stack gap="xl">
         <Box className="text-center md:text-left">
           <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-2">
@@ -142,7 +157,10 @@ export default function AdminProfilePage() {
         <Paper
           p={40}
           radius="32px"
-          className="glass-dark border border-white/10 text-center relative overflow-hidden"
+          className={cn(
+            "border text-center relative overflow-hidden transition-colors shadow-2xl",
+            isDark ? "bg-white/5 border-white/10" : "bg-white border-gray-200",
+          )}
         >
           <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 to-orange-500" />
           <Avatar
@@ -155,7 +173,10 @@ export default function AdminProfilePage() {
           </Avatar>
           <Title
             order={2}
-            className="text-white mt-6 font-manrope font-black text-2xl tracking-tight"
+            className={cn(
+              "mt-6 font-manrope font-black text-2xl tracking-tight transition-colors",
+              isDark ? "text-white" : "text-gray-900",
+            )}
           >
             {profile?.displayName ?? "Admin"}
           </Title>
@@ -167,7 +188,10 @@ export default function AdminProfilePage() {
         <Paper
           p={40}
           radius="32px"
-          className="glass-dark border border-white/10"
+          className={cn(
+            "border transition-colors shadow-2xl",
+            isDark ? "bg-white/5 border-white/10" : "bg-white border-gray-200",
+          )}
         >
           <Stack gap="xl">
             <TextInput
@@ -182,8 +206,12 @@ export default function AdminProfilePage() {
               disabled={!editing}
               leftSection={<IconUser size={18} />}
               classNames={{
-                input:
-                  "bg-white/5 border-2 border-white/5 text-white h-14 rounded-2xl focus:border-brand-red transition-all",
+                input: cn(
+                  "border-2 h-14 rounded-2xl transition-all font-bold",
+                  isDark
+                    ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                    : "bg-gray-50 border-gray-100 text-gray-900 focus:border-brand-red",
+                ),
               }}
             />
 
@@ -199,8 +227,12 @@ export default function AdminProfilePage() {
               disabled={!editing}
               leftSection={<IconMail size={18} />}
               classNames={{
-                input:
-                  "bg-white/5 border-2 border-white/5 text-white h-14 rounded-2xl focus:border-brand-red transition-all",
+                input: cn(
+                  "border-2 h-14 rounded-2xl transition-all font-bold",
+                  isDark
+                    ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                    : "bg-gray-50 border-gray-100 text-gray-900 focus:border-brand-red",
+                ),
               }}
             />
 
@@ -216,8 +248,12 @@ export default function AdminProfilePage() {
                 onChange={(e) => setPassword(e.target.value)}
                 leftSection={<IconLock size={18} />}
                 classNames={{
-                  input:
-                    "bg-white/5 border-2 border-white/5 text-white h-14 rounded-2xl focus:border-brand-red transition-all",
+                  input: cn(
+                    "border-2 h-14 rounded-2xl transition-all font-bold",
+                    isDark
+                      ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                      : "bg-gray-50 border-gray-100 text-gray-900 focus:border-brand-red",
+                  ),
                   innerInput: "h-14",
                 }}
               />
@@ -228,7 +264,12 @@ export default function AdminProfilePage() {
             {!editing ? (
               <Button
                 variant="filled"
-                className="bg-white text-black hover:bg-gray-200 h-14 rounded-2xl font-black transition-all shadow-xl"
+                className={cn(
+                  "h-14 rounded-2xl font-black transition-all shadow-xl",
+                  isDark
+                    ? "bg-white text-black hover:bg-gray-200"
+                    : "bg-brand-red text-white hover:bg-brand-dark-red",
+                )}
                 leftSection={<IconEdit size={20} />}
                 onClick={() => setEditing(true)}
               >

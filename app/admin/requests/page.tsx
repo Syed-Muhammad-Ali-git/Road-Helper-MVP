@@ -36,6 +36,7 @@ import { showSuccess } from "@/lib/sweetalert";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useAppTheme } from "@/app/context/ThemeContext";
+import { useLanguage } from "@/app/context/LanguageContext";
 import { subscribeAllRequests } from "@/lib/services/requestService";
 import type { RideRequestDoc } from "@/types";
 
@@ -46,6 +47,7 @@ const RequestsPage = () => {
     Array<{ id: string } & RideRequestDoc>
   >([]);
   const { isDark } = useAppTheme();
+  const { dict } = useLanguage();
 
   useEffect(() => {
     const unsub = subscribeAllRequests({
@@ -171,10 +173,13 @@ const RequestsPage = () => {
             </motion.div>
             <Title
               order={1}
-              className="font-manrope font-black text-4xl md:text-5xl text-white tracking-tight"
+              className={cn(
+                "font-manrope font-black text-4xl md:text-5xl tracking-tight transition-colors",
+                isDark ? "text-white" : "text-gray-900",
+              )}
             >
               Service{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
                 Logistics
               </span>
             </Title>
@@ -184,7 +189,7 @@ const RequestsPage = () => {
           </Box>
           <motion.div variants={itemVariants}>
             <Button
-              className="bg-brand-red hover:bg-brand-dark-red text-white h-14 rounded-2xl px-8 transition-all font-black shadow-2xl shadow-brand-red/20 group"
+              className="bg-brand-red hover:bg-brand-dark-red text-white h-14 rounded-2xl px-8 transition-all font-black shadow-2xl shadow-brand-red/20 group border-none"
               leftSection={
                 <IconDownload
                   size={20}
@@ -206,7 +211,12 @@ const RequestsPage = () => {
           <Paper
             p={12}
             radius="24px"
-            className="lg:col-span-8 glass-dark border border-white/10 flex items-center shadow-xl"
+            className={cn(
+              "lg:col-span-8 border flex items-center shadow-xl",
+              isDark
+                ? "bg-white/5 border-white/10"
+                : "bg-white border-gray-200",
+            )}
           >
             <Tabs
               value={activeTab}
@@ -251,7 +261,12 @@ const RequestsPage = () => {
             />
             <input
               placeholder="Search requests..."
-              className="w-full h-15 bg-white/[0.03] border-2 border-white/5 rounded-2xl pl-14 pr-6 text-white font-bold text-sm outline-none focus:border-brand-red transition-all"
+              className={cn(
+                "w-full h-15 border-2 rounded-2xl pl-14 pr-6 font-bold text-sm outline-none focus:border-brand-red transition-all",
+                isDark
+                  ? "bg-white/[0.03] border-white/5 text-white"
+                  : "bg-white border-gray-200 text-gray-900",
+              )}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -262,9 +277,19 @@ const RequestsPage = () => {
         <motion.div variants={itemVariants}>
           <Paper
             radius="32px"
-            className="glass-dark border border-white/10 overflow-hidden shadow-2xl relative min-h-[500px]"
+            className={cn(
+              "border overflow-hidden shadow-2xl relative min-h-[500px]",
+              isDark
+                ? "bg-white/5 border-white/10"
+                : "bg-white border-gray-200",
+            )}
           >
-            <div className="absolute top-0 right-0 p-10 text-white/[0.01]">
+            <div
+              className={cn(
+                "absolute top-0 right-0 p-10",
+                isDark ? "text-white/[0.01]" : "text-gray-900/[0.01]",
+              )}
+            >
               <IconTruck size={300} />
             </div>
 
@@ -272,9 +297,17 @@ const RequestsPage = () => {
               <Table
                 verticalSpacing="xl"
                 horizontalSpacing="xl"
-                className="text-white min-w-[1100px]"
+                className={cn(
+                  "min-w-[1100px]",
+                  isDark ? "text-white" : "text-gray-900",
+                )}
               >
-                <Table.Thead className="bg-white/5 border-none">
+                <Table.Thead
+                  className={cn(
+                    "border-none",
+                    isDark ? "bg-white/5" : "bg-gray-50/50 shadow-inner",
+                  )}
+                >
                   <Table.Tr>
                     <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none py-6">
                       Reference ID
@@ -307,7 +340,12 @@ const RequestsPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.98 }}
                         transition={{ delay: idx * 0.05 }}
-                        className="group hover:bg-white/[0.03] transition-colors border-b border-white/[0.05] last:border-0"
+                        className={cn(
+                          "group transition-colors border-b last:border-0",
+                          isDark
+                            ? "hover:bg-white/[0.03] border-white/[0.05]"
+                            : "hover:bg-gray-50 border-gray-100",
+                        )}
                       >
                         <Table.Td className="font-mono text-[11px] font-black text-white/40">
                           {req.id.slice(0, 8)}
@@ -322,7 +360,13 @@ const RequestsPage = () => {
                               {(req.customerName || "?")[0]}
                             </Avatar>
                             <div>
-                              <Text fw={800} size="sm">
+                              <Text
+                                fw={800}
+                                size="sm"
+                                className={
+                                  isDark ? "text-white" : "text-gray-900"
+                                }
+                              >
                                 {req.customerName || "Unknown"}
                               </Text>
                               <Text size="xs" c="dimmed" fw={600}>
@@ -386,7 +430,12 @@ const RequestsPage = () => {
                         </Table.Td>
                         <Table.Td>
                           <div className="flex flex-col">
-                            <Text fw={900} className="text-white">
+                            <Text
+                              fw={900}
+                              className={
+                                isDark ? "text-white" : "text-gray-900"
+                              }
+                            >
                               {/* Amount not yet in schema, standard placeholder */}
                               Rs {(req as any).amount || "0"}
                             </Text>

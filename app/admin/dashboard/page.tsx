@@ -149,36 +149,36 @@ const AdminDashboard = () => {
     if (!adminStats) return;
     const builtStats = [
       {
-        title: "Total Users",
+        title: dict.admin.total_users,
         value: adminStats.totalUsers.toString(),
-        subtitle: "Active Community",
+        subtitle: dict.admin.active_community,
         change: `+${Math.floor(adminStats.totalUsers * 0.084)}`,
         icon: IconUsers,
         color: "blue",
         gradient: "from-blue-600/20 to-indigo-600/20",
       },
       {
-        title: "Active Helpers",
+        title: dict.admin.active_helpers,
         value: adminStats.activeHelpers.toString(),
-        subtitle: "On-Duty Now",
+        subtitle: dict.admin.on_duty_now,
         change: `+${Math.floor(adminStats.activeHelpers * 0.076)}`,
         icon: IconActivity,
         color: "green",
         gradient: "from-emerald-600/20 to-teal-600/20",
       },
       {
-        title: "Completed Jobs",
+        title: dict.admin.completed_jobs,
         value: adminStats.completedJobs.toString(),
-        subtitle: "Total Success",
+        subtitle: dict.admin.total_success,
         change: `+${Math.floor(adminStats.completedJobs * 0.025)}`,
         icon: IconTrendingUp,
         color: "violet",
         gradient: "from-violet-600/20 to-purple-600/20",
       },
       {
-        title: "Pending Help",
+        title: dict.admin.pending_help,
         value: adminStats.pendingRequests.toString(),
-        subtitle: "High Priority",
+        subtitle: dict.admin.high_priority,
         change: `${adminStats.pendingRequests > 5 ? adminStats.pendingRequests - 5 : 0} critical`,
         icon: IconAlertCircle,
         color: "red",
@@ -321,7 +321,7 @@ const AdminDashboard = () => {
             >
               <IconCrown size={16} className="text-brand-red" />
               <Text className="text-brand-red font-bold uppercase tracking-[0.3em] text-[10px]">
-                Central Intelligence
+                {dict.admin.central_intelligence}
               </Text>
             </motion.div>
             <Title
@@ -332,14 +332,14 @@ const AdminDashboard = () => {
               )}
             >
               {profile
-                ? `Welcome, ${profile.displayName.split(" ")[0]}`
-                : "Platform"}{" "}
+                ? `${dict.dashboard.welcome}, ${profile.displayName.split(" ")[0]}`
+                : dict.admin.platform_dashboard}{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
-                Dashboard
+                {dict.admin.dashboard}
               </span>
             </Title>
             <Text className="text-gray-400 mt-2 font-medium">
-              Real-time data visualization and operational controls.
+              {dict.admin.real_time_visualization}
             </Text>
           </Box>
           <motion.div variants={itemVariants}>
@@ -359,88 +359,90 @@ const AdminDashboard = () => {
               }
               onClick={handleDownloadReport}
             >
-              Export Analytics
+              {dict.admin.export_analytics}
             </Button>
           </motion.div>
         </Group>
 
         {/* Stats Grid */}
-        <SimpleGrid cols={{ base: 1, md: 4 }} spacing={20} mb={40}>
-          {stats.map((stat) => (
-            <motion.div key={stat.title} variants={itemVariants}>
-              <Paper
-                p={24}
-                radius="24px"
-                className={cn(
-                  "border relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 h-full shadow-xl",
-                  isDark
-                    ? "glass-dark border-white/5 shadow-white/5"
-                    : "bg-white border-gray-200 shadow-gray-200/50",
-                )}
-              >
-                <div
+        {stats.length > 0 && (
+          <SimpleGrid cols={{ base: 1, md: 4 }} spacing={20} mb={40}>
+            {stats.map((stat) => (
+              <motion.div key={stat.title} variants={itemVariants}>
+                <Paper
+                  p={24}
+                  radius="24px"
                   className={cn(
-                    "absolute inset-0 bg-gradient-to-br opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500",
-                    stat.gradient,
-                  )}
-                />
-
-                <Group justify="space-between" mb={24}>
-                  <div
-                    className={cn(
-                      "h-12 w-12 rounded-2xl flex items-center justify-center border transition-transform group-hover:scale-110",
-                      isDark
-                        ? "bg-white/5 border-white/5 shadow-inner"
-                        : "bg-gray-50 border-gray-200",
-                    )}
-                  >
-                    <stat.icon
-                      size={24}
-                      className={cn(
-                        stat.color === "blue"
-                          ? "text-blue-500"
-                          : stat.color === "green"
-                            ? "text-emerald-500"
-                            : stat.color === "violet"
-                              ? "text-violet-500"
-                              : "text-brand-red",
-                      )}
-                    />
-                  </div>
-                  <Badge
-                    variant="dot"
-                    color="gray"
-                    className="text-gray-500 border-none px-0"
-                  >
-                    {stat.subtitle}
-                  </Badge>
-                </Group>
-
-                <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">
-                  {stat.title}
-                </Text>
-                <Title
-                  order={2}
-                  className={cn(
-                    "text-3xl font-black mb-2 transition-colors",
-                    isDark ? "text-white" : "text-gray-900",
+                    "border relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 h-full shadow-xl",
+                    isDark
+                      ? "bg-white/5 border-white/5 shadow-white/5"
+                      : "bg-white border-gray-200 shadow-gray-200/50",
                   )}
                 >
-                  {stat.value}
-                </Title>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full text-[10px] font-black border border-emerald-500/20">
-                    <IconTrendingUp size={12} />
-                    {stat.change}
-                  </div>
-                  <Text className="text-[10px] font-bold text-gray-600">
-                    Growth
+                  <div
+                    className={cn(
+                      "absolute inset-0 bg-gradient-to-br opacity-[0.03] group-hover:opacity-[0.08] transition-opacity duration-500",
+                      stat.gradient,
+                    )}
+                  />
+
+                  <Group justify="space-between" mb={24}>
+                    <div
+                      className={cn(
+                        "h-12 w-12 rounded-2xl flex items-center justify-center border transition-transform group-hover:scale-110",
+                        isDark
+                          ? "bg-white/5 border-white/5 shadow-inner"
+                          : "bg-gray-50 border-gray-200",
+                      )}
+                    >
+                      <stat.icon
+                        size={24}
+                        className={cn(
+                          stat.color === "blue"
+                            ? "text-blue-500"
+                            : stat.color === "green"
+                              ? "text-emerald-500"
+                              : stat.color === "violet"
+                                ? "text-violet-500"
+                                : "text-brand-red",
+                        )}
+                      />
+                    </div>
+                    <Badge
+                      variant="dot"
+                      color="gray"
+                      className="text-gray-500 border-none px-0"
+                    >
+                      {stat.subtitle}
+                    </Badge>
+                  </Group>
+
+                  <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-1">
+                    {stat.title}
                   </Text>
-                </div>
-              </Paper>
-            </motion.div>
-          ))}
-        </SimpleGrid>
+                  <Title
+                    order={2}
+                    className={cn(
+                      "text-3xl font-black mb-2 transition-colors",
+                      isDark ? "text-white" : "text-gray-900",
+                    )}
+                  >
+                    {stat.value}
+                  </Title>
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1 text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full text-[10px] font-black border border-emerald-500/20">
+                      <IconTrendingUp size={12} />
+                      {stat.change}
+                    </div>
+                    <Text className="text-[10px] font-bold text-gray-600">
+                      {dict.admin.growth}
+                    </Text>
+                  </div>
+                </Paper>
+              </motion.div>
+            ))}
+          </SimpleGrid>
+        )}
 
         {/* Charts & Map Grid */}
         <SimpleGrid cols={{ base: 1, lg: 3 }}>
@@ -449,9 +451,19 @@ const AdminDashboard = () => {
             <Paper
               p={40}
               radius="32px"
-              className="glass-dark border border-white/5 h-full flex flex-col relative overflow-hidden shadow-2xl"
+              className={cn(
+                "border h-full flex flex-col relative overflow-hidden shadow-2xl",
+                isDark
+                  ? "bg-white/5 border-white/5"
+                  : "bg-white border-gray-200",
+              )}
             >
-              <div className="absolute top-0 right-0 p-10 text-white/[0.02]">
+              <div
+                className={cn(
+                  "absolute top-0 right-0 p-10",
+                  isDark ? "text-white/[0.02]" : "text-gray-900/[0.02]",
+                )}
+              >
                 <IconReceipt size={240} />
               </div>
 
@@ -459,12 +471,15 @@ const AdminDashboard = () => {
                 <Box>
                   <Title
                     order={3}
-                    className="font-manrope text-2xl font-black text-white tracking-tight"
+                    className={cn(
+                      "font-manrope text-2xl font-black tracking-tight",
+                      isDark ? "text-white" : "text-gray-900",
+                    )}
                   >
-                    Financial Performance
+                    {dict.admin.financial_performance}
                   </Title>
                   <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">
-                    Platform Revenue Share Analytics
+                    {dict.admin.platform_revenue_analytics}
                   </Text>
                 </Box>
               </Group>
@@ -545,7 +560,7 @@ const AdminDashboard = () => {
                       strokeWidth={4}
                       fillOpacity={1}
                       fill="url(#total)"
-                      name="Gross Value"
+                      name={dict.admin.gross_value}
                     />
                     <Area
                       type="monotone"
@@ -554,7 +569,7 @@ const AdminDashboard = () => {
                       strokeWidth={4}
                       fillOpacity={1}
                       fill="url(#platform)"
-                      name="20% Share"
+                      name={dict.admin.platform_share}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
@@ -567,19 +582,19 @@ const AdminDashboard = () => {
               >
                 {[
                   {
-                    label: "Commission Paid",
+                    label: dict.admin.commission_paid,
                     value: `Rs ${paidCommission.toFixed(0)}`,
                     color: "emerald",
                     icon: IconPercentage,
                   },
                   {
-                    label: "Fees Pending",
+                    label: dict.admin.fees_pending,
                     value: `Rs ${pendingCommission.toFixed(0)}`,
                     color: "amber",
                     icon: IconAlertCircle,
                   },
                   {
-                    label: "Platform Growth",
+                    label: dict.admin.platform_growth,
                     value: "+24%",
                     color: "sky",
                     icon: IconActivity,
@@ -589,14 +604,21 @@ const AdminDashboard = () => {
                     key={idx}
                     p={24}
                     radius="24px"
-                    className="bg-white/[0.03] border border-white/[0.05] hover:border-white/10 transition-colors group"
+                    className={cn(
+                      "border transition-colors group",
+                      isDark
+                        ? "bg-white/[0.03] border-white/[0.05] hover:border-white/10"
+                        : "bg-gray-50 border-gray-100 hover:border-gray-200",
+                    )}
                   >
                     <Group gap="sm" mb={12}>
                       <ThemeIcon
                         size="sm"
                         radius="md"
                         className={cn(
-                          "bg-white/5",
+                          isDark
+                            ? "bg-white/5"
+                            : "bg-white border border-gray-100",
                           textColorMap[item.color as keyof typeof textColorMap],
                         )}
                       >
@@ -606,7 +628,12 @@ const AdminDashboard = () => {
                         {item.label}
                       </Text>
                     </Group>
-                    <Text className="text-white text-2xl font-black font-manrope">
+                    <Text
+                      className={cn(
+                        "text-2xl font-black font-manrope",
+                        isDark ? "text-white" : "text-gray-900",
+                      )}
+                    >
                       {item.value}
                     </Text>
                   </Paper>
@@ -635,18 +662,30 @@ const AdminDashboard = () => {
                     isDark ? "text-white" : "text-gray-900",
                   )}
                 >
-                  Platform Health
+                  {dict.admin.platform_health}
                 </Title>
                 <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">
-                  System Reliability Index
+                  {dict.admin.system_reliability_index}
                 </Text>
               </div>
 
               <Stack gap="xl">
                 {[
-                  { label: "Active Jobs Density", val: 85, color: "blue" },
-                  { label: "Helper Availability", val: 42, color: "emerald" },
-                  { label: "Avg Service Time", val: 28, color: "amber" },
+                  {
+                    label: dict.admin.active_jobs_density,
+                    val: 85,
+                    color: "blue",
+                  },
+                  {
+                    label: dict.admin.helper_availability,
+                    val: 42,
+                    color: "emerald",
+                  },
+                  {
+                    label: dict.admin.avg_service_time,
+                    val: 28,
+                    color: "amber",
+                  },
                 ].map((item, i) => (
                   <div key={i}>
                     <Group justify="space-between" mb={8}>
@@ -694,7 +733,7 @@ const AdminDashboard = () => {
                   component={Link}
                   href="/admin/status"
                 >
-                  Detailed Diagnostics
+                  {dict.admin.detailed_diagnostics}
                 </Button>
               </Stack>
             </Paper>
@@ -711,7 +750,12 @@ const AdminDashboard = () => {
               isDark ? "glass-dark border-white/5" : "bg-white border-gray-200",
             )}
           >
-            <div className="absolute top-0 left-0 p-10 text-white/[0.01]">
+            <div
+              className={cn(
+                "absolute top-0 left-0 p-10",
+                isDark ? "text-white/[0.01]" : "text-gray-900/[0.01]",
+              )}
+            >
               <IconSparkles size={240} />
             </div>
 
@@ -724,21 +768,26 @@ const AdminDashboard = () => {
                     isDark ? "text-white" : "text-gray-900",
                   )}
                 >
-                  Recent Operations
+                  {dict.admin.recent_operations}
                 </Title>
                 <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">
-                  Job fulfillment registry
+                  {dict.admin.job_fulfillment_registry}
                 </Text>
               </div>
               <Button
                 variant="subtle"
                 color="gray"
-                className="hover:bg-white/5 text-gray-500 font-black rounded-xl"
+                className={cn(
+                  "font-black rounded-xl",
+                  isDark
+                    ? "hover:bg-white/5 text-gray-500"
+                    : "hover:bg-gray-50 text-gray-600",
+                )}
                 component={Link}
                 href="/admin/requests"
                 rightSection={<IconArrowRight size={16} />}
               >
-                View Full Logs
+                {dict.admin.view_full_logs}
               </Button>
             </Group>
 
@@ -754,22 +803,22 @@ const AdminDashboard = () => {
                 <Table.Thead className="bg-white/5 border-none">
                   <Table.Tr>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">
-                      User Profile
+                      {dict.admin.user_profile}
                     </Table.Th>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">
-                      Category
+                      {dict.admin.category}
                     </Table.Th>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">
-                      Operation Status
+                      {dict.admin.operation_status}
                     </Table.Th>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">
-                      Assigned Pro
+                      {dict.admin.assigned_pro}
                     </Table.Th>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none text-right">
-                      Value (PKR)
+                      {dict.admin.value_pkr}
                     </Table.Th>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">
-                      Fee (20%)
+                      {dict.admin.fee_20}
                     </Table.Th>
                     <Table.Th className="border-none"></Table.Th>
                   </Table.Tr>

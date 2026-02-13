@@ -24,6 +24,8 @@ import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { getAdminStats } from "@/lib/services/adminService";
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { useLanguage } from "@/app/context/LanguageContext";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -40,6 +42,8 @@ const itemVariants: Variants = {
 };
 
 const StatusPage = () => {
+  const { isDark } = useAppTheme();
+  const { dict } = useLanguage();
   const [stats, setStats] = useState<any>(null);
 
   useEffect(() => {
@@ -51,8 +55,8 @@ const StatusPage = () => {
 
   const systemMetrics = [
     {
-      title: "Fleet Connectivity",
-      sub: "Active Helpers",
+      title: dict.admin.fleet_connectivity,
+      sub: dict.admin.active_helpers,
       val: stats
         ? Math.min(
             100,
@@ -64,7 +68,7 @@ const StatusPage = () => {
       details: [`Online: ${stats?.activeHelpers || 0}`, "Ping: 45ms"],
     },
     {
-      title: "Data Pipeline",
+      title: dict.admin.data_pipeline,
       sub: "Firestore Sync",
       val: 99,
       color: "blue",
@@ -72,7 +76,7 @@ const StatusPage = () => {
       details: ["Sync: Live", "Errors: 0"],
     },
     {
-      title: "Auth Gateway",
+      title: dict.admin.auth_gateway,
       sub: "Identity Service",
       val: 100,
       color: "violet",
@@ -80,7 +84,7 @@ const StatusPage = () => {
       details: ["Status: Nominal", "Method: Firebase"],
     },
     {
-      title: "Service Traffic",
+      title: dict.admin.service_traffic,
       sub: "Request Load",
       val: stats ? Math.min(100, stats.pendingRequests * 10) : 0,
       color: "amber",
@@ -90,14 +94,25 @@ const StatusPage = () => {
   ];
 
   return (
-    <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white pt-24">
+    <Box
+      className={cn(
+        "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi transition-colors pt-24",
+        isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
+      )}
+    >
       {/* Dynamic Grid Background */}
-      <div className="absolute inset-0 pointer-events-none opacity-20">
+      <div
+        className={cn(
+          "absolute inset-0 pointer-events-none transition-opacity",
+          isDark ? "opacity-20" : "opacity-10",
+        )}
+      >
         <div
           className="absolute inset-0"
           style={{
-            backgroundImage:
-              "radial-gradient(circle at 1px 1px, #333 1px, transparent 0)",
+            backgroundImage: isDark
+              ? "radial-gradient(circle at 1px 1px, #333 1px, transparent 0)"
+              : "radial-gradient(circle at 1px 1px, #ccc 1px, transparent 0)",
             backgroundSize: "40px 40px",
           }}
         />
@@ -121,21 +136,23 @@ const StatusPage = () => {
           >
             <IconActivity size={16} className="text-brand-red" />
             <Text className="text-brand-red font-black uppercase tracking-[0.3em] text-[10px]">
-              Infrastructure Health
+              {dict.admin.infrastructure_health}
             </Text>
           </motion.div>
           <Title
             order={1}
-            className="font-manrope font-black text-4xl md:text-5xl text-white tracking-tight"
+            className={cn(
+              "font-manrope font-black text-4xl md:text-5xl tracking-tight transition-colors",
+              isDark ? "text-white" : "text-gray-900",
+            )}
           >
             Network{" "}
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
-              Status
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
+              {dict.admin.status_title.split(" ")[1]}
             </span>
           </Title>
           <Text className="text-gray-500 mt-2 font-bold uppercase tracking-tight text-xs">
-            Operational tracking of core platform components and community
-            activity.
+            {dict.admin.operational_tracking}
           </Text>
         </header>
 
@@ -145,7 +162,12 @@ const StatusPage = () => {
               <Paper
                 p={32}
                 radius="32px"
-                className="glass-dark border border-white/10 relative overflow-hidden group hover:border-brand-red/30 transition-all duration-500 shadow-2xl"
+                className={cn(
+                  "border relative overflow-hidden group transition-all duration-500 shadow-2xl",
+                  isDark
+                    ? "bg-white/5 border-white/10 hover:border-brand-red/30"
+                    : "bg-white border-gray-200 hover:border-brand-red/20",
+                )}
               >
                 <div
                   className={cn(
@@ -166,7 +188,10 @@ const StatusPage = () => {
                       size={64}
                       radius="22px"
                       className={cn(
-                        "bg-white/5 border border-white/10 group-hover:scale-110 transition-transform shadow-inner",
+                        "border group-hover:scale-110 transition-transform shadow-inner",
+                        isDark
+                          ? "bg-white/5 border-white/10"
+                          : "bg-gray-50 border-gray-100",
                         metric.color === "emerald"
                           ? "text-emerald-400"
                           : metric.color === "blue"
@@ -181,7 +206,10 @@ const StatusPage = () => {
                     <div>
                       <Text
                         fw={900}
-                        className="text-white text-xl tracking-tight uppercase font-manrope"
+                        className={cn(
+                          "text-xl tracking-tight uppercase font-manrope",
+                          isDark ? "text-white" : "text-gray-900",
+                        )}
                       >
                         {metric.title}
                       </Text>
@@ -233,7 +261,7 @@ const StatusPage = () => {
                         fw={900}
                         ta="center"
                         size="sm"
-                        className="text-white font-manrope"
+                        className={isDark ? "text-white" : "text-gray-900"}
                       >
                         {metric.val}%
                       </Text>
@@ -244,14 +272,22 @@ const StatusPage = () => {
                 <SimpleGrid
                   cols={2}
                   spacing="md"
-                  className="border-t border-white/5 pt-6 relative z-10"
+                  className={cn(
+                    "border-t pt-6 relative z-10",
+                    isDark ? "border-white/5" : "border-gray-100",
+                  )}
                 >
                   {metric.details.map((detail, i) => (
                     <div key={i} className="flex flex-col">
                       <Text className="text-gray-600 text-[10px] font-black uppercase tracking-widest">
                         {detail.split(":")[0]}
                       </Text>
-                      <Text className="text-white font-black text-md">
+                      <Text
+                        className={cn(
+                          "font-black text-md",
+                          isDark ? "text-white" : "text-gray-900",
+                        )}
+                      >
                         {detail.split(":")[1]}
                       </Text>
                     </div>
@@ -268,26 +304,47 @@ const StatusPage = () => {
             <Paper
               p={40}
               radius="32px"
-              className="glass-dark border border-white/10 h-full shadow-2xl overflow-hidden relative"
+              className={cn(
+                "border h-full shadow-2xl overflow-hidden relative",
+                isDark
+                  ? "bg-white/5 border-white/10"
+                  : "bg-white border-gray-200",
+              )}
             >
-              <div className="absolute top-0 right-0 p-8 text-white/[0.02]">
+              <div
+                className={cn(
+                  "absolute top-0 right-0 p-8",
+                  isDark ? "text-white/[0.02]" : "text-gray-900/[0.02]",
+                )}
+              >
                 <IconShieldLock size={120} />
               </div>
               <Title
                 order={3}
-                className="text-white font-black mb-10 text-xl tracking-tight uppercase"
+                className={cn(
+                  "font-black mb-10 text-xl tracking-tight uppercase",
+                  isDark ? "text-white" : "text-gray-900",
+                )}
               >
-                Internal Governance
+                {dict.admin.internal_governance}
               </Title>
 
               <Timeline
                 bulletSize={32}
                 lineWidth={2}
                 active={2}
-                color="brand-red"
+                color="red"
                 classNames={{
-                  itemTitle: "text-white font-bold text-sm",
-                  itemBullet: "bg-[#111] border-2 border-white/10",
+                  itemTitle: cn(
+                    "font-bold text-sm",
+                    isDark ? "text-white" : "text-gray-900",
+                  ),
+                  itemBullet: cn(
+                    "border-2",
+                    isDark
+                      ? "bg-[#111] border-white/10"
+                      : "bg-white border-gray-200",
+                  ),
                   itemContent: "text-gray-500 text-xs font-medium",
                 }}
               >
@@ -318,14 +375,22 @@ const StatusPage = () => {
             <Paper
               p={40}
               radius="32px"
-              className="glass-dark border border-white/10 shadow-2xl"
+              className={cn(
+                "border shadow-2xl",
+                isDark
+                  ? "bg-white/5 border-white/10"
+                  : "bg-white border-gray-200",
+              )}
             >
               <Group justify="space-between" mb={30}>
                 <Title
                   order={3}
-                  className="text-white font-black text-xl tracking-tight uppercase"
+                  className={cn(
+                    "font-black text-xl tracking-tight uppercase",
+                    isDark ? "text-white" : "text-gray-900",
+                  )}
                 >
-                  Resource Telemetry
+                  {dict.admin.resource_telemetry}
                 </Title>
                 <div className="flex items-center gap-2 bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20">
                   <IconActivity size={14} className="text-emerald-400" />
@@ -368,7 +433,10 @@ const StatusPage = () => {
                       <Text
                         size="xs"
                         fw={900}
-                        className="text-white font-manrope"
+                        className={cn(
+                          "font-manrope",
+                          isDark ? "text-white" : "text-gray-900",
+                        )}
                       >
                         {row.stat}
                       </Text>

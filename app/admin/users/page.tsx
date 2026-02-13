@@ -41,6 +41,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { showSuccess, showError, showConfirm } from "@/lib/sweetalert";
 import { cn } from "@/lib/utils";
 import { useAppTheme } from "@/app/context/ThemeContext";
+import { useLanguage } from "@/app/context/LanguageContext";
 import { getAllUsers } from "@/lib/services/userService";
 import type { AppUserRecord } from "@/lib/services/userService";
 
@@ -67,6 +68,7 @@ const UsersPage = () => {
   });
 
   const { isDark } = useAppTheme();
+  const { dict } = useLanguage();
 
   useEffect(() => {
     let alive = true;
@@ -184,7 +186,7 @@ const UsersPage = () => {
             >
               <IconUsers size={16} className="text-brand-red" />
               <Text className="text-brand-red font-black uppercase tracking-[0.3em] text-[10px]">
-                User Governance
+                {dict.admin.user_governance}
               </Text>
             </motion.div>
             <Title
@@ -194,9 +196,9 @@ const UsersPage = () => {
                 isDark ? "text-white" : "text-gray-900",
               )}
             >
-              Community{" "}
+              {dict.admin.users_title.split(" ")[0]}{" "}
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
-                Registry
+                {dict.admin.users_title.split(" ")[1]}
               </span>
             </Title>
             <Text className="text-gray-500 mt-2 font-medium">
@@ -206,17 +208,22 @@ const UsersPage = () => {
           <motion.div variants={itemVariants} className="flex gap-4">
             <Button
               variant="default"
-              className="bg-white/5 text-white border-white/10 hover:bg-white/10 h-14 rounded-2xl px-6 transition-all font-bold"
+              className={cn(
+                "h-14 rounded-2xl px-6 transition-all font-bold",
+                isDark
+                  ? "bg-white/5 text-white border-white/10 hover:bg-white/10"
+                  : "bg-white text-gray-900 border-gray-200 hover:bg-gray-50",
+              )}
               leftSection={<IconDownload size={20} />}
             >
-              Export Database
+              {dict.admin.export_database}
             </Button>
             <Button
               className="bg-brand-red hover:bg-brand-dark-red text-white h-14 rounded-2xl px-8 transition-all font-black text-sm shadow-xl shadow-brand-red/20 border-none"
               leftSection={<IconUserPlus size={22} />}
               onClick={open}
             >
-              Onboard User
+              {dict.admin.onboard_user}
             </Button>
           </motion.div>
         </Group>
@@ -226,7 +233,12 @@ const UsersPage = () => {
           <Paper
             p={24}
             radius="32px"
-            className="glass-dark border border-white/10 shadow-2xl"
+            className={cn(
+              "border shadow-2xl",
+              isDark
+                ? "bg-white/5 border-white/10"
+                : "bg-white border-gray-200",
+            )}
           >
             <Group
               justify="space-between"
@@ -255,7 +267,12 @@ const UsersPage = () => {
                 <Button
                   variant="outline"
                   color="gray"
-                  className="h-14 rounded-2xl border-white/10 text-gray-400 hover:bg-white/5 px-6 font-bold"
+                  className={cn(
+                    "h-14 rounded-2xl px-6 font-bold",
+                    isDark
+                      ? "border-white/10 text-gray-400 hover:bg-white/5"
+                      : "border-gray-200 text-gray-500 hover:bg-gray-50",
+                  )}
                   leftSection={<IconFilter size={18} />}
                 >
                   Advanced Filters
@@ -276,7 +293,12 @@ const UsersPage = () => {
         <motion.div variants={itemVariants}>
           <Paper
             radius="32px"
-            className="glass-dark border border-white/10 overflow-hidden shadow-2xl relative"
+            className={cn(
+              "border overflow-hidden shadow-2xl relative",
+              isDark
+                ? "bg-white/5 border-white/10"
+                : "bg-white border-gray-200",
+            )}
           >
             <div className="absolute top-0 right-0 p-10 text-white/[0.01]">
               <IconShieldCheck size={280} />
@@ -291,19 +313,24 @@ const UsersPage = () => {
                   isDark ? "text-white" : "text-gray-900",
                 )}
               >
-                <Table.Thead className="bg-white/5 border-none">
+                <Table.Thead
+                  className={cn(
+                    "border-none",
+                    isDark ? "bg-white/5 shadow-inner" : "bg-gray-50/50",
+                  )}
+                >
                   <Table.Tr>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none py-6">
-                      User Identity
+                      {dict.admin.user_identity}
                     </Table.Th>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">
-                      Access Privilege
+                      {dict.admin.access_privilege}
                     </Table.Th>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">
-                      Verification Status
+                      {dict.admin.verification_status}
                     </Table.Th>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">
-                      Last Interaction
+                      {dict.admin.last_interaction}
                     </Table.Th>
                     <Table.Th className="border-none"></Table.Th>
                   </Table.Tr>
@@ -318,7 +345,12 @@ const UsersPage = () => {
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, scale: 0.95 }}
                         transition={{ delay: idx * 0.05 }}
-                        className="group hover:bg-white/[0.03] transition-colors border-b border-white/[0.05] last:border-0"
+                        className={cn(
+                          "group transition-colors border-b last:border-0",
+                          isDark
+                            ? "hover:bg-white/[0.03] border-white/[0.05]"
+                            : "hover:bg-gray-50 border-gray-100",
+                        )}
                       >
                         <Table.Td>
                           <Group gap="sm" wrap="nowrap">
@@ -414,10 +446,22 @@ const UsersPage = () => {
                                 <IconDotsVertical size={20} />
                               </ActionIcon>
                             </Menu.Target>
-                            <Menu.Dropdown className="bg-[#0f0f0f] border-white/10 p-2 shadow-2xl backdrop-blur-3xl">
+                            <Menu.Dropdown
+                              className={cn(
+                                "border p-2 shadow-2xl backdrop-blur-3xl",
+                                isDark
+                                  ? "bg-[#0f0f0f] border-white/10"
+                                  : "bg-white border-gray-200",
+                              )}
+                            >
                               <Menu.Item
                                 leftSection={<IconEdit size={16} />}
-                                className="rounded-lg text-gray-300 font-bold hover:bg-white/5 transition-colors"
+                                className={cn(
+                                  "rounded-lg font-bold transition-colors",
+                                  isDark
+                                    ? "text-gray-300 hover:bg-white/5"
+                                    : "text-gray-700 hover:bg-gray-50",
+                                )}
                               >
                                 Edit Metadata
                               </Menu.Item>
@@ -428,7 +472,11 @@ const UsersPage = () => {
                               >
                                 Apply Sanction
                               </Menu.Item>
-                              <Menu.Divider className="border-white/5" />
+                              <Menu.Divider
+                                className={
+                                  isDark ? "border-white/5" : "border-gray-100"
+                                }
+                              />
                               <Menu.Item
                                 leftSection={<IconTrash size={16} />}
                                 color="red"
@@ -475,8 +523,12 @@ const UsersPage = () => {
             total={1}
             radius="xl"
             classNames={{
-              control:
-                "bg-white/5 border-white/10 text-white font-bold h-12 w-12 hover:bg-white/10 transition-all data-[active=true]:bg-brand-red data-[active=true]:border-none shadow-xl",
+              control: cn(
+                "border font-bold h-12 w-12 transition-all data-[active=true]:border-none shadow-xl",
+                isDark
+                  ? "bg-white/5 border-white/10 text-white hover:bg-white/10 data-[active=true]:bg-brand-red"
+                  : "bg-white border-gray-200 text-gray-900 hover:bg-gray-50 data-[active=true]:bg-brand-red data-[active=true]:text-white",
+              ),
             }}
           />
         </motion.div>
@@ -497,12 +549,29 @@ const UsersPage = () => {
           </Title>
         }
         classNames={{
-          content:
-            "bg-[#0f0f0f] border-2 border-white/10 backdrop-blur-3xl shadow-3xl",
-          header: "bg-[#0f0f0f] border-b border-white/5 p-8",
+          content: cn(
+            "border-2 backdrop-blur-3xl shadow-3xl",
+            isDark
+              ? "bg-[#0f0f0f] border-white/10"
+              : "bg-white border-gray-200",
+          ),
+          header: cn(
+            "border-b p-8",
+            isDark
+              ? "bg-[#0f0f0f] border-white/5"
+              : "bg-gray-50 border-gray-100",
+          ),
           body: "p-8",
-          close:
-            "text-gray-500 hover:text-white hover:bg-white/10 rounded-full transition-all scale-125 mr-2",
+          close: cn(
+            "text-gray-500 rounded-full transition-all scale-125 mr-2",
+            isDark
+              ? "hover:text-white hover:bg-white/10"
+              : "hover:text-black hover:bg-gray-100",
+          ),
+          title: cn(
+            "font-manrope font-black",
+            isDark ? "text-white" : "text-gray-900",
+          ),
         }}
         overlayProps={{ blur: 10, opacity: 0.8 }}
       >
@@ -518,8 +587,12 @@ const UsersPage = () => {
               classNames={{
                 label:
                   "text-gray-500 text-[10px] font-black uppercase tracking-widest mb-2",
-                input:
-                  "bg-white/5 border-2 border-white/5 text-white h-14 rounded-2xl focus:border-brand-red transition-all",
+                input: cn(
+                  "border-2 h-14 rounded-2xl transition-all font-bold",
+                  isDark
+                    ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                    : "bg-gray-50 border-gray-200 text-gray-900 focus:border-brand-red",
+                ),
               }}
             />
             <TextInput
@@ -533,8 +606,12 @@ const UsersPage = () => {
               classNames={{
                 label:
                   "text-gray-500 text-[10px] font-black uppercase tracking-widest mb-2",
-                input:
-                  "bg-white/5 border-2 border-white/5 text-white h-14 rounded-2xl focus:border-brand-red transition-all",
+                input: cn(
+                  "border-2 h-14 rounded-2xl transition-all font-bold",
+                  isDark
+                    ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                    : "bg-gray-50 border-gray-200 text-gray-900 focus:border-brand-red",
+                ),
               }}
             />
           </SimpleGrid>
@@ -546,8 +623,12 @@ const UsersPage = () => {
             classNames={{
               label:
                 "text-gray-500 text-[10px] font-black uppercase tracking-widest mb-2",
-              input:
-                "bg-white/5 border-2 border-white/5 text-white h-14 rounded-2xl focus:border-brand-red transition-all",
+              input: cn(
+                "border-2 h-14 rounded-2xl transition-all font-bold",
+                isDark
+                  ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                  : "bg-gray-50 border-gray-200 text-gray-900 focus:border-brand-red",
+              ),
             }}
           />
           <Select
@@ -559,11 +640,20 @@ const UsersPage = () => {
             classNames={{
               label:
                 "text-gray-500 text-[10px] font-black uppercase tracking-widest mb-2",
-              input:
-                "bg-white/5 border-2 border-white/5 text-white h-14 rounded-2xl focus:border-brand-red transition-all",
-              dropdown: "bg-[#0f0f0f] border border-white/10 rounded-2xl p-2",
+              input: cn(
+                "border-2 h-14 rounded-2xl transition-all font-bold",
+                isDark
+                  ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                  : "bg-gray-50 border-gray-200 text-gray-900 focus:border-brand-red",
+              ),
+              dropdown: cn(
+                "border rounded-2xl p-2 shadow-2xl",
+                isDark
+                  ? "bg-[#0f0f0f] border-white/10"
+                  : "bg-white border-gray-200",
+              ),
               option:
-                "rounded-xl font-bold hover:bg-white/5 data-[checked=true]:bg-brand-red transition-all",
+                "rounded-xl font-bold hover:bg-white/5 data-[checked=true]:bg-brand-red data-[checked=true]:text-white transition-all",
             }}
           />
           <Button

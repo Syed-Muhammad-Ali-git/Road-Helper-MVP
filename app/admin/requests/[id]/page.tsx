@@ -38,6 +38,8 @@ import { motion, Variants } from "framer-motion";
 import Link from "next/link";
 import { showSuccess, showInfo } from "@/lib/sweetalert";
 import { cn } from "@/lib/utils";
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { useLanguage } from "@/app/context/LanguageContext";
 import { subscribeRideRequest } from "@/lib/services/requestService";
 import type { RideRequestDoc } from "@/types";
 
@@ -56,6 +58,8 @@ const RequestDetailPage = () => {
   const router = useRouter();
   const id = params.id as string;
   const [request, setRequest] = useState<any | null>(null);
+  const { isDark } = useAppTheme();
+  const { dict } = useLanguage();
 
   // Production-safe Tailwind color mapping
   const colorMap = {
@@ -77,14 +81,24 @@ const RequestDetailPage = () => {
 
   if (!request) {
     return (
-      <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white flex items-center justify-center">
-        <Text>Loading request…</Text>
+      <Box
+        className={cn(
+          "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi flex items-center justify-center",
+          isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
+        )}
+      >
+        <Text>{dict.common.loading || "Loading request…"}</Text>
       </Box>
     );
   }
 
   return (
-    <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white">
+    <Box
+      className={cn(
+        "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi transition-colors",
+        isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
+      )}
+    >
       {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
@@ -111,21 +125,37 @@ const RequestDetailPage = () => {
             <Button
               variant="ghost"
               onClick={() => router.back()}
-              className="text-gray-400 hover:text-white h-14 rounded-2xl hover:bg-white/5 px-6 group"
+              className={cn(
+                "h-14 rounded-2xl px-6 group",
+                isDark
+                  ? "text-gray-400 hover:text-white hover:bg-white/5"
+                  : "text-gray-500 hover:text-gray-900 hover:bg-gray-100",
+              )}
             >
               <IconArrowLeft
                 size={22}
                 className="mr-3 group-hover:-translate-x-1 transition-transform"
               />
-              Return to Registry
+              {dict.profile.back || "Return to Registry"}
             </Button>
-            <div className="h-10 w-px bg-white/10 hidden md:block" />
+            <div
+              className={cn(
+                "h-10 w-px hidden md:block",
+                isDark ? "bg-white/10" : "bg-gray-200",
+              )}
+            />
             <Box>
               <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.3em] mb-1">
-                Operational ID
+                {dict.admin.operational_id}
               </Text>
-              <Title order={4} className="text-white font-mono text-xl">
-                {request.id}
+              <Title
+                order={4}
+                className={cn(
+                  "font-mono text-xl",
+                  isDark ? "text-white" : "text-gray-900",
+                )}
+              >
+                {request.id.slice(0, 12)}...
               </Title>
             </Box>
           </Group>
@@ -135,7 +165,12 @@ const RequestDetailPage = () => {
               radius="2xl"
               variant="subtle"
               color="gray"
-              className="bg-white/5 border border-white/10 text-gray-400 hover:text-white"
+              className={cn(
+                "border transition-all",
+                isDark
+                  ? "bg-white/5 border-white/10 text-gray-400 hover:text-white"
+                  : "bg-white border-gray-200 text-gray-400 hover:text-gray-900",
+              )}
             >
               <IconDotsVertical size={24} />
             </ActionIcon>
@@ -156,18 +191,31 @@ const RequestDetailPage = () => {
               <Paper
                 p={40}
                 radius="40px"
-                className="glass-dark border border-white/10 shadow-2xl relative overflow-hidden"
+                className={cn(
+                  "border shadow-2xl relative overflow-hidden",
+                  isDark
+                    ? "bg-white/5 border-white/10"
+                    : "bg-white border-gray-200",
+                )}
               >
-                <div className="absolute top-0 right-0 p-10 text-white/1">
+                <div
+                  className={cn(
+                    "absolute top-0 right-0 p-10",
+                    isDark ? "text-white/[0.02]" : "text-gray-900/[0.02]",
+                  )}
+                >
                   <IconRoute size={240} />
                 </div>
                 <Group justify="space-between" mb={35} align="flex-start">
                   <Box>
                     <Title
                       order={3}
-                      className="text-white font-manrope font-black text-2xl tracking-tight"
+                      className={cn(
+                        "font-manrope font-black text-2xl tracking-tight",
+                        isDark ? "text-white" : "text-gray-900",
+                      )}
                     >
-                      Mission Telemetry
+                      {dict.admin.mission_telemetry}
                     </Title>
                     <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">
                       Real-time engagement timeline
@@ -208,20 +256,27 @@ const RequestDetailPage = () => {
                       classNames={{
                         itemTitle: cn(
                           "font-black uppercase text-xs tracking-widest",
-                          item.active ? "text-white" : "text-gray-600",
+                          item.active
+                            ? isDark
+                              ? "text-white"
+                              : "text-gray-900"
+                            : "text-gray-600",
                         ),
                         itemContent: "mt-1",
                         itemBullet: cn(
-                          "bg-[#0a0a0a] border-2",
+                          "border-2",
+                          isDark ? "bg-[#0a0a0a]" : "bg-white",
                           item.active
                             ? "border-brand-red shadow-[0_0_15px_#ef4444]"
-                            : "border-white/10",
+                            : isDark
+                              ? "border-white/10"
+                              : "border-gray-200",
                         ),
                       }}
                     >
                       <Text
                         size="xs"
-                        color="dimmed"
+                        c="dimmed"
                         fw={700}
                         className="font-manrope"
                       >
@@ -238,14 +293,22 @@ const RequestDetailPage = () => {
               <Paper
                 p={40}
                 radius="40px"
-                className="glass-dark border border-white/10 shadow-2xl relative overflow-hidden"
+                className={cn(
+                  "border shadow-2xl relative overflow-hidden",
+                  isDark
+                    ? "bg-white/5 border-white/10"
+                    : "bg-white border-gray-200",
+                )}
               >
                 <header className="mb-10">
                   <Title
                     order={3}
-                    className="text-white font-manrope font-black text-2xl tracking-tight"
+                    className={cn(
+                      "font-manrope font-black text-2xl tracking-tight",
+                      isDark ? "text-white" : "text-gray-900",
+                    )}
                   >
-                    Deployment Specification
+                    {dict.admin.deployment_specification}
                   </Title>
                   <div className="h-1 w-20 bg-brand-red mt-3" />
                 </header>
@@ -300,7 +363,10 @@ const RequestDetailPage = () => {
                         size={48}
                         radius="16px"
                         className={cn(
-                          "bg-white/5 border border-white/10",
+                          "border transition-transform hover:scale-110",
+                          isDark
+                            ? "bg-white/5 border-white/10"
+                            : "bg-gray-50 border-gray-100",
                           colorMap[spec.color as keyof typeof colorMap],
                         )}
                       >
@@ -312,10 +378,12 @@ const RequestDetailPage = () => {
                         </Text>
                         <Text
                           className={cn(
-                            "font-black tracking-tight",
+                            "font-black tracking-tight transition-colors",
                             spec.premium
                               ? "text-2xl text-emerald-400"
-                              : "text-white text-lg",
+                              : isDark
+                                ? "text-white text-lg"
+                                : "text-gray-900 text-lg",
                           )}
                         >
                           {spec.value}
@@ -325,7 +393,10 @@ const RequestDetailPage = () => {
                   ))}
                 </div>
 
-                <Divider my={40} color="white/5" />
+                <Divider
+                  my={40}
+                  className={isDark ? "border-white/5" : "border-gray-100"}
+                />
 
                 <div>
                   <Text className="text-gray-500 text-[10px] font-black uppercase tracking-[0.2em] mb-4">
@@ -334,9 +405,19 @@ const RequestDetailPage = () => {
                   <Paper
                     p={24}
                     radius="20px"
-                    className="bg-white/2 border border-white/5 relative"
+                    className={cn(
+                      "border relative",
+                      isDark
+                        ? "bg-white/[0.02] border-white/5"
+                        : "bg-gray-50/50 border-gray-100",
+                    )}
                   >
-                    <Text className="text-gray-300 font-medium italic leading-loose">
+                    <Text
+                      className={cn(
+                        "font-medium italic leading-loose",
+                        isDark ? "text-gray-300" : "text-gray-600",
+                      )}
+                    >
                       &quot;{request.notes}&quot;
                     </Text>
                   </Paper>
@@ -352,14 +433,29 @@ const RequestDetailPage = () => {
               <Paper
                 p={32}
                 radius="40px"
-                className="glass-dark border border-white/10 shadow-2xl overflow-hidden relative group"
+                className={cn(
+                  "border shadow-2xl overflow-hidden relative group",
+                  isDark
+                    ? "bg-white/5 border-white/10"
+                    : "bg-white border-gray-200",
+                )}
               >
-                <div className="absolute top-0 right-0 p-6 text-white/1 group-hover:text-white/3 transition-colors">
+                <div
+                  className={cn(
+                    "absolute top-0 right-0 p-6 transition-colors",
+                    isDark
+                      ? "text-white/[0.01] group-hover:text-white/[0.03]"
+                      : "text-gray-900/[0.01] group-hover:text-gray-900/[0.03]",
+                  )}
+                >
                   <IconUser size={100} />
                 </div>
                 <Title
                   order={4}
-                  className="text-white font-black text-sm uppercase tracking-widest mb-8"
+                  className={cn(
+                    "font-black text-sm uppercase tracking-widest mb-8",
+                    isDark ? "text-white" : "text-gray-900",
+                  )}
                 >
                   Asset: Requester
                 </Title>
@@ -375,7 +471,10 @@ const RequestDetailPage = () => {
                   <div>
                     <Text
                       fw={900}
-                      className="text-xl text-white tracking-tight"
+                      className={cn(
+                        "text-xl tracking-tight transition-colors",
+                        isDark ? "text-white" : "text-gray-900",
+                      )}
                     >
                       {request.user.name}
                     </Text>
@@ -388,16 +487,29 @@ const RequestDetailPage = () => {
                   </div>
                 </div>
 
-                <Stack gap="md" className="border-t border-white/5 pt-8">
+                <Stack
+                  gap="md"
+                  className={cn(
+                    "border-t pt-8",
+                    isDark ? "border-white/5" : "border-gray-100",
+                  )}
+                >
                   <div className="flex items-center gap-3">
                     <ThemeIcon
                       radius="md"
                       size="md"
-                      className="bg-white/5 text-gray-500"
+                      className={cn(
+                        "bg-transparent",
+                        isDark ? "text-gray-500" : "text-gray-400",
+                      )}
                     >
                       <IconPhone size={16} />
                     </ThemeIcon>
-                    <Text size="sm" fw={800} className="text-gray-300">
+                    <Text
+                      size="sm"
+                      fw={800}
+                      className={isDark ? "text-gray-300" : "text-gray-600"}
+                    >
                       {request.user.phone}
                     </Text>
                   </div>
@@ -405,11 +517,18 @@ const RequestDetailPage = () => {
                     <ThemeIcon
                       radius="md"
                       size="md"
-                      className="bg-white/5 text-gray-500"
+                      className={cn(
+                        "bg-transparent",
+                        isDark ? "text-gray-500" : "text-gray-400",
+                      )}
                     >
                       <IconMail size={16} />
                     </ThemeIcon>
-                    <Text size="sm" fw={800} className="text-gray-300">
+                    <Text
+                      size="sm"
+                      fw={800}
+                      className={isDark ? "text-gray-300" : "text-gray-600"}
+                    >
                       {request.user.email}
                     </Text>
                   </div>
@@ -426,14 +545,29 @@ const RequestDetailPage = () => {
               <Paper
                 p={32}
                 radius="40px"
-                className="glass-dark border border-white/10 shadow-2xl overflow-hidden relative group"
+                className={cn(
+                  "border shadow-2xl overflow-hidden relative group",
+                  isDark
+                    ? "bg-white/5 border-white/10"
+                    : "bg-white border-gray-200",
+                )}
               >
-                <div className="absolute top-0 right-0 p-6 text-white/1">
+                <div
+                  className={cn(
+                    "absolute top-0 right-0 p-6 transition-colors",
+                    isDark
+                      ? "text-white/[0.01] group-hover:text-white/[0.03]"
+                      : "text-gray-900/[0.01] group-hover:text-gray-900/[0.03]",
+                  )}
+                >
                   <IconTools size={100} />
                 </div>
                 <Title
                   order={4}
-                  className="text-white font-black text-sm uppercase tracking-widest mb-8"
+                  className={cn(
+                    "font-black text-sm uppercase tracking-widest mb-8",
+                    isDark ? "text-white" : "text-gray-900",
+                  )}
                 >
                   Asset: Deployer
                 </Title>
@@ -449,7 +583,10 @@ const RequestDetailPage = () => {
                   <div>
                     <Text
                       fw={900}
-                      className="text-xl text-white tracking-tight"
+                      className={cn(
+                        "text-xl tracking-tight transition-colors",
+                        isDark ? "text-white" : "text-gray-900",
+                      )}
                     >
                       {request.helper.name}
                     </Text>
@@ -469,7 +606,14 @@ const RequestDetailPage = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 mb-10 bg-white/5 p-4 rounded-2xl border border-white/5">
+                <div
+                  className={cn(
+                    "flex items-center gap-3 mb-10 p-4 rounded-2xl border transition-colors",
+                    isDark
+                      ? "bg-white/5 border-white/5"
+                      : "bg-gray-50 border-gray-100",
+                  )}
+                >
                   <ThemeIcon
                     radius="md"
                     size="md"
@@ -477,7 +621,11 @@ const RequestDetailPage = () => {
                   >
                     <IconPhone size={16} />
                   </ThemeIcon>
-                  <Text size="sm" fw={800} className="text-gray-300">
+                  <Text
+                    size="sm"
+                    fw={800}
+                    className={isDark ? "text-gray-300" : "text-gray-600"}
+                  >
                     {request.helper.phone}
                   </Text>
                 </div>

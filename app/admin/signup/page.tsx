@@ -29,6 +29,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { showSuccess, showError } from "@/lib/sweetalert";
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { useLanguage } from "@/app/context/LanguageContext";
 import { cn } from "@/lib/utils";
 import { AuthRuleError, signupWithEmail } from "@/lib/services/authService";
 
@@ -45,6 +47,8 @@ const AdminSignup = () => {
   const [isClient] = useState(true);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { isDark } = useAppTheme();
+  const { dict } = useLanguage();
 
   const form = useForm<AdminSignupValues>({
     initialValues: {
@@ -69,7 +73,12 @@ const AdminSignup = () => {
   });
 
   return (
-    <div className="min-h-screen flex bg-[#0a0a0a] font-satoshi text-white overflow-hidden relative">
+    <div
+      className={cn(
+        "min-h-screen flex font-satoshi transition-colors overflow-hidden relative",
+        isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
+      )}
+    >
       {/* --- PREMIUM BACKGROUND ELEMENTS --- */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         {isClient &&
@@ -113,7 +122,12 @@ const AdminSignup = () => {
       />
 
       {/* --- LEFT SIDE: THEMATIC --- */}
-      <div className="hidden lg:flex w-1/2 relative flex-col items-center justify-center p-20 overflow-hidden bg-[#0A0A0A] border-r border-white/5">
+      <div
+        className={cn(
+          "hidden lg:flex w-1/2 relative flex-col items-center justify-center p-20 overflow-hidden border-r transition-colors",
+          isDark ? "bg-[#0A0A0A] border-white/5" : "bg-white border-gray-200",
+        )}
+      >
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
@@ -126,14 +140,26 @@ const AdminSignup = () => {
               y: [0, -10, 0],
             }}
             transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-            className="inline-block p-8 rounded-[40px] glass-dark border-2 border-brand-red/20 shadow-2xl mb-12"
+            className={cn(
+              "inline-block p-8 rounded-[40px] border-2 shadow-2xl mb-12 backdrop-blur-3xl",
+              isDark
+                ? "bg-white/5 border-brand-red/20"
+                : "bg-white border-brand-red/10",
+            )}
           >
             <IconShieldLock
               size={80}
               className="text-brand-red animate-pulse"
             />
           </motion.div>
-          <Title className="text-6xl font-black font-manrope tracking-tighter mb-6 bg-gradient-to-br from-white to-gray-500 bg-clip-text text-transparent">
+          <Title
+            className={cn(
+              "text-6xl font-black font-manrope tracking-tighter mb-6 transition-colors",
+              isDark
+                ? "bg-gradient-to-br from-white to-gray-500 bg-clip-text text-transparent"
+                : "text-gray-900",
+            )}
+          >
             SECURE ACCESS
             <br />
             CONTROL
@@ -153,9 +179,14 @@ const AdminSignup = () => {
         <Link href="/" className="absolute top-8 right-8 group">
           <motion.div
             whileHover={{ x: 5 }}
-            className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-white transition-all"
+            className={cn(
+              "flex items-center gap-2 text-sm font-bold transition-all",
+              isDark
+                ? "text-gray-500 hover:text-white"
+                : "text-gray-400 hover:text-gray-900",
+            )}
           >
-            <span>Back to Portal</span>
+            <span>{dict.common.home || "Back to Portal"}</span>
             <IconArrowRight
               size={16}
               className="group-hover:translate-x-1 transition-transform"
@@ -218,8 +249,12 @@ const AdminSignup = () => {
                 classNames={{
                   label:
                     "text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2",
-                  input:
-                    "bg-white/5 border-2 border-white/5 text-white focus:border-brand-red h-14 rounded-2xl transition-all",
+                  input: cn(
+                    "border-2 h-14 rounded-2xl transition-all font-bold",
+                    isDark
+                      ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                      : "bg-gray-50 border-gray-100 text-gray-900 focus:border-brand-red",
+                  ),
                 }}
               />
               <TextInput
@@ -230,8 +265,12 @@ const AdminSignup = () => {
                 classNames={{
                   label:
                     "text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2",
-                  input:
-                    "bg-white/5 border-2 border-white/5 text-white focus:border-brand-red h-14 rounded-2xl transition-all",
+                  input: cn(
+                    "border-2 h-14 rounded-2xl transition-all font-bold",
+                    isDark
+                      ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                      : "bg-gray-50 border-gray-100 text-gray-900 focus:border-brand-red",
+                  ),
                 }}
               />
             </SimpleGrid>
@@ -244,8 +283,12 @@ const AdminSignup = () => {
               classNames={{
                 label:
                   "text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2",
-                input:
-                  "bg-white/5 border-2 border-white/5 text-white focus:border-brand-red h-14 rounded-2xl transition-all",
+                input: cn(
+                  "border-2 h-14 rounded-2xl transition-all font-bold",
+                  isDark
+                    ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                    : "bg-gray-50 border-gray-100 text-gray-900 focus:border-brand-red",
+                ),
               }}
             />
 
@@ -258,8 +301,12 @@ const AdminSignup = () => {
                 classNames={{
                   label:
                     "text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2",
-                  input:
-                    "bg-white/5 border-2 border-white/5 text-white focus:border-brand-red h-14 rounded-2xl transition-all",
+                  input: cn(
+                    "border-2 h-14 rounded-2xl transition-all font-bold",
+                    isDark
+                      ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                      : "bg-gray-50 border-gray-100 text-gray-900 focus:border-brand-red",
+                  ),
                   innerInput: "h-14",
                 }}
               />
@@ -271,8 +318,12 @@ const AdminSignup = () => {
                 classNames={{
                   label:
                     "text-gray-400 text-[10px] font-black uppercase tracking-widest mb-2",
-                  input:
-                    "bg-white/5 border-2 border-white/5 text-white focus:border-brand-red h-14 rounded-2xl transition-all",
+                  input: cn(
+                    "border-2 h-14 rounded-2xl transition-all font-bold",
+                    isDark
+                      ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                      : "bg-gray-50 border-gray-100 text-gray-900 focus:border-brand-red",
+                  ),
                   innerInput: "h-14",
                 }}
               />
@@ -292,8 +343,12 @@ const AdminSignup = () => {
               classNames={{
                 label:
                   "text-brand-red text-[10px] font-black uppercase tracking-widest mb-2",
-                input:
-                  "bg-brand-red/5 border-2 border-brand-red/20 text-white focus:border-brand-red h-16 rounded-2xl transition-all shadow-inner group-hover:bg-brand-red/10",
+                input: cn(
+                  "border-2 h-16 rounded-2xl transition-all shadow-inner font-bold",
+                  isDark
+                    ? "bg-brand-red/5 border-brand-red/20 text-white focus:border-brand-red hover:bg-brand-red/10"
+                    : "bg-brand-red/5 border-brand-red/20 text-gray-900 focus:border-brand-red hover:bg-brand-red/10",
+                ),
               }}
             />
 
@@ -312,20 +367,35 @@ const AdminSignup = () => {
           <Paper
             p="xl"
             radius="24px"
-            className="mt-10 bg-white/5 border border-white/5 flex items-center justify-between"
+            className={cn(
+              "mt-10 border flex items-center justify-between transition-colors",
+              isDark ? "bg-white/5 border-white/5" : "bg-white border-gray-100",
+            )}
           >
             <div>
               <Text className="text-gray-500 text-xs font-bold uppercase tracking-wider mb-0.5">
                 Existing Operator?
               </Text>
-              <Text className="text-white font-bold">Access Terminal Now</Text>
+              <Text
+                className={cn(
+                  "font-bold",
+                  isDark ? "text-white" : "text-gray-900",
+                )}
+              >
+                Access Terminal Now
+              </Text>
             </div>
             <Button
               variant="outline"
               color="gray"
               component={Link}
               href="/admin/login"
-              className="border-white/10 text-white hover:bg-white/5 rounded-xl font-bold"
+              className={cn(
+                "rounded-xl font-bold transition-all",
+                isDark
+                  ? "border-white/10 text-white hover:bg-white/5"
+                  : "border-gray-200 text-gray-600 hover:bg-gray-50",
+              )}
             >
               Sign In
             </Button>

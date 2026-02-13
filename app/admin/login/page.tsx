@@ -9,13 +9,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { motion } from "framer-motion";
 import { showSuccess, showError } from "@/lib/sweetalert";
-import {
-  AuthRuleError,
-  loginWithEmail,
-} from "@/lib/services/authService";
+import { AuthRuleError, loginWithEmail } from "@/lib/services/authService";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useAppTheme } from "@/app/context/ThemeContext";
+import { useLanguage } from "@/app/context/LanguageContext";
+import { cn } from "@/lib/utils";
 
 import {
   Mail,
@@ -37,6 +37,8 @@ export default function AdminLoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const { isDark } = useAppTheme();
+  const { dict } = useLanguage();
 
   const {
     register,
@@ -64,17 +66,19 @@ export default function AdminLoginPage() {
           : error instanceof Error
             ? error.message
             : "Invalid credentials or unauthorized access.";
-      await showError(
-        "Access Denied",
-        msg
-      );
+      await showError("Access Denied", msg);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex bg-[#0a0a0a] font-satoshi text-white overflow-hidden relative">
+    <div
+      className={cn(
+        "min-h-screen flex font-satoshi transition-colors overflow-hidden relative",
+        isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
+      )}
+    >
       {/* Background Decor */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -100,7 +104,10 @@ export default function AdminLoginPage() {
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1 }}
-        className="hidden lg:flex w-1/2 relative flex-col justify-between p-16 z-10 border-r border-white/5 bg-black"
+        className={cn(
+          "hidden lg:flex w-1/2 relative flex-col justify-between p-16 z-10 border-r transition-colors",
+          isDark ? "border-white/5 bg-black" : "border-gray-200 bg-white",
+        )}
       >
         <div className="absolute inset-0 z-0">
           <Image
@@ -108,10 +115,18 @@ export default function AdminLoginPage() {
             alt="Admin Background"
             fill
             sizes="50vw"
-            className="object-cover opacity-20 grayscale"
+            className={cn(
+              "object-cover grayscale",
+              isDark ? "opacity-20" : "opacity-10",
+            )}
             priority
           />
-          <div className="absolute inset-0 bg-gradient-to-l from-black via-black/80 to-transparent" />
+          <div
+            className={cn(
+              "absolute inset-0 bg-gradient-to-l to-transparent",
+              isDark ? "from-black via-black/80" : "from-white via-white/80",
+            )}
+          />
         </div>
 
         <div className="relative z-10">
@@ -142,7 +157,12 @@ export default function AdminLoginPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            <h1 className="text-7xl font-black leading-[1.1] mb-8 tracking-tighter">
+            <h1
+              className={cn(
+                "text-7xl font-black leading-[1.1] mb-8 tracking-tighter",
+                isDark ? "text-white" : "text-gray-900",
+              )}
+            >
               Central <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
                 Command
@@ -158,10 +178,22 @@ export default function AdminLoginPage() {
         </div>
 
         <div className="relative z-10 flex gap-6">
-          <div className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl">
+          <div
+            className={cn(
+              "flex items-center gap-4 px-6 py-4 rounded-2xl border backdrop-blur-xl",
+              isDark
+                ? "bg-white/5 border-white/10"
+                : "bg-gray-50 border-gray-100",
+            )}
+          >
             <Shield className="text-brand-red" size={24} />
             <div>
-              <p className="text-white font-black text-xl leading-none mb-1">
+              <p
+                className={cn(
+                  "font-black text-xl leading-none mb-1",
+                  isDark ? "text-white" : "text-gray-900",
+                )}
+              >
                 SECURED
               </p>
               <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
@@ -169,10 +201,22 @@ export default function AdminLoginPage() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-4 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-xl">
+          <div
+            className={cn(
+              "flex items-center gap-4 px-6 py-4 rounded-2xl border backdrop-blur-xl",
+              isDark
+                ? "bg-white/5 border-white/10"
+                : "bg-gray-50 border-gray-100",
+            )}
+          >
             <Activity className="text-orange-500" size={24} />
             <div>
-              <p className="text-white font-black text-xl leading-none mb-1">
+              <p
+                className={cn(
+                  "font-black text-xl leading-none mb-1",
+                  isDark ? "text-white" : "text-gray-900",
+                )}
+              >
                 SYSTEMS
               </p>
               <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">
@@ -188,9 +232,14 @@ export default function AdminLoginPage() {
         <Link href="/" className="absolute top-8 right-8 group">
           <motion.div
             whileHover={{ x: 5 }}
-            className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-white transition-all"
+            className={cn(
+              "flex items-center gap-2 text-sm font-bold transition-all",
+              isDark
+                ? "text-gray-500 hover:text-white"
+                : "text-gray-400 hover:text-gray-900",
+            )}
           >
-            <span>Back to Portal</span>
+            <span>{dict.common.home || "Back to Portal"}</span>
             <ArrowRight
               size={16}
               className="group-hover:translate-x-1 transition-transform"
@@ -215,8 +264,13 @@ export default function AdminLoginPage() {
             >
               <Shield size={52} className="text-brand-red" />
             </motion.div>
-            <h2 className="text-4xl font-black mb-3 text-white tracking-tight">
-              Admin Authentication
+            <h2
+              className={cn(
+                "text-4xl font-black mb-3 text-white tracking-tight",
+                isDark ? "text-white" : "text-gray-900",
+              )}
+            >
+              {dict.auth.login || "Admin Authentication"}
             </h2>
             <p className="text-gray-500 font-medium">
               Verify your administrative credentials to enter the HQ
@@ -233,7 +287,12 @@ export default function AdminLoginPage() {
                 <Input
                   {...register("email")}
                   placeholder="name@protocol.com"
-                  className="pl-14 h-16 bg-white/[0.03] border-2 border-white/5 focus:border-brand-red text-white rounded-2xl transition-all font-medium"
+                  className={cn(
+                    "pl-14 h-16 border-2 focus:border-brand-red rounded-2xl transition-all font-medium",
+                    isDark
+                      ? "bg-white/[0.03] border-white/5 text-white"
+                      : "bg-gray-50 border-gray-100 text-gray-900",
+                  )}
                 />
               </div>
               {errors.email && (
@@ -250,7 +309,12 @@ export default function AdminLoginPage() {
                   {...register("password")}
                   type={showPassword ? "text" : "password"}
                   placeholder="••••••••"
-                  className="pl-14 pr-14 h-16 bg-white/[0.03] border-2 border-white/5 focus:border-brand-red text-white rounded-2xl transition-all font-medium"
+                  className={cn(
+                    "pl-14 pr-14 h-16 border-2 focus:border-brand-red rounded-2xl transition-all font-medium",
+                    isDark
+                      ? "bg-white/[0.03] border-white/5 text-white"
+                      : "bg-gray-50 border-gray-100 text-gray-900",
+                  )}
                 />
                 <button
                   type="button"
