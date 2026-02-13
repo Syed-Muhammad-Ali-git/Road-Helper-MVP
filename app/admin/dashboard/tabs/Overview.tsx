@@ -369,7 +369,14 @@ const OverviewTab = () => {
                     <ThemeIcon
                       size="sm"
                       radius="md"
-                      className={cn("bg-white/5", `text-${item.color}-400`)}
+                      className={cn(
+                        "bg-white/5",
+                        item.color === "emerald"
+                          ? "text-emerald-400"
+                          : item.color === "blue"
+                            ? "text-blue-400"
+                            : "text-amber-400",
+                      )}
                     >
                       <item.icon size={14} />
                     </ThemeIcon>

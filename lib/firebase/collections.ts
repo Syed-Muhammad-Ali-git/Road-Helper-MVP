@@ -15,4 +15,5 @@ export const COLLECTIONS = {
   PLANS: "plans",
   PAYMENTS: "payments",
   NOTIFICATIONS: "notifications",
+  SETTINGS: "settings",
 } as const;

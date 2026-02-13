@@ -57,6 +57,14 @@ const RequestDetailPage = () => {
   const id = params.id as string;
   const [request, setRequest] = useState<any | null>(null);
 
+  // Production-safe Tailwind color mapping
+  const colorMap = {
+    red: "text-red-400",
+    blue: "text-blue-400",
+    emerald: "text-emerald-400",
+    amber: "text-amber-400",
+  };
+
   useEffect(() => {
     if (!id) return;
     const unsub = subscribeRideRequest(id, (req) => setRequest(req));
@@ -293,7 +301,7 @@ const RequestDetailPage = () => {
                         radius="16px"
                         className={cn(
                           "bg-white/5 border border-white/10",
-                          `text-${spec.color}-400`,
+                          colorMap[spec.color as keyof typeof colorMap],
                         )}
                       >
                         <spec.icon size={22} />
@@ -360,7 +368,7 @@ const RequestDetailPage = () => {
                   <Avatar
                     size={72}
                     radius="24px"
-                    className="bg-liner-to-br from-brand-red to-brand-dark-red border-2 border-white/10 font-black shadow-xl"
+                    className="bg-gradient-to-br from-brand-red to-brand-dark-red border-2 border-white/10 font-black shadow-xl"
                   >
                     {request.user.name[0]}
                   </Avatar>

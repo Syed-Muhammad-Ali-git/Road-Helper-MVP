@@ -49,6 +49,9 @@ import {
 } from "@/lib/services/adminService";
 import { useLanguage } from "@/app/context/LanguageContext";
 
+import { auth } from "@/lib/firebase/config";
+import { getUserByUid } from "@/lib/services/userService";
+
 const mapBg = "/assets/images/backgrounds/map-bg.svg";
 
 const generateDefaultRevenueData = () => [
@@ -215,6 +218,23 @@ const AdminDashboard = () => {
     [totalCommission, paidCommission],
   );
 
+  // Production-safe Tailwind color mapping
+  const textColorMap = {
+    emerald: "text-emerald-500",
+    amber: "text-amber-500",
+    sky: "text-sky-500",
+    blue: "text-blue-500",
+    green: "text-emerald-500",
+    violet: "text-violet-500",
+    red: "text-brand-red",
+  };
+
+  const bgColorMap = {
+    emerald: "bg-emerald-500",
+    blue: "bg-blue-500",
+    amber: "bg-amber-500",
+  };
+
   const handleDownloadReport = useCallback(() => {
     const csvContent =
       "data:text/csv;charset=utf-8," +
@@ -232,7 +252,7 @@ const AdminDashboard = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  }, []);
+  }, [recentRequests]);
 
   // No changes needed here as they are moved out
 
@@ -501,14 +521,22 @@ const AdminDashboard = () => {
                     />
                     <RechartsTooltip
                       contentStyle={{
-                        backgroundColor: "#0f0f0f",
-                        borderRadius: 20,
-                        border: "1px solid #ffffff10",
-                        color: "white",
-                        padding: 15,
-                        boxShadow: "0 20px 50px rgba(0,0,0,0.5)",
+                        backgroundColor: isDark ? "#0f0f0f" : "#fff",
+                        borderRadius: 16,
+                        border: isDark
+                          ? "1px solid rgba(255,255,255,0.1)"
+                          : "1px solid rgba(0,0,0,0.1)",
+                        color: isDark ? "#fff" : "#000",
+                        padding: 12,
+                        boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
                       }}
-                      cursor={{ stroke: "#ffffff10", strokeWidth: 1 }}
+                      itemStyle={{ fontWeight: 700 }}
+                      cursor={{
+                        stroke: isDark
+                          ? "rgba(255,255,255,0.1)"
+                          : "rgba(0,0,0,0.1)",
+                        strokeWidth: 1,
+                      }}
                     />
                     <Area
                       type="monotone"
@@ -567,7 +595,10 @@ const AdminDashboard = () => {
                       <ThemeIcon
                         size="sm"
                         radius="md"
-                        className={cn("bg-white/5", `text-${item.color}-400`)}
+                        className={cn(
+                          "bg-white/5",
+                          textColorMap[item.color as keyof typeof textColorMap],
+                        )}
                       >
                         <item.icon size={14} />
                       </ThemeIcon>
