@@ -14,6 +14,7 @@ import {
   Box,
   Avatar,
   ActionIcon,
+  Stack,
 } from "@mantine/core";
 import {
   IconUsers,
@@ -41,7 +42,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useAppTheme } from "@/app/context/ThemeContext";
-import { getAdminStats, subscribeToAdminRequests, getRevenueData } from "@/lib/services/adminService";
+import {
+  getAdminStats,
+  subscribeToAdminRequests,
+  getRevenueData,
+} from "@/lib/services/adminService";
 import { useLanguage } from "@/app/context/LanguageContext";
 
 const mapBg = "/assets/images/backgrounds/map-bg.svg";
@@ -54,7 +59,8 @@ const generateDefaultRevenueData = () => [
   { day: "Fri", total: 4600, platform: 920 },
   { day: "Sat", total: 3800, platform: 760 },
   { day: "Sun", total: 3000, platform: 600 },
-]; const containerVariants: Variants = {
+];
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -80,9 +86,21 @@ const AdminDashboard = () => {
   const [recentRequests, setRecentRequests] = useState<any[]>([]);
   const [adminStats, setAdminStats] = useState<any>(null);
 
+  const [profile, setProfile] = useState<any>(null);
+
   // Load Firebase data
   useEffect(() => {
     let mounted = true;
+
+    // Load current user profile
+    const loadProfile = async () => {
+      const user = auth.currentUser;
+      if (user && mounted) {
+        const p = await getUserByUid(user.uid);
+        if (mounted) setProfile(p);
+      }
+    };
+    loadProfile();
 
     // Load stats
     const loadStats = async () => {
@@ -178,7 +196,11 @@ const AdminDashboard = () => {
   );
 
   const totalCommission = useMemo(
-    () => recentRequests.reduce((sum: number, r: any) => sum + (r.amount || 0) * 0.2, 0),
+    () =>
+      recentRequests.reduce(
+        (sum: number, r: any) => sum + (r.amount || 0) * 0.2,
+        0,
+      ),
     [recentRequests],
   );
   const paidCommission = useMemo(
@@ -284,11 +306,16 @@ const AdminDashboard = () => {
             </motion.div>
             <Title
               order={1}
-              className="font-manrope font-extrabold text-4xl md:text-5xl text-white tracking-tight"
+              className={cn(
+                "font-manrope font-extrabold text-4xl md:text-5xl tracking-tight transition-colors",
+                isDark ? "text-white" : "text-gray-900",
+              )}
             >
-              Platform{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-gray-500">
-                Overview
+              {profile
+                ? `Welcome, ${profile.displayName.split(" ")[0]}`
+                : "Platform"}{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
+                Dashboard
               </span>
             </Title>
             <Text className="text-gray-400 mt-2 font-medium">
@@ -298,7 +325,12 @@ const AdminDashboard = () => {
           <motion.div variants={itemVariants}>
             <Button
               variant="default"
-              className="bg-white/5 text-white border-white/10 hover:bg-white/10 h-14 rounded-2xl px-8 transition-all font-bold shadow-2xl group"
+              className={cn(
+                "h-14 rounded-2xl px-8 transition-all font-bold shadow-2xl group border-2",
+                isDark
+                  ? "bg-white/5 text-white border-white/10 hover:bg-white/10"
+                  : "bg-white text-gray-900 border-gray-200 hover:bg-gray-50",
+              )}
               leftSection={
                 <IconDownload
                   size={20}
@@ -317,9 +349,14 @@ const AdminDashboard = () => {
           {stats.map((stat) => (
             <motion.div key={stat.title} variants={itemVariants}>
               <Paper
-                p={30}
-                radius="32px"
-                className="glass-dark border border-white/5 relative overflow-hidden group hover:border-white/20 transition-all duration-500 h-full shadow-xl"
+                p={24}
+                radius="24px"
+                className={cn(
+                  "border relative overflow-hidden group hover:-translate-y-1 transition-all duration-300 h-full shadow-xl",
+                  isDark
+                    ? "glass-dark border-white/5 shadow-white/5"
+                    : "bg-white border-gray-200 shadow-gray-200/50",
+                )}
               >
                 <div
                   className={cn(
@@ -331,18 +368,21 @@ const AdminDashboard = () => {
                 <Group justify="space-between" mb={24}>
                   <div
                     className={cn(
-                      "h-12 w-12 rounded-2xl flex items-center justify-center border border-white/5 bg-white/5 shadow-inner transition-transform group-hover:scale-110",
+                      "h-12 w-12 rounded-2xl flex items-center justify-center border transition-transform group-hover:scale-110",
+                      isDark
+                        ? "bg-white/5 border-white/5 shadow-inner"
+                        : "bg-gray-50 border-gray-200",
                     )}
                   >
                     <stat.icon
                       size={24}
                       className={cn(
                         stat.color === "blue"
-                          ? "text-blue-400"
+                          ? "text-blue-500"
                           : stat.color === "green"
-                            ? "text-emerald-400"
+                            ? "text-emerald-500"
                             : stat.color === "violet"
-                              ? "text-violet-400"
+                              ? "text-violet-500"
                               : "text-brand-red",
                       )}
                     />
@@ -361,7 +401,10 @@ const AdminDashboard = () => {
                 </Text>
                 <Title
                   order={2}
-                  className="text-white text-4xl font-black mb-3"
+                  className={cn(
+                    "text-3xl font-black mb-2 transition-colors",
+                    isDark ? "text-white" : "text-gray-900",
+                  )}
                 >
                   {stat.value}
                 </Title>
@@ -380,7 +423,7 @@ const AdminDashboard = () => {
         </SimpleGrid>
 
         {/* Charts & Map Grid */}
-        <SimpleGrid cols={{ base: 1, lg: 3 }} spacing={24} mb={40}>
+        <SimpleGrid cols={{ base: 1, lg: 3 }}>
           {/* Revenue Chart */}
           <motion.div variants={itemVariants} className="lg:col-span-2">
             <Paper
@@ -544,61 +587,85 @@ const AdminDashboard = () => {
           {/* Map Snapshot */}
           <motion.div variants={itemVariants}>
             <Paper
+              p={32}
               radius="32px"
-              className="glass-dark border border-white/5 h-full relative overflow-hidden flex flex-col shadow-2xl"
+              className={cn(
+                "border h-full relative overflow-hidden flex flex-col shadow-2xl",
+                isDark
+                  ? "glass-dark border-white/5"
+                  : "bg-white border-gray-200",
+              )}
             >
-              <div className="p-8 relative z-10 bg-gradient-to-b from-[#0a0a0a] to-transparent">
-                <Group justify="space-between">
-                  <Box>
-                    <Title
-                      order={3}
-                      className="font-manrope text-2xl font-black text-white tracking-tight"
-                    >
-                      Heat Map
-                    </Title>
-                    <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">
-                      Global Traffic Density
-                    </Text>
-                  </Box>
-                </Group>
+              <div className="mb-8">
+                <Title
+                  order={3}
+                  className={cn(
+                    "font-manrope text-2xl font-black tracking-tight",
+                    isDark ? "text-white" : "text-gray-900",
+                  )}
+                >
+                  Platform Health
+                </Title>
+                <Text className="text-gray-500 font-bold text-xs uppercase tracking-widest mt-1">
+                  System Reliability Index
+                </Text>
               </div>
 
-              <Box className="flex-1 relative bg-[#0f0f0f]">
-                <div className="absolute inset-0 opacity-10 grayscale brightness-150">
-                  <Image src={mapBg} alt="Map" fill className="object-cover" />
-                </div>
-
-                {/* Visual Markers */}
-                <div className="absolute top-[40%] left-[30%] h-4 w-4 rounded-full bg-emerald-500 shadow-[0_0_20px_#10b981] animate-ping" />
-                <div className="absolute top-[60%] left-[50%] h-3 w-3 rounded-full bg-brand-red shadow-[0_0_15px_#ef4444] animate-pulse" />
-                <div className="absolute top-[30%] left-[70%] h-5 w-5 rounded-full bg-amber-400 shadow-[0_0_25px_#fbbf24] animate-bounce" />
-
-                <div className="absolute bottom-10 left-8 right-8 space-y-4">
-                  <div className="p-6 glass-dark border border-white/20 rounded-[28px] backdrop-blur-2xl">
-                    <div className="flex items-center gap-4 mb-4">
-                      <div className="h-10 w-10 rounded-xl bg-white/5 flex items-center justify-center text-white border border-white/10">
-                        <IconActivity size={20} />
-                      </div>
-                      <div>
-                        <Text className="text-white font-black text-sm uppercase">
-                          Active Traffic
-                        </Text>
-                        <Text className="text-green-400 font-black text-xs">
-                          STABLE LOAD
-                        </Text>
-                      </div>
-                    </div>
-                    <Button
-                      fullWidth
-                      radius="xl"
-                      className="bg-brand-red hover:bg-brand-dark-red text-white font-black h-12 shadow-xl shadow-brand-red/20"
-                      rightSection={<IconArrowRight size={18} />}
+              <Stack gap="xl">
+                {[
+                  { label: "Active Jobs Density", val: 85, color: "blue" },
+                  { label: "Helper Availability", val: 42, color: "emerald" },
+                  { label: "Avg Service Time", val: 28, color: "amber" },
+                ].map((item, i) => (
+                  <div key={i}>
+                    <Group justify="space-between" mb={8}>
+                      <Text
+                        size="sm"
+                        fw={700}
+                        className={isDark ? "text-gray-300" : "text-gray-700"}
+                      >
+                        {item.label}
+                      </Text>
+                      <Text size="sm" fw={900} color={item.color}>
+                        {item.val}%
+                      </Text>
+                    </Group>
+                    <div
+                      className={cn(
+                        "h-3 w-full rounded-full overflow-hidden",
+                        isDark ? "bg-white/5" : "bg-gray-100",
+                      )}
                     >
-                      Live Tracking
-                    </Button>
+                      <motion.div
+                        initial={{ width: 0 }}
+                        animate={{ width: `${item.val}%` }}
+                        className={cn(
+                          "h-full rounded-full transition-all duration-1000",
+                          item.color === "blue"
+                            ? "bg-blue-500 shadow-[0_0_10px_#3b82f6]"
+                            : item.color === "emerald"
+                              ? "bg-emerald-500 shadow-[0_0_10px_#10b981]"
+                              : "bg-amber-500 shadow-[0_0_10px_#f59e0b]",
+                        )}
+                      />
+                    </div>
                   </div>
-                </div>
-              </Box>
+                ))}
+
+                <Button
+                  fullWidth
+                  radius="xl"
+                  size="lg"
+                  variant="gradient"
+                  gradient={{ from: "brand-red", to: "orange", deg: 90 }}
+                  className="mt-8 font-black shadow-xl"
+                  rightSection={<IconArrowRight size={18} />}
+                  component={Link}
+                  href="/admin/status"
+                >
+                  Detailed Diagnostics
+                </Button>
+              </Stack>
             </Paper>
           </motion.div>
         </SimpleGrid>
@@ -606,9 +673,12 @@ const AdminDashboard = () => {
         {/* Requests Table */}
         <motion.div variants={itemVariants}>
           <Paper
-            p={40}
+            p={32}
             radius="32px"
-            className="glass-dark border border-white/5 shadow-2xl relative overflow-hidden"
+            className={cn(
+              "border shadow-2xl relative overflow-hidden",
+              isDark ? "glass-dark border-white/5" : "bg-white border-gray-200",
+            )}
           >
             <div className="absolute top-0 left-0 p-10 text-white/[0.01]">
               <IconSparkles size={240} />
@@ -618,7 +688,10 @@ const AdminDashboard = () => {
               <div>
                 <Title
                   order={3}
-                  className="font-manrope text-3xl font-black text-white tracking-tight"
+                  className={cn(
+                    "font-manrope text-3xl font-black tracking-tight",
+                    isDark ? "text-white" : "text-gray-900",
+                  )}
                 >
                   Recent Operations
                 </Title>
@@ -642,7 +715,10 @@ const AdminDashboard = () => {
               <Table
                 verticalSpacing="lg"
                 horizontalSpacing="xl"
-                className="text-white min-w-[1000px]"
+                className={cn(
+                  "min-w-[1000px]",
+                  isDark ? "text-white" : "text-gray-900",
+                )}
               >
                 <Table.Thead className="bg-white/5 border-none">
                   <Table.Tr>
@@ -682,7 +758,13 @@ const AdminDashboard = () => {
                           >
                             {req.user[0]}
                           </Avatar>
-                          <Text fw={700} className="text-sm whitespace-nowrap">
+                          <Text
+                            fw={700}
+                            className={cn(
+                              "text-sm whitespace-nowrap",
+                              isDark ? "text-white" : "text-gray-900",
+                            )}
+                          >
                             {req.user}
                           </Text>
                         </Group>

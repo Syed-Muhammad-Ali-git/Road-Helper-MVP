@@ -26,6 +26,7 @@ import {
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { auth } from "@/lib/firebase/config";
+import { useRouter } from "next/navigation";
 import {
   subscribeHelperActiveJobs,
   updateRideStatus,
@@ -42,6 +43,7 @@ export default function ActiveJobUI() {
   const [updating, setUpdating] = useState(false);
   const [uid, setUid] = useState<string | null>(null);
   const { dict, isRTL } = useLanguage();
+  const router = useRouter();
 
   useEffect(() => {
     const unsub = auth.onAuthStateChanged((u) => setUid(u?.uid ?? null));
@@ -68,6 +70,9 @@ export default function ActiveJobUI() {
         status: status as "in_progress" | "completed",
       });
       toast.success(`Status updated to ${status.replace("_", " ")}`);
+      if (status === "in_progress") {
+        router.push(`/journey/${activeJob.id}`);
+      }
     } catch (e: unknown) {
       await showError(
         "Update failed",

@@ -238,7 +238,7 @@ const LandingNavbar = () => {
         opened={opened}
         onClose={() => setOpened(false)}
         size="100%"
-        withCloseButton={false}
+        withCloseButton={true}
         padding="xl"
         className={isDark ? "bg-black text-white" : "bg-white"}
       >

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { memo } from "react";
+import React, { memo, useEffect, useState } from "react";
 import {
   Title,
   Text,
@@ -13,18 +13,17 @@ import {
   Timeline,
 } from "@mantine/core";
 import {
-  IconServer,
   IconDatabase,
-  IconWifi,
-  IconCpu,
   IconActivity,
   IconShieldLock,
-  IconCloudComputing,
   IconBolt,
+  IconUsers,
+  IconTruck,
 } from "@tabler/icons-react";
 import { motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { getAdminStats } from "@/lib/services/adminService";
 
 const containerVariants: Variants = {
   hidden: { opacity: 0 },
@@ -40,44 +39,58 @@ const itemVariants: Variants = {
   },
 };
 
-const systemMetrics = [
-  {
-    title: "Distributed Core",
-    sub: "Load Balanced",
-    val: 98,
-    color: "emerald",
-    icon: IconServer,
-    details: ["Uptime: 14d 21h", "Latency: 24ms"],
-  },
-  {
-    title: "Real-time DB",
-    sub: "Clusters Active",
-    val: 45,
-    color: "blue",
-    icon: IconDatabase,
-    details: ["Conn: 1,204/5k", "Cache: Hit 99.2%"],
-  },
-  {
-    title: "Neural Processing",
-    sub: "Priority Queue",
-    val: 65,
-    color: "amber",
-    icon: IconCpu,
-    details: ["Thread: 4/12", "Cycles: 4.2GHz"],
-  },
-  {
-    title: "Neural Network",
-    sub: "Encrypted Fiber",
-    val: 25,
-    color: "violet",
-    icon: IconWifi,
-    details: ["BW: 1.2 GB/s", "Packet Loss: 0%"],
-  },
-];
-
 const StatusPage = () => {
+  const [stats, setStats] = useState<any>(null);
+
+  useEffect(() => {
+    (async () => {
+      const s = await getAdminStats();
+      setStats(s);
+    })();
+  }, []);
+
+  const systemMetrics = [
+    {
+      title: "Fleet Connectivity",
+      sub: "Active Helpers",
+      val: stats
+        ? Math.min(
+            100,
+            Math.round((stats.activeHelpers / (stats.totalUsers || 1)) * 100),
+          )
+        : 0,
+      color: "emerald",
+      icon: IconTruck,
+      details: [`Online: ${stats?.activeHelpers || 0}`, "Ping: 45ms"],
+    },
+    {
+      title: "Data Pipeline",
+      sub: "Firestore Sync",
+      val: 99,
+      color: "blue",
+      icon: IconDatabase,
+      details: ["Sync: Live", "Errors: 0"],
+    },
+    {
+      title: "Auth Gateway",
+      sub: "Identity Service",
+      val: 100,
+      color: "violet",
+      icon: IconShieldLock,
+      details: ["Status: Nominal", "Method: Firebase"],
+    },
+    {
+      title: "Service Traffic",
+      sub: "Request Load",
+      val: stats ? Math.min(100, stats.pendingRequests * 10) : 0,
+      color: "amber",
+      icon: IconActivity,
+      details: [`Pending: ${stats?.pendingRequests || 0}`, "Load: Optimal"],
+    },
+  ];
+
   return (
-    <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white">
+    <Box className="relative min-h-screen bg-[#0a0a0a] overflow-hidden p-4 md:p-8 font-satoshi text-white pt-24">
       {/* Dynamic Grid Background */}
       <div className="absolute inset-0 pointer-events-none opacity-20">
         <div
@@ -108,20 +121,21 @@ const StatusPage = () => {
           >
             <IconActivity size={16} className="text-brand-red" />
             <Text className="text-brand-red font-black uppercase tracking-[0.3em] text-[10px]">
-              Bios-Level Monitoring
+              Infrastructure Health
             </Text>
           </motion.div>
           <Title
             order={1}
             className="font-manrope font-black text-4xl md:text-5xl text-white tracking-tight"
           >
-            System{" "}
+            Network{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
-              Integrity
+              Status
             </span>
           </Title>
           <Text className="text-gray-500 mt-2 font-bold uppercase tracking-tight text-xs">
-            Real-time telemetry from core infrastructure components.
+            Operational tracking of core platform components and community
+            activity.
           </Text>
         </header>
 
@@ -136,7 +150,13 @@ const StatusPage = () => {
                 <div
                   className={cn(
                     "absolute inset-0 bg-gradient-to-br opacity-[0.02] group-hover:opacity-[0.08] transition-opacity",
-                    `from-${metric.color}-600/20 to-transparent`,
+                    metric.color === "emerald"
+                      ? "from-emerald-600/20 to-transparent"
+                      : metric.color === "blue"
+                        ? "from-blue-600/20 to-transparent"
+                        : metric.color === "violet"
+                          ? "from-violet-600/20 to-transparent"
+                          : "from-amber-600/20 to-transparent",
                   )}
                 />
 
@@ -147,7 +167,13 @@ const StatusPage = () => {
                       radius="22px"
                       className={cn(
                         "bg-white/5 border border-white/10 group-hover:scale-110 transition-transform shadow-inner",
-                        `text-${metric.color}-400`,
+                        metric.color === "emerald"
+                          ? "text-emerald-400"
+                          : metric.color === "blue"
+                            ? "text-blue-400"
+                            : metric.color === "violet"
+                              ? "text-violet-400"
+                              : "text-amber-400",
                       )}
                     >
                       <metric.icon size={32} />
@@ -163,14 +189,26 @@ const StatusPage = () => {
                         <span
                           className={cn(
                             "h-1.5 w-1.5 rounded-full animate-pulse",
-                            `bg-${metric.color}-400`,
+                            metric.color === "emerald"
+                              ? "bg-emerald-400"
+                              : metric.color === "blue"
+                                ? "bg-blue-400"
+                                : metric.color === "violet"
+                                  ? "bg-violet-400"
+                                  : "bg-amber-400",
                           )}
                         />
                         <Text
                           size="xs"
                           className={cn(
                             "font-black tracking-widest uppercase",
-                            `text-${metric.color}-400`,
+                            metric.color === "emerald"
+                              ? "text-emerald-400"
+                              : metric.color === "blue"
+                                ? "text-blue-400"
+                                : metric.color === "violet"
+                                  ? "text-violet-400"
+                                  : "text-amber-400",
                           )}
                         >
                           {metric.sub}
@@ -239,7 +277,7 @@ const StatusPage = () => {
                 order={3}
                 className="text-white font-black mb-10 text-xl tracking-tight uppercase"
               >
-                Security Protocols
+                Internal Governance
               </Title>
 
               <Timeline
@@ -254,22 +292,22 @@ const StatusPage = () => {
                 }}
               >
                 <Timeline.Item
-                  bullet={<IconCloudComputing size={16} />}
-                  title="Global Auth Proxy"
+                  bullet={<IconUsers size={16} />}
+                  title="User Onboarding"
                 >
-                  Active - Encrypted with 256-bit AES protocol.
+                  Active - Monitoring new registrations globally.
                 </Timeline.Item>
                 <Timeline.Item
                   bullet={<IconShieldLock size={16} />}
-                  title="RBAC Enforcement"
+                  title="Payment Escrow"
                 >
-                  Enforced - Dynamic role monitoring active.
+                  Enforced - 20% commission deduction active.
                 </Timeline.Item>
                 <Timeline.Item
                   bullet={<IconBolt size={16} />}
-                  title="DDoS Mitigation"
+                  title="Incident Management"
                 >
-                  Active - Scalable traffic filtering active.
+                  Active - Real-time job status tracking.
                 </Timeline.Item>
               </Timeline>
             </Paper>
@@ -287,12 +325,12 @@ const StatusPage = () => {
                   order={3}
                   className="text-white font-black text-xl tracking-tight uppercase"
                 >
-                  Health Diagnostics
+                  Resource Telemetry
                 </Title>
                 <div className="flex items-center gap-2 bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20">
                   <IconActivity size={14} className="text-emerald-400" />
                   <Text className="text-emerald-400 font-black text-[10px] uppercase tracking-widest">
-                    All Systems Normal
+                    Cluster Status: Optimized
                   </Text>
                 </div>
               </Group>
@@ -300,22 +338,22 @@ const StatusPage = () => {
               <div className="space-y-6">
                 {[
                   {
-                    label: "Memory Retention",
-                    val: "84%",
-                    color: "blue",
-                    stat: "14.2 GB Used",
-                  },
-                  {
-                    label: "Storage I/O",
+                    label: "Network Latency",
                     val: "12%",
-                    color: "emerald",
-                    stat: "2.4k IOPS",
+                    color: "blue",
+                    stat: "24ms Avg",
                   },
                   {
-                    label: "Traffic Surge",
-                    val: "6%",
+                    label: "Database I/O",
+                    val: "45%",
+                    color: "emerald",
+                    stat: "Healthy",
+                  },
+                  {
+                    label: "Compute Load",
+                    val: "18%",
                     color: "amber",
-                    stat: "Low Load",
+                    stat: "Low",
                   },
                 ].map((row, idx) => (
                   <div key={idx} className="space-y-3">
@@ -342,7 +380,11 @@ const StatusPage = () => {
                         transition={{ duration: 1, delay: idx * 0.2 }}
                         className={cn(
                           "h-full rounded-full",
-                          `bg-${row.color === "emerald" ? "teal" : row.color}-500 shadow-[0_0_10px_currentColor]`,
+                          row.color === "emerald"
+                            ? "bg-emerald-500"
+                            : row.color === "blue"
+                              ? "bg-blue-500"
+                              : "bg-amber-500",
                         )}
                       />
                     </div>

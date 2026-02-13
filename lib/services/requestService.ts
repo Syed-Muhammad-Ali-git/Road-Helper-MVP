@@ -84,19 +84,22 @@ export async function updateRideStatus(params: {
   customerLocation?: GeoLocation | null;
 }) {
   const ref = doc(db, COLLECTIONS.RIDE_REQUESTS, params.requestId);
-  await updateDoc(ref, {
+  const updates: any = {
     status: params.status,
-    helperLocation:
-      typeof params.helperLocation === "undefined"
-        ? undefined
-        : params.helperLocation,
-    customerLocation:
-      typeof params.customerLocation === "undefined"
-        ? undefined
-        : params.customerLocation,
-    completedAt: params.status === "completed" ? serverTimestamp() : undefined,
     updatedAt: serverTimestamp(),
-  });
+  };
+
+  if (params.helperLocation !== undefined) {
+    updates.helperLocation = params.helperLocation;
+  }
+  if (params.customerLocation !== undefined) {
+    updates.customerLocation = params.customerLocation;
+  }
+  if (params.status === "completed") {
+    updates.completedAt = serverTimestamp();
+  }
+
+  await updateDoc(ref, updates);
 }
 
 export async function updateRideLocations(params: {
@@ -105,17 +108,18 @@ export async function updateRideLocations(params: {
   customerLocation?: GeoLocation | null;
 }) {
   const ref = doc(db, COLLECTIONS.RIDE_REQUESTS, params.requestId);
-  await updateDoc(ref, {
-    helperLocation:
-      typeof params.helperLocation === "undefined"
-        ? undefined
-        : params.helperLocation,
-    customerLocation:
-      typeof params.customerLocation === "undefined"
-        ? undefined
-        : params.customerLocation,
+  const updates: any = {
     updatedAt: serverTimestamp(),
-  });
+  };
+
+  if (params.helperLocation !== undefined) {
+    updates.helperLocation = params.helperLocation;
+  }
+  if (params.customerLocation !== undefined) {
+    updates.customerLocation = params.customerLocation;
+  }
+
+  await updateDoc(ref, updates);
 }
 
 export function subscribeRideRequest(

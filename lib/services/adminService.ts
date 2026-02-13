@@ -9,6 +9,8 @@ import {
   Timestamp,
   type Unsubscribe,
   type QueryConstraint,
+  doc,
+  setDoc,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase/config";
 import { COLLECTIONS } from "@/lib/firebase/collections";
@@ -138,8 +140,8 @@ export function subscribeToAdminRequests(
         user: data.customerName || "Unknown",
         type: data.serviceType || "Unknown",
         status:
-          data.status.charAt(0).toUpperCase() + data.status.slice(1).replace("_", " ") ||
-          "Pending",
+          data.status.charAt(0).toUpperCase() +
+            data.status.slice(1).replace("_", " ") || "Pending",
         helper: data.helperName || "---",
         amount: data.cost || 0,
         hasCommissionPaid: data.hasCommissionPaid || false,
@@ -167,7 +169,9 @@ export function subscribeToAdminUsers(
         id: doc.id,
         name: data.displayName || "Unknown",
         email: data.email || "",
-        role: (data.role?.charAt(0).toUpperCase() + data.role?.slice(1)) || "Customer",
+        role:
+          data.role?.charAt(0).toUpperCase() + data.role?.slice(1) ||
+          "Customer",
         status:
           data.status === "active"
             ? "Active"
@@ -225,4 +229,33 @@ export async function getRevenueData(): Promise<RevenueDataPoint[]> {
     console.error("Error fetching revenue data:", error);
     return [];
   }
+}
+
+/**
+ * Get system settings (like platform commission)
+ */
+export async function getSystemSettings(): Promise<{ commission: number }> {
+  try {
+    const settingsDoc = await getDocs(
+      query(collection(db, COLLECTIONS.SETTINGS), limit(1)),
+    );
+    if (settingsDoc.empty) {
+      return { commission: 20 };
+    }
+    const data = settingsDoc.docs[0].data();
+    return { commission: data.commission ?? 20 };
+  } catch (error) {
+    console.error("Error fetching system settings:", error);
+    return { commission: 20 };
+  }
+}
+
+/**
+ * Update system settings
+ */
+export async function updateSystemSettings(settings: {
+  commission: number;
+}): Promise<void> {
+  const settingsRef = doc(db, COLLECTIONS.SETTINGS, "platform_config");
+  await setDoc(settingsRef, settings, { merge: true });
 }

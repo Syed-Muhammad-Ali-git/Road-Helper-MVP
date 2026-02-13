@@ -30,10 +30,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { showSuccess, showError } from "@/lib/sweetalert";
 import { cn } from "@/lib/utils";
-import {
-  AuthRuleError,
-  signupWithEmail,
-} from "@/lib/services/authService";
+import { AuthRuleError, signupWithEmail } from "@/lib/services/authService";
 
 interface AdminSignupValues {
   firstName: string;
@@ -46,6 +43,7 @@ interface AdminSignupValues {
 
 const AdminSignup = () => {
   const [isClient] = useState(true);
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const form = useForm<AdminSignupValues>({
@@ -65,7 +63,8 @@ const AdminSignup = () => {
         val.length < 6 ? "Password must include at least 6 characters" : null,
       confirmPassword: (val: string, values: AdminSignupValues) =>
         val !== values.password ? "Passwords do not match" : null,
-      adminCode: (val: string) => (val.length < 4 ? "Invalid Admin Code" : null),
+      adminCode: (val: string) =>
+        val.length < 4 ? "Invalid Admin Code" : null,
     },
   });
 
@@ -187,6 +186,7 @@ const AdminSignup = () => {
           <form
             onSubmit={form.onSubmit(async (data) => {
               try {
+                setLoading(true);
                 await signupWithEmail({
                   role: "admin",
                   email: data.email,
@@ -203,6 +203,8 @@ const AdminSignup = () => {
                       ? err.message
                       : "Signup failed";
                 await showError("Signup Failed", msg);
+              } finally {
+                setLoading(false);
               }
             })}
             className="space-y-6"
@@ -299,7 +301,8 @@ const AdminSignup = () => {
               fullWidth
               size="lg"
               type="submit"
-              rightSection={<IconArrowRight size={20} />}
+              loading={loading}
+              rightSection={!loading && <IconArrowRight size={20} />}
               className="bg-brand-red hover:bg-brand-dark-red text-white h-16 rounded-2xl transition-all shadow-2xl shadow-brand-red/20 border-none font-black text-lg tracking-tight"
             >
               INITIALIZE ADMIN ID

@@ -37,7 +37,10 @@ import { toast } from "react-toastify";
 import type { RideRequestDoc } from "@/types";
 import type { AppUserRecord } from "@/lib/services/userService";
 
-function haversineKm(a: { lat: number; lng: number }, b: { lat: number; lng: number }) {
+function haversineKm(
+  a: { lat: number; lng: number },
+  b: { lat: number; lng: number },
+) {
   const toRad = (v: number) => (v * Math.PI) / 180;
   const R = 6371;
   const dLat = toRad(b.lat - a.lat);
@@ -61,11 +64,18 @@ export default function JourneyPage() {
     | "admin";
 
   const live = useLiveLocation({
-    onSuccess: () => toast.success("Location enabled! Live tracking is active."),
+    onSuccess: () =>
+      toast.success("Location enabled! Live tracking is active."),
   });
-  const [req, setReq] = useState<({ id: string } & RideRequestDoc) | null>(null);
-  const [customer, setCustomer] = useState<({ id: string } & AppUserRecord) | null>(null);
-  const [helper, setHelper] = useState<({ id: string } & AppUserRecord) | null>(null);
+  const [req, setReq] = useState<({ id: string } & RideRequestDoc) | null>(
+    null,
+  );
+  const [customer, setCustomer] = useState<
+    ({ id: string } & AppUserRecord) | null
+  >(null);
+  const [helper, setHelper] = useState<({ id: string } & AppUserRecord) | null>(
+    null,
+  );
   const [feedbackRating, setFeedbackRating] = useState(0);
   const [feedbackComment, setFeedbackComment] = useState("");
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
@@ -151,7 +161,10 @@ export default function JourneyPage() {
             </Title>
             <Group gap="sm" mt={6}>
               <Badge className="bg-brand-red text-white">
-                {(req?.status ?? "pending").toString().replace("_", " ").toUpperCase()}
+                {(req?.status ?? "pending")
+                  .toString()
+                  .replace("_", " ")
+                  .toUpperCase()}
               </Badge>
               {eta && (
                 <Group gap={6}>
@@ -164,15 +177,28 @@ export default function JourneyPage() {
             </Group>
           </Box>
 
-          <Button
-            variant="light"
-            color="gray"
-            onClick={() =>
-              router.push(role === "helper" ? "/helper/requests" : "/customer/request-status")
-            }
-          >
-            Back
-          </Button>
+          <Group gap="sm">
+            <Button
+              variant="light"
+              color="gray"
+              onClick={() =>
+                router.push(
+                  role === "helper"
+                    ? "/helper/requests"
+                    : "/customer/request-status",
+                )
+              }
+            >
+              Back
+            </Button>
+            <Button
+              variant="outline"
+              color="red"
+              onClick={() => router.push("/")}
+            >
+              Back to Home
+            </Button>
+          </Group>
         </Group>
 
         <Paper p="lg" radius="xl" className="glass-dark border border-white/10">
@@ -195,10 +221,18 @@ export default function JourneyPage() {
           </Group>
         </Paper>
 
-        <LiveMap customer={customerPoint} helper={helperPoint} className="h-[420px] w-full rounded-2xl overflow-hidden border border-white/10" />
+        <LiveMap
+          customer={customerPoint}
+          helper={helperPoint}
+          className="h-[420px] w-full rounded-2xl overflow-hidden border border-white/10"
+        />
 
         <Group align="stretch" grow className="flex-col md:flex-row">
-          <Paper p="lg" radius="xl" className="glass-dark border border-white/10">
+          <Paper
+            p="lg"
+            radius="xl"
+            className="glass-dark border border-white/10"
+          >
             <Stack gap="sm">
               <Text className="text-gray-400 text-xs uppercase tracking-wider">
                 {role === "helper" ? "Customer" : "Helper"} details
@@ -237,7 +271,11 @@ export default function JourneyPage() {
             </Stack>
           </Paper>
 
-          <Paper p="lg" radius="xl" className="glass-dark border border-white/10">
+          <Paper
+            p="lg"
+            radius="xl"
+            className="glass-dark border border-white/10"
+          >
             <Stack gap="sm">
               <Text className="text-gray-400 text-xs uppercase tracking-wider">
                 Next actions
@@ -256,11 +294,16 @@ export default function JourneyPage() {
                             ? { lat: live.coords.lat, lng: live.coords.lng }
                             : undefined,
                         });
-                        await showSuccess("Status updated", "Marked as in progress.");
+                        await showSuccess(
+                          "Status updated",
+                          "Marked as in progress.",
+                        );
                       } catch (e: unknown) {
                         await showError(
                           "Update failed",
-                          e instanceof Error ? e.message : "Unable to update status.",
+                          e instanceof Error
+                            ? e.message
+                            : "Unable to update status.",
                         );
                       }
                     }}
@@ -280,11 +323,16 @@ export default function JourneyPage() {
                             ? { lat: live.coords.lat, lng: live.coords.lng }
                             : undefined,
                         });
-                        await showSuccess("Completed", "Great work. Waiting for feedback.");
+                        await showSuccess(
+                          "Completed",
+                          "Great work. Waiting for feedback.",
+                        );
                       } catch (e: unknown) {
                         await showError(
                           "Update failed",
-                          e instanceof Error ? e.message : "Unable to update status.",
+                          e instanceof Error
+                            ? e.message
+                            : "Unable to update status.",
                         );
                       }
                     }}
@@ -296,15 +344,24 @@ export default function JourneyPage() {
               ) : (
                 <Stack gap="sm">
                   <Text size="sm" className="text-gray-300">
-                    When your helper completes the job, you’ll be able to leave feedback here.
+                    When your helper completes the job, you’ll be able to leave
+                    feedback here.
                   </Text>
-                  {req?.status === "completed" && (
-                    feedbackSubmitted || (req as { customerRating?: number | null }).customerRating ? (
+                  {req?.status === "completed" &&
+                    (feedbackSubmitted ||
+                    (req as { customerRating?: number | null })
+                      .customerRating ? (
                       <Group gap="xs">
                         {[1, 2, 3, 4, 5].map((s) => (
-                          <IconStarFilled key={s} size={24} className="text-brand-yellow" />
+                          <IconStarFilled
+                            key={s}
+                            size={24}
+                            className="text-brand-yellow"
+                          />
                         ))}
-                        <Text size="sm" className="text-gray-400">Thank you for your feedback!</Text>
+                        <Text size="sm" className="text-gray-400">
+                          Thank you for your feedback!
+                        </Text>
                       </Group>
                     ) : (
                       <Stack gap="md">
@@ -317,7 +374,10 @@ export default function JourneyPage() {
                               className="p-1 rounded-lg hover:bg-white/10 transition-colors"
                             >
                               {s <= feedbackRating ? (
-                                <IconStarFilled size={28} className="text-brand-yellow" />
+                                <IconStarFilled
+                                  size={28}
+                                  className="text-brand-yellow"
+                                />
                               ) : (
                                 <IconStar size={28} className="text-gray-500" />
                               )}
@@ -351,7 +411,12 @@ export default function JourneyPage() {
                               setFeedbackSubmitted(true);
                               toast.success("Thanks for your feedback!");
                             } catch (e) {
-                              await showError("Failed", e instanceof Error ? e.message : "Could not submit feedback.");
+                              await showError(
+                                "Failed",
+                                e instanceof Error
+                                  ? e.message
+                                  : "Could not submit feedback.",
+                              );
                             } finally {
                               setFeedbackSubmitting(false);
                             }
@@ -360,8 +425,7 @@ export default function JourneyPage() {
                           Submit Feedback
                         </Button>
                       </Stack>
-                    )
-                  )}
+                    ))}
                 </Stack>
               )}
             </Stack>
@@ -371,4 +435,3 @@ export default function JourneyPage() {
     </Box>
   );
 }
-

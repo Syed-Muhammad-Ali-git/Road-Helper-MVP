@@ -74,20 +74,19 @@ const UsersPage = () => {
       try {
         const records = await getAllUsers();
         if (!alive) return;
-        const mapped: AdminUserRow[] = records.map((u) => ({
-          id: u.id,
-          name: u.displayName,
-          email: u.email,
-          role:
-            u.role === "admin"
-              ? "Admin"
-              : u.role === "helper"
-              ? "Helper"
-              : "Customer",
-          phone: u.phone ?? "",
-          status: "Active",
-          lastActive: "",
-        }));
+        const mapped: AdminUserRow[] = records
+          .filter((u) => u.role !== "admin") // Filter out admins
+          .map((u) => ({
+            id: u.id,
+            name: u.displayName,
+            email: u.email,
+            role: u.role === "helper" ? "Helper" : "Customer",
+            phone: u.phone ?? "",
+            status: "Active",
+            lastActive: u.updatedAt
+              ? new Date(u.updatedAt as any).toLocaleDateString()
+              : "Never",
+          }));
         setUsers(mapped);
       } catch (e) {
         console.error("Failed to load users", e);
@@ -102,7 +101,7 @@ const UsersPage = () => {
     // In production, admins should not onboard users manually from here.
     await showError(
       "Not available",
-      "Admins cannot manually create users from this panel. Ask users to register via the signup flow."
+      "Admins cannot manually create users from this panel. Ask users to register via the signup flow.",
     );
   }, []);
 
@@ -115,7 +114,9 @@ const UsersPage = () => {
     if (isConfirmed) {
       // Soft delete from UI only; full deletion should be handled by a dedicated admin flow.
       setUsers((prev) => prev.filter((u) => u.id !== id));
-      await showSuccess("User removed from view. Full account deletion must be done from the auth console.");
+      await showSuccess(
+        "User removed from view. Full account deletion must be done from the auth console.",
+      );
     }
   }, []);
 
@@ -143,7 +144,7 @@ const UsersPage = () => {
     <Box
       className={cn(
         "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi",
-        isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900"
+        isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
       )}
     >
       {/* Premium Background */}
@@ -188,10 +189,13 @@ const UsersPage = () => {
             </motion.div>
             <Title
               order={1}
-              className="font-manrope font-extrabold text-4xl md:text-5xl text-white tracking-tight"
+              className={cn(
+                "font-manrope font-extrabold text-4xl md:text-5xl tracking-tight",
+                isDark ? "text-white" : "text-gray-900",
+              )}
             >
               Community{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-gray-500">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
                 Registry
               </span>
             </Title>
@@ -208,7 +212,7 @@ const UsersPage = () => {
               Export Database
             </Button>
             <Button
-              className="bg-brand-red hover:bg-brand-dark-red text-white h-14 rounded-2xl px-8 transition-all font-black text-sm shadow-xl shadow-brand-red/20"
+              className="bg-brand-red hover:bg-brand-dark-red text-white h-14 rounded-2xl px-8 transition-all font-black text-sm shadow-xl shadow-brand-red/20 border-none"
               leftSection={<IconUserPlus size={22} />}
               onClick={open}
             >
@@ -237,7 +241,12 @@ const UsersPage = () => {
                 <input
                   type="text"
                   placeholder="Search by identity, email or credentials..."
-                  className="w-full h-16 bg-white/[0.03] border-2 border-white/5 rounded-2xl pl-14 pr-6 text-white font-medium focus:border-brand-red transition-all outline-none"
+                  className={cn(
+                    "w-full h-16 border-2 rounded-2xl pl-14 pr-6 font-medium focus:border-brand-red transition-all outline-none",
+                    isDark
+                      ? "bg-white/[0.03] border-white/5 text-white"
+                      : "bg-gray-50 border-gray-200 text-gray-900",
+                  )}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
@@ -275,14 +284,17 @@ const UsersPage = () => {
 
             <Box className="overflow-x-auto">
               <Table
-                verticalSpacing="xl"
+                verticalSpacing="lg"
                 horizontalSpacing="xl"
-                className="text-white min-w-[900px]"
+                className={cn(
+                  "min-w-[900px]",
+                  isDark ? "text-white" : "text-gray-900",
+                )}
               >
                 <Table.Thead className="bg-white/5 border-none">
                   <Table.Tr>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none py-6">
-                      Identity Profile
+                      User Identity
                     </Table.Th>
                     <Table.Th className="text-gray-500 font-black uppercase text-[10px] tracking-widest border-none">
                       Access Privilege
@@ -309,28 +321,31 @@ const UsersPage = () => {
                         className="group hover:bg-white/[0.03] transition-colors border-b border-white/[0.05] last:border-0"
                       >
                         <Table.Td>
-                          <Group gap="lg">
+                          <Group gap="sm" wrap="nowrap">
                             <Avatar
-                              size="lg"
-                              radius="20px"
-                              className="bg-gradient-to-br from-[#1a1a1a] to-black border-2 border-white/5 text-white font-black shadow-lg"
+                              size="md"
+                              radius="xl"
+                              className="bg-brand-red/10 text-brand-red font-black border border-brand-red/20"
                             >
                               {user.name[0]}
                             </Avatar>
-                            <div>
+                            <Box className="flex-1">
                               <Text
-                                fw={800}
-                                className="text-md text-white tracking-tight"
+                                fw={700}
+                                className={cn(
+                                  "text-sm whitespace-nowrap",
+                                  isDark ? "text-white" : "text-gray-900",
+                                )}
                               >
                                 {user.name}
                               </Text>
                               <Text
                                 size="xs"
-                                className="text-gray-500 font-medium"
+                                className="text-gray-500 font-medium whitespace-nowrap overflow-hidden text-ellipsis max-w-[200px]"
                               >
                                 {user.email}
                               </Text>
-                            </div>
+                            </Box>
                           </Group>
                         </Table.Td>
                         <Table.Td>
@@ -373,7 +388,12 @@ const UsersPage = () => {
                             {user.status}
                           </Badge>
                         </Table.Td>
-                        <Table.Td className="text-gray-400 text-xs font-bold font-manrope">
+                        <Table.Td
+                          className={cn(
+                            "text-xs font-bold font-manrope",
+                            isDark ? "text-gray-400" : "text-gray-600",
+                          )}
+                        >
                           {user.lastActive}
                         </Table.Td>
                         <Table.Td>
