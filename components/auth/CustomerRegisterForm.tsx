@@ -21,6 +21,12 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import {
+  uploadImageToCloudinary,
+  validateImageFile,
+} from "@/lib/services/cloudinaryService";
+import { Avatar, Text } from "@mantine/core";
+import { Camera } from "lucide-react";
 
 const customerSchema = z.object({
   fullName: z.string().min(2, "Name is required"),
@@ -126,26 +132,50 @@ const FormField = React.memo(
 FormField.displayName = "FormField";
 
 export const CustomerRegisterForm: React.FC<CustomerRegisterFormProps> = ({
-  isLoading,
+  isLoading: externalLoading,
   onSubmit,
 }) => {
   const { dict, isRTL } = useLanguage();
   const { isDark } = useAppTheme();
   const [showPassword, setShowPassword] = useState(false);
+  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  const isLoading = externalLoading || uploading;
 
   const {
     register,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm({
     resolver: zodResolver(customerSchema),
   });
 
+  const handleImageUpload = async (file: File | null) => {
+    if (!file) return;
+    const validation = validateImageFile(file);
+    if (!validation.valid) {
+      alert(validation.error);
+      return;
+    }
+
+    try {
+      setUploading(true);
+      const url = await uploadImageToCloudinary(file);
+      setProfileImage(url);
+    } catch (e) {
+      console.error("Cloudinary upload failed", e);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleFormSubmit = useCallback(
     async (data: CustomerFormData) => {
-      await onSubmit(data);
+      await onSubmit({ ...data, profileImage } as any);
     },
-    [onSubmit],
+    [onSubmit, profileImage],
   );
 
   const onPasswordToggle = useCallback(
@@ -185,6 +215,50 @@ export const CustomerRegisterForm: React.FC<CustomerRegisterFormProps> = ({
       onSubmit={handleSubmit(handleFormSubmit)}
       className={cn("space-y-4", isRTL && "text-right")}
     >
+      {/* Profile Image Upload */}
+      <div className="flex flex-col items-center justify-center mb-6">
+        <div className="relative group cursor-pointer">
+          <Avatar
+            src={profileImage}
+            size={100}
+            radius="100%"
+            className={cn(
+              "border-4 transition-all duration-300 shadow-2xl",
+              isDark
+                ? "border-white/10 bg-white/5"
+                : "border-gray-200 bg-gray-50",
+              uploading && "opacity-50",
+            )}
+          >
+            {uploading ? (
+              <Loader2 className="animate-spin text-brand-red" />
+            ) : (
+              <User size={40} className="text-gray-400" />
+            )}
+          </Avatar>
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={() => document.getElementById("profile-upload")?.click()}
+          >
+            <Camera size={24} className="text-white" />
+          </div>
+          <input
+            id="profile-upload"
+            type="file"
+            className="hidden"
+            accept="image/*"
+            onChange={(e) => handleImageUpload(e.target.files?.[0] || null)}
+          />
+        </div>
+        <Text
+          size="xs"
+          mt="xs"
+          fw={700}
+          className="text-gray-500 uppercase tracking-widest"
+        >
+          {uploading ? "Uploading..." : "Upload Profile Photo"}
+        </Text>
+      </div>
       {formFields.map((config) => (
         <FormField
           key={config.field}
@@ -218,7 +292,7 @@ export const CustomerRegisterForm: React.FC<CustomerRegisterFormProps> = ({
         type="submit"
         disabled={isLoading}
         className={cn(
-          "w-full font-semibold py-2 rounded-lg transition-all h-12 relative overflow-hidden group",
+          "w-full h-16 text-lg font-bold rounded-xl mt-4 group relative overflow-hidden border-2 transition-all duration-500 cursor-pointer",
           isDark
             ? "bg-gradient-to-r from-brand-red via-brand-dark-red to-brand-red hover:shadow-2xl hover:shadow-brand-red/50 text-white border-2 border-brand-red/50 hover:border-brand-red"
             : "bg-gradient-to-r from-brand-red via-orange-600 to-brand-red hover:shadow-2xl hover:shadow-red-500/30 text-white border-2 border-brand-red hover:border-brand-red",
@@ -239,10 +313,17 @@ export const CustomerRegisterForm: React.FC<CustomerRegisterFormProps> = ({
           ) : (
             <>
               {dict.auth.create_account}
-              <ArrowRight
-                size={20}
-                className="group-hover:translate-x-1 transition-transform"
-              />
+              {isRTL ? (
+                <ArrowRight
+                  size={20}
+                  className="group-hover:-translate-x-1 transition-transform"
+                />
+              ) : (
+                <ArrowRight
+                  size={20}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+              )}
             </>
           )}
         </span>

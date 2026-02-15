@@ -55,41 +55,41 @@ const StatusPage = () => {
 
   const systemMetrics = [
     {
-      title: dict.admin.fleet_connectivity,
-      sub: dict.admin.active_helpers,
+      title: "Rescue Beacons",
+      sub: "Active Help Signals",
+      val: stats ? Math.min(100, stats.pendingRequests * 10) : 0,
+      color: "red",
+      icon: IconActivity,
+      details: [`Pending: ${stats?.pendingRequests || 0}`, "Signal: Strong"],
+    },
+    {
+      title: "Dispatch Engine",
+      sub: "Matching Logic",
+      val: 99,
+      color: "emerald",
+      icon: IconBolt,
+      details: ["Efficiency: 94%", "Latency: 12ms"],
+    },
+    {
+      title: "Hero Network",
+      sub: "Helper Connectivity",
       val: stats
         ? Math.min(
             100,
             Math.round((stats.activeHelpers / (stats.totalUsers || 1)) * 100),
           )
         : 0,
-      color: "emerald",
+      color: "blue",
       icon: IconTruck,
       details: [`Online: ${stats?.activeHelpers || 0}`, "Ping: 45ms"],
     },
     {
-      title: dict.admin.data_pipeline,
-      sub: "Firestore Sync",
-      val: 99,
-      color: "blue",
-      icon: IconDatabase,
-      details: ["Sync: Live", "Errors: 0"],
-    },
-    {
-      title: dict.admin.auth_gateway,
-      sub: "Identity Service",
+      title: "Ops Control",
+      sub: "Platform Stability",
       val: 100,
       color: "violet",
       icon: IconShieldLock,
-      details: ["Status: Nominal", "Method: Firebase"],
-    },
-    {
-      title: dict.admin.service_traffic,
-      sub: "Request Load",
-      val: stats ? Math.min(100, stats.pendingRequests * 10) : 0,
-      color: "amber",
-      icon: IconActivity,
-      details: [`Pending: ${stats?.pendingRequests || 0}`, "Load: Optimal"],
+      details: ["Status: Nominal", "Uptime: 99.9%"],
     },
   ];
 
@@ -97,7 +97,7 @@ const StatusPage = () => {
     <Box
       className={cn(
         "relative min-h-screen overflow-hidden p-4 md:p-8 font-satoshi transition-colors pt-24",
-        isDark ? "bg-[#0a0a0a] text-white" : "bg-gray-50 text-gray-900",
+        isDark ? "bg-[#0a0a0a] text-white" : "bg-white text-gray-900",
       )}
     >
       {/* Dynamic Grid Background */}
@@ -117,9 +117,9 @@ const StatusPage = () => {
           }}
         />
         <motion.div
-          animate={{ x: [-1000, 1000], opacity: [0, 1, 0] }}
+          animate={{ x: [-1000, 1000], opacity: [0, 0.5, 0] }}
           transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-          className="absolute top-[20%] left-0 w-full h-[1px] bg-brand-red/50 shadow-[0_0_15px_#ef4444]"
+          className="absolute top-[20%] left-0 w-full h-[1px] bg-brand-red shadow-[0_0_15px_#ef4444]"
         />
       </div>
 
@@ -136,7 +136,7 @@ const StatusPage = () => {
           >
             <IconActivity size={16} className="text-brand-red" />
             <Text className="text-brand-red font-black uppercase tracking-[0.3em] text-[10px]">
-              {dict.admin.infrastructure_health}
+              Platform Intelligence
             </Text>
           </motion.div>
           <Title
@@ -146,13 +146,13 @@ const StatusPage = () => {
               isDark ? "text-white" : "text-gray-900",
             )}
           >
-            Network{" "}
+            System{" "}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-brand-red to-orange-500">
-              {dict.admin.status_title.split(" ")[1]}
+              Pulse
             </span>
           </Title>
           <Text className="text-gray-500 mt-2 font-bold uppercase tracking-tight text-xs">
-            {dict.admin.operational_tracking}
+            Operational status of core rescue infrastructure
           </Text>
         </header>
 
@@ -166,19 +166,19 @@ const StatusPage = () => {
                   "border relative overflow-hidden group transition-all duration-500 shadow-2xl",
                   isDark
                     ? "bg-white/5 border-white/10 hover:border-brand-red/30"
-                    : "bg-white border-gray-200 hover:border-brand-red/20",
+                    : "bg-white border-gray-200 hover:border-brand-red/20 shadow-gray-200/50",
                 )}
               >
                 <div
                   className={cn(
                     "absolute inset-0 bg-gradient-to-br opacity-[0.02] group-hover:opacity-[0.08] transition-opacity",
-                    metric.color === "emerald"
-                      ? "from-emerald-600/20 to-transparent"
-                      : metric.color === "blue"
-                        ? "from-blue-600/20 to-transparent"
-                        : metric.color === "violet"
-                          ? "from-violet-600/20 to-transparent"
-                          : "from-amber-600/20 to-transparent",
+                    metric.color === "red"
+                      ? "from-brand-red/20 to-transparent"
+                      : metric.color === "emerald"
+                        ? "from-emerald-600/20 to-transparent"
+                        : metric.color === "blue"
+                          ? "from-blue-600/20 to-transparent"
+                          : "from-violet-600/20 to-transparent",
                   )}
                 />
 
@@ -192,13 +192,13 @@ const StatusPage = () => {
                         isDark
                           ? "bg-white/5 border-white/10"
                           : "bg-gray-50 border-gray-100",
-                        metric.color === "emerald"
-                          ? "text-emerald-400"
-                          : metric.color === "blue"
-                            ? "text-blue-400"
-                            : metric.color === "violet"
-                              ? "text-violet-400"
-                              : "text-amber-400",
+                        metric.color === "red"
+                          ? "text-brand-red"
+                          : metric.color === "emerald"
+                            ? "text-emerald-400"
+                            : metric.color === "blue"
+                              ? "text-blue-400"
+                              : "text-violet-400",
                       )}
                     >
                       <metric.icon size={32} />
@@ -217,26 +217,26 @@ const StatusPage = () => {
                         <span
                           className={cn(
                             "h-1.5 w-1.5 rounded-full animate-pulse",
-                            metric.color === "emerald"
-                              ? "bg-emerald-400"
-                              : metric.color === "blue"
-                                ? "bg-blue-400"
-                                : metric.color === "violet"
-                                  ? "bg-violet-400"
-                                  : "bg-amber-400",
+                            metric.color === "red"
+                              ? "bg-brand-red"
+                              : metric.color === "emerald"
+                                ? "bg-emerald-400"
+                                : metric.color === "blue"
+                                  ? "bg-blue-400"
+                                  : "bg-violet-400",
                           )}
                         />
                         <Text
                           size="xs"
                           className={cn(
                             "font-black tracking-widest uppercase",
-                            metric.color === "emerald"
-                              ? "text-emerald-400"
-                              : metric.color === "blue"
-                                ? "text-blue-400"
-                                : metric.color === "violet"
-                                  ? "text-violet-400"
-                                  : "text-amber-400",
+                            metric.color === "red"
+                              ? "text-brand-red"
+                              : metric.color === "emerald"
+                                ? "text-emerald-400"
+                                : metric.color === "blue"
+                                  ? "text-blue-400"
+                                  : "text-violet-400",
                           )}
                         >
                           {metric.sub}
@@ -253,7 +253,11 @@ const StatusPage = () => {
                       {
                         value: metric.val,
                         color:
-                          metric.color === "emerald" ? "teal" : metric.color,
+                          metric.color === "red"
+                            ? "red"
+                            : metric.color === "emerald"
+                              ? "teal"
+                              : metric.color,
                       },
                     ]}
                     label={
@@ -279,7 +283,7 @@ const StatusPage = () => {
                 >
                   {metric.details.map((detail, i) => (
                     <div key={i} className="flex flex-col">
-                      <Text className="text-gray-600 text-[10px] font-black uppercase tracking-widest">
+                      <Text className="text-gray-500 text-[10px] font-black uppercase tracking-widest">
                         {detail.split(":")[0]}
                       </Text>
                       <Text
@@ -308,7 +312,7 @@ const StatusPage = () => {
                 "border h-full shadow-2xl overflow-hidden relative",
                 isDark
                   ? "bg-white/5 border-white/10"
-                  : "bg-white border-gray-200",
+                  : "bg-white border-gray-200 shadow-gray-200/50",
               )}
             >
               <div
@@ -326,7 +330,7 @@ const StatusPage = () => {
                   isDark ? "text-white" : "text-gray-900",
                 )}
               >
-                {dict.admin.internal_governance}
+                Security Protocols
               </Title>
 
               <Timeline
@@ -379,7 +383,7 @@ const StatusPage = () => {
                 "border shadow-2xl",
                 isDark
                   ? "bg-white/5 border-white/10"
-                  : "bg-white border-gray-200",
+                  : "bg-white border-gray-200 shadow-gray-200/50",
               )}
             >
               <Group justify="space-between" mb={30}>
@@ -390,12 +394,12 @@ const StatusPage = () => {
                     isDark ? "text-white" : "text-gray-900",
                   )}
                 >
-                  {dict.admin.resource_telemetry}
+                  Dispatch Telemetry
                 </Title>
                 <div className="flex items-center gap-2 bg-emerald-500/10 px-4 py-1.5 rounded-full border border-emerald-500/20">
                   <IconActivity size={14} className="text-emerald-400" />
                   <Text className="text-emerald-400 font-black text-[10px] uppercase tracking-widest">
-                    Cluster Status: Optimized
+                    Fleet Status: Optimized
                   </Text>
                 </div>
               </Group>
@@ -426,7 +430,7 @@ const StatusPage = () => {
                       <Text
                         size="xs"
                         fw={900}
-                        className="text-gray-400 uppercase tracking-widest"
+                        className="text-gray-500 uppercase tracking-widest"
                       >
                         {row.label}
                       </Text>
@@ -441,7 +445,12 @@ const StatusPage = () => {
                         {row.stat}
                       </Text>
                     </Group>
-                    <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                    <div
+                      className={cn(
+                        "h-2 w-full rounded-full overflow-hidden",
+                        isDark ? "bg-white/5" : "bg-gray-100",
+                      )}
+                    >
                       <motion.div
                         initial={{ width: 0 }}
                         animate={{ width: row.val }}

@@ -16,7 +16,12 @@
     "fast_value": "< 2 min",
     "uptime_value": "99.9%",
     "you": "Aap",
-    "user": "User"
+    "user": "User",
+    "currency": "PKR",
+    "role": "Role",
+    "english": "English",
+    "urdu": "Urdu",
+    "roman": "Roman English"
   },
   "roles": {
     "admin": "Admin",

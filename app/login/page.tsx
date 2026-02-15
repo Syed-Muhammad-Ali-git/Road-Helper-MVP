@@ -208,16 +208,9 @@ export default function LoginPage() {
         transition={{ duration: 1, ease: "easeOut" }}
         className="hidden lg:flex w-1/2 relative flex-col justify-between p-12 z-10"
       >
-        <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-brand-charcoal/50 to-transparent">
-          <Image
-            src="/assets/images/login-sidebar.png"
-            alt="Background"
-            fill
-            sizes="50vw"
-            className="object-cover opacity-30 grayscale"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-transparent" />
+        <div className="absolute inset-0 z-0 bg-gradient-to-br from-black via-brand-charcoal to-transparent">
+          {/* Background image removed as requested by user */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/95 to-transparent" />
         </div>
 
         <motion.div

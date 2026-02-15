@@ -59,6 +59,7 @@ const UsersPage = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const [users, setUsers] = useState<AdminUserRow[]>([]);
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState<string>("all");
   const [newUser, setNewUser] = useState({
     firstName: "",
     lastName: "",
@@ -68,7 +69,7 @@ const UsersPage = () => {
   });
 
   const { isDark } = useAppTheme();
-  const { dict } = useLanguage();
+  const { dict, language } = useLanguage();
 
   useEffect(() => {
     let alive = true;
@@ -76,19 +77,22 @@ const UsersPage = () => {
       try {
         const records = await getAllUsers();
         if (!alive) return;
-        const mapped: AdminUserRow[] = records
-          .filter((u) => u.role !== "admin") // Filter out admins
-          .map((u) => ({
-            id: u.id,
-            name: u.displayName,
-            email: u.email,
-            role: u.role === "helper" ? "Helper" : "Customer",
-            phone: u.phone ?? "",
-            status: "Active",
-            lastActive: u.updatedAt
-              ? new Date(u.updatedAt as any).toLocaleDateString()
-              : "Never",
-          }));
+        const mapped: AdminUserRow[] = records.map((u) => ({
+          id: u.id,
+          name: u.displayName || u.email?.split("@")[0] || "Unknown",
+          email: u.email || "N/A",
+          role:
+            u.role === "admin"
+              ? "Admin"
+              : u.role === "helper"
+                ? "Helper"
+                : "Customer",
+          phone: u.phone ?? "",
+          status: "Active",
+          lastActive: u.updatedAt
+            ? new Date(u.updatedAt as any).toLocaleDateString()
+            : "Never",
+        }));
         setUsers(mapped);
       } catch (e) {
         console.error("Failed to load users", e);
@@ -126,10 +130,12 @@ const UsersPage = () => {
     () =>
       users.filter(
         (user) =>
-          user.name.toLowerCase().includes(search.toLowerCase()) ||
-          user.email.toLowerCase().includes(search.toLowerCase()),
+          (roleFilter === "all" ||
+            user.role.toLowerCase() === roleFilter.toLowerCase()) &&
+          (user.name.toLowerCase().includes(search.toLowerCase()) ||
+            user.email.toLowerCase().includes(search.toLowerCase())),
       ),
-    [users, search],
+    [users, search, roleFilter],
   );
 
   const containerVariants = {
@@ -264,6 +270,27 @@ const UsersPage = () => {
                 />
               </div>
               <Group gap="md">
+                <Select
+                  placeholder="Role"
+                  value={roleFilter}
+                  onChange={(val) => setRoleFilter(val || "all")}
+                  data={[
+                    { value: "all", label: "All" },
+                    { value: "customer", label: "Customers" },
+                    { value: "helper", label: "Helpers" },
+                    { value: "admin", label: "Admins" },
+                  ]}
+                  variant="filled"
+                  radius="xl"
+                  classNames={{
+                    input: cn(
+                      "border-2 h-14 w-[140px] font-bold px-4 transition-all",
+                      isDark
+                        ? "bg-white/5 border-white/5 text-white focus:border-brand-red"
+                        : "bg-gray-50 border-gray-100 text-gray-900 focus:border-brand-red",
+                    ),
+                  }}
+                />
                 <Button
                   variant="outline"
                   color="gray"

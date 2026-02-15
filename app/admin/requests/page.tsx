@@ -297,7 +297,7 @@ const RequestsPage = () => {
 
             <Box className="overflow-x-auto">
               <Table
-                verticalSpacing="xl"
+                verticalSpacing="md"
                 horizontalSpacing="xl"
                 className={cn(
                   "min-w-[1100px]",
@@ -323,8 +323,8 @@ const RequestsPage = () => {
                     <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
                       {dict.admin.operational_area}
                     </Table.Th>
-                    <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
-                      {dict.admin.duty_status}
+                    <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none text-center">
+                      Status Controls
                     </Table.Th>
                     <Table.Th className="text-gray-600 font-black uppercase text-[10px] tracking-widest border-none">
                       {dict.admin.financials}
@@ -407,28 +407,66 @@ const RequestsPage = () => {
                           </div>
                         </Table.Td>
                         <Table.Td>
-                          <div
-                            className={cn(
-                              "inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border-2 text-[10px] font-black uppercase tracking-widest",
-                              req.status === "completed"
-                                ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-400"
-                                : req.status === "pending"
-                                  ? "bg-orange-500/10 border-orange-500/20 text-orange-400 shadow-[0_0_15px_rgba(249,115,22,0.1)]"
-                                  : "bg-blue-500/10 border-blue-500/20 text-blue-400",
-                            )}
+                          <Menu
+                            position="bottom-end"
+                            shadow="xl"
+                            radius="xl"
+                            width={200}
                           >
-                            <div
+                            <Menu.Target>
+                              <Button
+                                variant="outline"
+                                size="xs"
+                                radius="xl"
+                                className={cn(
+                                  "h-9 px-4 font-black uppercase text-[10px] tracking-widest transition-all",
+                                  req.status === "completed"
+                                    ? "border-emerald-500/30 text-emerald-400 hover:bg-emerald-500/10"
+                                    : req.status === "pending"
+                                      ? "border-orange-500/30 text-orange-400 hover:bg-orange-500/10"
+                                      : "border-blue-500/30 text-blue-400 hover:bg-blue-500/10",
+                                )}
+                              >
+                                {req.status}
+                              </Button>
+                            </Menu.Target>
+                            <Menu.Dropdown
                               className={cn(
-                                "w-1.5 h-1.5 rounded-full animate-pulse",
-                                req.status === "completed"
-                                  ? "bg-emerald-400"
-                                  : req.status === "pending"
-                                    ? "bg-orange-400"
-                                    : "bg-blue-400",
+                                "backdrop-blur-xl border",
+                                isDark
+                                  ? "bg-[#0f0f0f] border-white/10"
+                                  : "bg-white border-gray-200",
                               )}
-                            />
-                            {req.status}
-                          </div>
+                            >
+                              <Menu.Label className="text-[9px] font-black uppercase tracking-widest text-gray-500">
+                                Update State
+                              </Menu.Label>
+                              <Menu.Item
+                                onClick={() =>
+                                  showSuccess("State updated to Pending")
+                                }
+                                className="font-bold text-xs uppercase tracking-tight text-orange-500 hover:bg-orange-500/10 rounded-lg py-2"
+                              >
+                                Set Pending
+                              </Menu.Item>
+                              <Menu.Item
+                                onClick={() =>
+                                  showSuccess("State updated to Active")
+                                }
+                                className="font-bold text-xs uppercase tracking-tight text-blue-500 hover:bg-blue-500/10 rounded-lg py-2"
+                              >
+                                Set Active
+                              </Menu.Item>
+                              <Menu.Item
+                                onClick={() =>
+                                  showSuccess("State updated to Completed")
+                                }
+                                className="font-bold text-xs uppercase tracking-tight text-emerald-500 hover:bg-emerald-500/10 rounded-lg py-2"
+                              >
+                                Set Completed
+                              </Menu.Item>
+                            </Menu.Dropdown>
+                          </Menu>
                         </Table.Td>
                         <Table.Td>
                           <div className="flex flex-col">

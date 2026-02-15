@@ -321,7 +321,10 @@ const HelperDashboard = () => {
                     order={1}
                     className={`font-manrope text-7xl font-black tracking-tighter mb-4 italic ${isRTL ? "text-right" : "text-left"}`}
                   >
-                    PKR {(userData.todaysEarnings || 0).toLocaleString("en-PK")}
+                    {dict.common.currency}{" "}
+                    {(userData.todaysEarnings || 0).toLocaleString(
+                      language === "en" ? "en-PK" : "ur-PK",
+                    )}
                   </Title>
                   <Group gap="xs" className={isRTL ? "flex-row-reverse" : ""}>
                     <div className="px-3 py-1 bg-green-500/20 text-green-400 text-[10px] font-bold rounded-full border border-green-500/30">

@@ -3,16 +3,14 @@
 /* ---------------- IMPORTS ---------------- */
 import React, { useState, useEffect, memo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Group,
-  Avatar,
-  Menu,
-  ActionIcon,
-  Badge,
-  Text,
-} from "@mantine/core";
+import { Group, Avatar, Menu, ActionIcon, Badge, Text } from "@mantine/core";
 import Image from "next/image";
-import { IconMenu2, IconSun, IconMoon, IconLanguage } from "@tabler/icons-react";
+import {
+  IconMenu2,
+  IconSun,
+  IconMoon,
+  IconLanguage,
+} from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
 import { clearAuthStorage } from "@/lib/auth-utils";
 import { auth } from "@/lib/firebase/config";
@@ -80,8 +78,16 @@ const CustomerHeader: React.FC<HeaderProps> = ({
 
   // RTL: Header starts from left edge (0), avatar on left. LTR: Header after sidebar.
   const headerStyle: React.CSSProperties = isRTL
-    ? { left: 0, right: "auto", width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)` }
-    : { left: headerLeft, right: "auto", width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)` };
+    ? {
+        left: 0,
+        right: "auto",
+        width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)`,
+      }
+    : {
+        left: headerLeft,
+        right: "auto",
+        width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)`,
+      };
 
   return (
     <div
@@ -141,7 +147,9 @@ const CustomerHeader: React.FC<HeaderProps> = ({
           radius="xl"
           onClick={toggleTheme}
           className={`${
-            isDark ? "text-gray-300 hover:text-brand-yellow" : "text-gray-600 hover:text-brand-gold"
+            isDark
+              ? "text-gray-300 hover:text-brand-yellow"
+              : "text-gray-600 hover:text-brand-gold"
           } transition-colors`}
           title={isDark ? "Light Mode" : "Dark Mode"}
         >
@@ -169,10 +177,16 @@ const CustomerHeader: React.FC<HeaderProps> = ({
             </ActionIcon>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item onClick={() => setLanguage("en")} disabled={language === "en"}>
+            <Menu.Item
+              onClick={() => setLanguage("en")}
+              disabled={language === "en"}
+            >
               {dict.navbar.english}
             </Menu.Item>
-            <Menu.Item onClick={() => setLanguage("ur")} disabled={language === "ur"}>
+            <Menu.Item
+              onClick={() => setLanguage("ur")}
+              disabled={language === "ur"}
+            >
               {dict.navbar.urdu}
             </Menu.Item>
             <Menu.Item
@@ -205,11 +219,11 @@ const CustomerHeader: React.FC<HeaderProps> = ({
           width={240}
           radius={12}
           position="bottom-end"
-          opened={isDropdownOpen}
-          onChange={setIsDropdownOpen}
           classNames={{
             dropdown: `${
-              isDark ? "glass-dark border border-white/10" : "bg-white border border-black/10"
+              isDark
+                ? "glass-dark border border-white/10"
+                : "bg-white border border-black/10"
             }`,
           }}
         >
@@ -224,7 +238,6 @@ const CustomerHeader: React.FC<HeaderProps> = ({
                   ? "ring-blue-500/40 hover:ring-blue-500/60 bg-blue-600/20 text-white"
                   : "ring-blue-400/40 hover:ring-blue-400/60 bg-blue-500/20 text-black"
               }`}
-              onClick={() => setIsDropdownOpen((o) => !o)}
             >
               {!profile && userName.charAt(0).toUpperCase()}
             </Avatar>
@@ -260,7 +273,10 @@ const CustomerHeader: React.FC<HeaderProps> = ({
                 >
                   {userName || "User"}
                 </div>
-                <div className={`text-xs truncate ${isDark ? "text-gray-400" : "text-gray-600"}`} title={userEmail || "email@example.com"}>
+                <div
+                  className={`text-xs truncate ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                  title={userEmail || "email@example.com"}
+                >
                   {userEmail || "email@example.com"}
                 </div>
                 <Badge

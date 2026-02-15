@@ -16,7 +16,12 @@
     "fast_value": "2 منٹ سے کم",
     "uptime_value": "99.9%",
     "you": "آپ",
-    "user": "صارف"
+    "user": "صارف",
+    "currency": "پی کے آر",
+    "role": "کردار",
+    "english": "انگریزی",
+    "urdu": "اردو",
+    "roman": "رومن"
   },
   "roles": {
     "admin": "ایڈمن",

@@ -2,16 +2,14 @@
 
 import React, { useEffect, useState, memo, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import {
-  Group,
-  Avatar,
-  Menu,
-  Text,
-  Badge,
-  ActionIcon,
-} from "@mantine/core";
+import { Group, Avatar, Menu, Text, Badge, ActionIcon } from "@mantine/core";
 import Image from "next/image";
-import { IconMenu2, IconSun, IconMoon, IconLanguage } from "@tabler/icons-react";
+import {
+  IconMenu2,
+  IconSun,
+  IconMoon,
+  IconLanguage,
+} from "@tabler/icons-react";
 import { useMediaQuery } from "@mantine/hooks";
 import { clearAuthStorage } from "@/lib/auth-utils";
 import { auth } from "@/lib/firebase/config";
@@ -71,8 +69,16 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
 
   const headerLeft = isMobile ? 0 : sidebarOpen ? drawerWidth : collapsedWidth;
   const headerStyle: React.CSSProperties = isRTL
-    ? { left: 0, right: "auto", width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)` }
-    : { left: headerLeft, right: "auto", width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)` };
+    ? {
+        left: 0,
+        right: "auto",
+        width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)`,
+      }
+    : {
+        left: headerLeft,
+        right: "auto",
+        width: isMobile ? "100%" : `calc(100% - ${headerLeft}px)`,
+      };
 
   return (
     <div
@@ -130,7 +136,9 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
           radius="xl"
           onClick={toggleTheme}
           className={`${
-            isDark ? "text-gray-300 hover:text-brand-yellow" : "text-gray-600 hover:text-brand-gold"
+            isDark
+              ? "text-gray-300 hover:text-brand-yellow"
+              : "text-gray-600 hover:text-brand-gold"
           } transition-colors`}
           title={isDark ? "Light Mode" : "Dark Mode"}
         >
@@ -158,10 +166,16 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
             </ActionIcon>
           </Menu.Target>
           <Menu.Dropdown>
-            <Menu.Item onClick={() => setLanguage("en")} disabled={language === "en"}>
+            <Menu.Item
+              onClick={() => setLanguage("en")}
+              disabled={language === "en"}
+            >
               {dict.navbar.english}
             </Menu.Item>
-            <Menu.Item onClick={() => setLanguage("ur")} disabled={language === "ur"}>
+            <Menu.Item
+              onClick={() => setLanguage("ur")}
+              disabled={language === "ur"}
+            >
               {dict.navbar.urdu}
             </Menu.Item>
             <Menu.Item
@@ -194,11 +208,11 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
           width={240}
           radius={12}
           position="bottom-end"
-          opened={isDropdownOpen}
-          onChange={setIsDropdownOpen}
           classNames={{
             dropdown: `${
-              isDark ? "glass-dark border border-white/10" : "bg-white border border-black/10"
+              isDark
+                ? "glass-dark border border-white/10"
+                : "bg-white border border-black/10"
             }`,
           }}
         >
@@ -211,12 +225,10 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                   ? "ring-brand-red/40 hover:ring-brand-red/60 bg-brand-red/20 text-white"
                   : "ring-brand-red/30 hover:ring-brand-red/50 bg-brand-red/10 text-black"
               }`}
-              onClick={() => setIsDropdownOpen((o) => !o)}
             >
               {adminName.charAt(0).toUpperCase()}
             </Avatar>
           </Menu.Target>
-
           <Menu.Dropdown>
             <div
               className={`flex items-center gap-3 p-4 border-b ${
@@ -244,7 +256,10 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
                 >
                   {adminName}
                 </div>
-                <div className={`text-xs truncate ${isDark ? "text-gray-400" : "text-gray-600"}`} title={adminEmail}>
+                <div
+                  className={`text-xs truncate ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                  title={adminEmail}
+                >
                   {adminEmail}
                 </div>
                 <Badge
@@ -298,7 +313,8 @@ const AdminHeader: React.FC<AdminHeaderProps> = ({
             >
               {dict.sidebar.logout}
             </Menu.Item>
-          </Menu.Dropdown>        </Menu>
+          </Menu.Dropdown>{" "}
+        </Menu>
       </Group>
     </div>
   );

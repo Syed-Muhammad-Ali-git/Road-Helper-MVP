@@ -91,6 +91,7 @@ export async function signupWithEmail(params: {
   password: string;
   displayName: string;
   phone?: string;
+  profileImage?: string;
 }) {
   await enforceEmailRoleProvider({
     email: params.email,
@@ -103,7 +104,10 @@ export async function signupWithEmail(params: {
     params.email,
     params.password,
   );
-  await updateProfile(cred.user, { displayName: params.displayName });
+  await updateProfile(cred.user, {
+    displayName: params.displayName,
+    photoURL: params.profileImage || null,
+  });
 
   await upsertUserRecord({
     uid: cred.user.uid,
@@ -111,7 +115,7 @@ export async function signupWithEmail(params: {
     role: params.role,
     authProvider: "password",
     displayName: params.displayName,
-    photoURL: cred.user.photoURL ?? null,
+    photoURL: params.profileImage || null,
     phone: params.phone ?? null,
   });
 

@@ -22,24 +22,24 @@ const AdminSideBar = ({ open, setOpen }: SideBarProps) => {
   const adminItems = useMemo(
     () => [
       {
-        text: dict.sidebar.dashboard,
+        text: "Analytics",
         icon: LayoutDashboard,
         path: "/admin/dashboard",
       },
-      { text: dict.sidebar.users, icon: Users, path: "/admin/users" },
+      { text: "Ops Users", icon: Users, path: "/admin/users" },
       {
-        text: dict.sidebar.requests,
+        text: "Deployments",
         icon: Receipt,
         path: "/admin/requests",
       },
-      { text: dict.sidebar.status, icon: Activity, path: "/admin/status" },
+      { text: "System Pulse", icon: Activity, path: "/admin/status" },
       {
-        text: dict.sidebar.settings,
+        text: "Config",
         icon: Settings,
         path: "/admin/settings",
       },
     ],
-    [dict],
+    [],
   );
 
   return (
